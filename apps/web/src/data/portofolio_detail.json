@@ -1,0 +1,60 @@
+{
+  "hero": {
+    "label": "Case Study / 2024",
+    "title": "Aether_Net",
+    "description": "The architectural evolution of global low-latency communication networks.",
+    "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBJiTX_7Z_DgSKgEEciA124nG_d1NCau5WX1ENGugAd3idGUIQ1c3VO7dRR2kfJ5jMm4zeQtQxVguGpcwiCEGSgaHcAD1jm16vaWJxkUPVlKxpuo-Je5MmOoND-6f-aCBmztj_aJ_ys5hWIdjekUmJX_Zoe6-f0kgpYJHdOkqr6eMNfoSV8CZ3wCUGfJu535khytI8jYpJg2q2p8mkCCVluu-v99xr4qEolekZ3veZBqx59cwu4z2zXig4xvpsiezCz31j9lSXAGhg"
+  },
+  "stats": {
+    "icon": "hub",
+    "label": "Efficiency",
+    "value": "0.4ms",
+    "valueLabel": "Node-to-node latency",
+    "tags": ["L1 STABLE", "ENCRYPTED"]
+  },
+  "narrative": {
+    "title": "The Infrastructure Problem",
+    "paragraphs": [
+      "Aether_Net was conceived as a response to the fragmentation of modern packet routing. As data volumes reach monolithic proportions, traditional infrastructure fails to sustain the precision required for real-time synaptic operations.",
+      "By building on a \"Digital Monolith\" philosophy, we carved a singular, immutable path for data. We utilized custom obsidian-grade hardware protocols and layered monochromatic encryption to ensure that every packet moves with mechanical elegance and absolute security."
+    ],
+    "buttons": [
+      { "text": "WHITE PAPER", "variant": "primary" },
+      { "text": "ARCHITECTURE", "variant": "secondary" }
+    ]
+  },
+  "features": [
+    { "id": "f1", "icon": "bolt", "title": "Performance", "description": "Optimized silicon routing." },
+    { "id": "f2", "icon": "shield", "title": "Security", "description": "Quantum-resistant tunneling." },
+    { "id": "f3", "icon": "auto_awesome_motion", "title": "Scalability", "description": "Infinite horizontal expansion." }
+  ],
+  "gallery": [
+    { 
+      "id": "g1",
+      "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAbH9EdVRf3wWKoIXyZzROEzTaBJsR5vDwZRoSIpvzjsgbMGWIiqBz47OQlKN0TsjifbKTDfQ0uBK9PoZcjv6x3H_O1OqiwCiUk43wDVPATsnxJuRdgiHaoUfLx6EOp1PcsVG8K3tQdUJVe0fapiMZItINO4iZcCkV9lHqZFNK9FLOfRigt9aaqInw_vUmwuqgoHcUir7yteuBwHZ572cKTtr2tpKSxrBdiac8Mdg2mUgVTKVlO7bBRDNcDAWB7enIAzzG7PBAK9Xs",
+      "label": "MODULE_ALPHA"
+    },
+    { 
+      "id": "g2",
+      "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuD33fpBfCXTP2AVzrzU6FNt1VgUIgaaATCVDqErz0l6o9pYpnOQ_1AwWYKJ6tbIwPWn7C8JpbGpZQkLiQkTNmcvQGhgbpGmn0QFnT667BPh-jQDBN2ThDvtPFeXEjgyMM1eb9z4m9sPukxBgi8BRHbSnm5JcXVYB2vHbvv8mnoSSlMcqQTj6JV0HlLm9TtQ7Ce4BGSXLPVrBwqQhri3ZSRGXIHqGI9L3Apsuv5Kp4qnoasZ4Cvo1YQI05nkQ4B-5osxG0lgwu6CPTM",
+      "label": "MODULE_BETA"
+    },
+    { 
+      "id": "g3",
+      "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAvcgIGauZphhMjBJ7kejOTimcEpfV40GcCGQ967mifKnXZF4WIWTGzX7L7JotnE-jAgSi20uTgbyklzA9yxIvVHiqgvBmVbEINEs43B1Jy-IfC2KLJHrEAzWjn1YOt3C33R0HqJwrlfa4OKPh2LHXzghzbS1LIInw-j5rRzJ7qhYms12nMy9fhL8pzuRmUFjONxG33swcXdtXa6c1qQKv8B1viB_p4QNxyf1f2B3cTjo-qDy80oy6yqwosfbC19wmT2sKmuJJ9Qx0",
+      "label": "NETWORK_ORBIT"
+    }
+  ],
+  "cta": {
+    "label": "Final Protocol",
+    "title": "Ready to Deploy.",
+    "description": "Integrate Aether_Net into your existing stack and achieve zero-latency sovereignty today. \nAvailable for enterprise orchestration and private cluster scaling.",
+    "buttons": [
+      { "text": "GET STARTED", "variant": "primary" },
+      { "text": "CONTACT SALES", "variant": "outline" }
+    ]
+  },
+  "tags": [
+    "TCP/IP+", "LUMINAL_ENCRYPTION", "OBSIDIAN_CORE", "ULTRA_SYNC", "NEURAL_ROUTING", "V3.14.0"
+  ]
+}

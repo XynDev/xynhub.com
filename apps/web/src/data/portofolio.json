@@ -1,0 +1,76 @@
+{
+  "header": {
+    "label": "Engineering Portfolio v2.04",
+    "titlePrefix": "XYN",
+    "titleSuffix": "_SYSTEM",
+    "stats": [
+      "Latency: 14ms",
+      "Status: Active"
+    ],
+    "description": "Low-latency systems architecture and high-performance frontend engineering."
+  },
+  "projects": [
+    {
+      "id": "aether",
+      "tag": "Core Protocol",
+      "title": "Aether_Net",
+      "metric": {
+        "value": "0.02ms",
+        "label": "P99 Latency"
+      },
+      "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuADEkUUCejDZn_LCG3xSpaSatiTbs161BdmuPZnJ8fWN5M3g2UpBI0xD3X-I7znn_HC1NTLuidIKA16kf0CiZY-Kl-JRU86-nYfnOFZdQam6Y0kAMz95zN0FQpMqKG2YLHF6AeqnNNMnkERbghJBw9Z9EUVrzFz_NNpZivBksb_FXy6J_DpAKQ4-gNNkUwkhmkVtk6jRV4aV7vWIeMqaBr7uvrWHfnaLl5GbUaXJW_a0ZnUy0hs8FZkaHgwX89NUmtkwT5OuFvQip4",
+      "tech1": { "icon": "terminal", "lang": "Rust", "role": "Engine" },
+      "tech2": { "icon": "dataset", "lang": "gRPC", "role": "Transport" },
+      "action": "Read Whitepaper"
+    },
+    {
+      "id": "synapse",
+      "tag": "Module: 02",
+      "title": "Synapse_OS",
+      "description": "Microkernel architecture for edge computing devices.",
+      "stack": ["Zig", "ARM64"],
+      "memory": "4.2KB Baseline"
+    },
+    {
+      "id": "quantum",
+      "tag": "Frontend Engineering",
+      "title": "Quantum_UI",
+      "description": "High-fidelity component library designed for real-time data visualization. Built on top of Next.js 14 and WebGL for zero-lag rendering.",
+      "metrics": [
+        { "value": "60FPS", "label": "Locked" },
+        { "value": "0kb", "label": "Runtime CSS" }
+      ],
+      "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuDLYA2UXE_67Hoq5WAjStXFo4fZaXX6gmnpipJDlY-t-jQxSgYnbDwDDpKEwbxm4RCjp4_NswXaGg4c6dDMe8fjqckdiJOB27K4bUl399Ewxjz_KVMkVkSkImNkFw02WpIMOLQ5Wv4ifMdeWiSmKVRhBVC5NOLKA3_q1LfVJnv37_mcvEL7_1R4BTqZ09uafMpO9aMk_tXgPECQdTgEar_FbTRAHsqcRy0Mjri0W5nZ6Y94Zk7bEJ88isJgquyzcvG8UUFT6kMPgWI"
+    }
+  ],
+  "proficiency": {
+    "label": "Capability Matrix",
+    "title": "Technical Proficiency",
+    "skills": [
+      { "id": "s1", "name": "Concurrency", "percentage": "98%" },
+      { "id": "s2", "name": "Dist Systems", "percentage": "92%" },
+      { "id": "s3", "name": "WebAssembly", "percentage": "85%" }
+    ],
+    "topology": {
+      "desc": "Visualizing real-time node propagation delays across global edge clusters."
+    },
+    "footer": {
+      "icon": "bolt",
+      "text": "Optimizing critical paths for ",
+      "highlight": "3.2M req/sec",
+      "text2": " across distributed clusters. Focused on deterministic performance."
+    }
+  },
+  "features": [
+    { "id": "f1", "icon": "security", "title": "Zero-Trust", "description": "End-to-end encrypted pipelines." },
+    { "id": "f2", "icon": "speed", "title": "Turbo-Boost", "description": "Hardware-accelerated rendering." },
+    { "id": "f3", "icon": "cloud_done", "title": "High Availability", "description": "99.999% uptime architecture." }
+  ],
+  "contact": {
+    "label": "Infrastucture Ready",
+    "title": "Scale your architecture to the edge.",
+    "description": "I build low-latency, high-performance systems for the next generation of the web. Available for architectural consulting and senior engineering roles.",
+    "actionPrimary": "Initialize Project",
+    "links": ["GitHub", "LinkedIn"]
+  }
+}
