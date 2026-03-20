@@ -1,0 +1,77 @@
+{
+  "hero": {
+    "label": "Archive // 2024",
+    "title": "XYN INTEL.",
+    "description": "Documentation of technical breakthroughs, theoretical frameworks, and infrastructure deployments across the XYN ecosystem."
+  },
+  "latest": {
+    "title": "Latest",
+    "meta": "[04]",
+    "featured": {
+      "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuDD9vVp-QPvvuaS97wxzsyCCetRpgnldx5ivGihfbePSKjtCOEbnqBvicuE9Zq9RSuyhKmvgW9O-3o1tAK0wjM1P3g-LJz2qND2uarGD2ynTPqs-V8r2m0UAv2c7pGMEZQmesz-6O2R31Ek6wUB3jUk3YY8VmuQ0STXGWH3gBjF1dytSPJ__wwFVU-SD3o57FhYG_nDkruNuVZ1yXlXs1CleonpTrOVIsPw_hzIDvQaBOzavRoQ0DLCMbBBLvF25ZHN8bexP__sGsA",
+      "tag": "Featured",
+      "title": "Architecting the Core: Distributed Systems at Scale",
+      "description": "A deep dive into the consensus mechanisms driving our latest infrastructure update, focusing on latency reduction in multi-regional clusters.",
+      "date": "Jun 12, 2024",
+      "readTime": "14 Min Read"
+    },
+    "posts": [
+      {
+        "category": "Deployment Log",
+        "title": "Edge Computing: Bridging the Gap in Real-Time Inference",
+        "icon": "terminal",
+        "action": "Read Insight"
+      },
+      {
+        "category": "System Optimization",
+        "title": "Memory Management in High-Throughput Environments",
+        "icon": "memory",
+        "action": "Read Insight"
+      }
+    ]
+  },
+  "research": {
+    "title": "Research",
+    "meta": "One Year Ago",
+    "posts": [
+      {
+        "icon": "science",
+        "tag": "Paper #442",
+        "title": "Neural Topology and Information Entropy",
+        "description": "Quantifying the structural efficiency of non-linear network configurations in adaptive learning models.",
+        "authors": ["DR", "KA"]
+      },
+      {
+        "icon": "biotech",
+        "tag": "Pre-Print",
+        "title": "Quantum Resilient Cryptographic Standards",
+        "description": "An evaluation of lattice-based security protocols in future-proofing decentralised ledger technology.",
+        "authors": ["LH"]
+      }
+    ]
+  },
+  "infrastructure": {
+    "title": "Infrastructure",
+    "meta": "Two Years Ago",
+    "posts": [
+      {
+        "icon": "dns",
+        "title": "Global CDN Expansion",
+        "description": "Status update on our South-East Asian node deployment and routing optimization.",
+        "date": "May 30, 2024"
+      },
+      {
+        "icon": "security",
+        "title": "Zero-Trust Implementation",
+        "description": "Transitioning internal authentication to a stateless, hardware-verified architecture.",
+        "date": "May 24, 2024"
+      },
+      {
+        "icon": "bolt",
+        "title": "Renewable Grid Sync",
+        "description": "Integrating data center consumption with localized green energy harvesting systems.",
+        "date": "May 12, 2024"
+      }
+    ]
+  }
+}
