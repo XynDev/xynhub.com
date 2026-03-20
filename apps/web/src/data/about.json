@@ -1,0 +1,84 @@
+{
+  "hero": {
+    "label": "Our Origin Story",
+    "headline": "The Genesis of Synaptic",
+    "description": "Architecting the invisible layer between human intent and machine execution. We don't just build nodes; we engineer evolution."
+  },
+  "timeline": {
+    "milestones": [
+      {
+        "id": "01",
+        "title": "Initial Convergence",
+        "description": "In a windowless lab in Zurich, our founders conceptualized a decentralized neural fabric that could bypass legacy latency bottlenecks."
+      },
+      {
+        "id": "02",
+        "title": "Node Expansion",
+        "description": "Scaling the network to 4,000 hyper-nodes across six continents, establishing the first global synaptic mesh."
+      }
+    ]
+  },
+  "tenets": {
+    "title": "Core Tenets",
+    "label": "XYN / PRINCIPLES",
+    "items": [
+      { "id": "t1", "icon": "target", "title": "Precision", "description": "Every calculation, every node handshake, and every protocol update is executed with nanosecond fidelity." },
+      { "id": "t2", "icon": "auto_awesome", "title": "Autonomy", "description": "We believe in self-healing systems. Our infrastructure is designed to anticipate failure without human intervention." },
+      { "id": "t3", "icon": "shield", "title": "Resilience", "description": "Built for the long tail of uncertainty. Our network maintains integrity through decentralized consensus." }
+    ]
+  },
+  "culture": {
+    "title": "Engineering Ethos",
+    "label": "XYN / CULTURE",
+    "items": [
+      { "id": "c1", "title": "Deep Focus Intervals", "description": "We operate on four-hour blocks of uninterrupted work. No Slack, no pings, just pure algorithmic architecture.", "span": "md:col-span-4", "bg": "bg-surface-container-low", "iconbg": "" },
+      { "id": "c2", "title": "Radical Candor Protocols", "description": "Code reviews at XYN aren't polite; they're rigorous. We believe the fastest way to truth is through direct, objective scrutiny of logic.", "span": "md:col-span-8", "bg": "bg-surface-container-high relative overflow-hidden group", "iconbg": "code" },
+      { "id": "c3", "title": "The 10% Innovation Habit", "description": "Every Friday afternoon is dedicated to \"Entropy Projects\"—building things that shouldn't work to understand why they don't.", "span": "md:col-span-7", "bg": "bg-surface-container", "iconbg": "" },
+      { "id": "c4", "title": "Asynchronous First", "description": "Meetings are a failure of documentation. We communicate via technical specs and clear version-controlled discourse.", "span": "md:col-span-5", "bg": "bg-surface-container-lowest border border-outline-variant/20", "iconbg": "" }
+    ]
+  },
+  "leadership": {
+    "title": "Core Leadership",
+    "label": "XYN / NODES",
+    "teams": [
+      {
+        "id": "l1",
+        "group": "Systems Architects",
+        "members": [
+          { "id": "m1", "name": "Dr. Elias Vance", "role": "Co-Founder & Chief Scientist", "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuA2eRLGHRsuwvuNGAgKL83bcFDIwzPjzOvxYXIgDIasGWpJw9oyD3Q2QywLB9FCkhQNxiLhSAEdO2ZocDxzGg7GeCtLkOB91neDZdTXfJkyyfldN46jLKRcEtlMxZ0t8atYKRAjde-8XVgYIoMdwQbnpA13KZ-2sZs-VtCzzmJow4zGBXDrw3BAIEcRQpzkFUyWEcYS2-xvUb9dOfYtqUSqZ2J22z5xW-AGb-QX6Yc9yxG698NC9pIEr_YvrIXBsR-KRefUHWpkJDs" },
+          { "id": "m2", "name": "Sonia Kalu", "role": "Chief Strategy Officer", "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuALdqutYjgEP9VmTJZ82dIH2bAEjqHayOUaPhM9xlMGFgfhQfmLwLcqo9Ei40bAHXRKkaooceNqC-VaZzMLDy1vTZXoZOVLRghZm9PH3Ueh0htvxjVKqdvnsdYY-7Xga3uA4hM5fOEftseVqX_5Eai0aBJReRDLVodeMyckIFt2rZuwzmMWBtXdWN4wWxjCeMUWG2X-HDY-re94co-pfc2-i44aLlfJDUMGYTKOJLLuP6PyXzUFGNf9rIiluBGLMu5t0_27FiwqqTk" }
+        ]
+      },
+      {
+        "id": "l2",
+        "group": "Infrastructure Engineers",
+        "members": [
+          { "id": "m3", "name": "Marcus Thorne", "role": "Lead Cryptographer", "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAExOz8p_JXLzRMneFW7xX53_a0O0qk_wJP2uDoddp0VOkgk0Ra54YePVCHDdp_gKKSVb3gtWwm2qnUXg5hh4G2KLDuZ3Kkb-HCmlXKuuAgJGhQiHNjnE_yRewWnocLNJeI2axzUD90kHDqSPdkinyhVoeCFMCsFloGnVqcbi2-9V19f_X-2rMw6qCcWGEgwJLpjxw3HILya5zoqi-qU9Zcx86Nk4ufRUCEHYsbO2WOMEuSYytEQ_ERANWI5G-l4ElgOFsnohorQPc" },
+          { "id": "m4", "name": "Aria Sterling", "role": "Distributed Systems Lead", "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBY3--6BAsyUHLLUte0pu3bLKEt5bhKhb_chfo35-jKY6BebnZDS5SIF-1bJHk06nOMhpIdPsKaUVLZc8JAGncqGKsUTSCerNtdSYt3_0klDHr9mxIaqq3RF83pknx0oLJnJBWK5yhoWvRdLauXysUPAfVI8iap1P0zXhyQwkbEa2IzCf7nXZBnXt4luuoBXB7Au_afCgtW2wGmvfSjyb-MGIJWvQbwFjyy0h7ci1hEyMezzZ3uQLTNFN5_UFfR-JscBUdWWpABUyA" }
+        ]
+      }
+    ]
+  },
+  "cta": {
+    "headline": "Join the Synaptic Revolution.",
+    "description": "We are always looking for pioneers in cryptography, quantum computing, and distributed systems.",
+    "buttonText": "View Positions"
+  },
+  "contact": {
+    "title": "Global Presence",
+    "label": "XYN / CONTACT",
+    "hq": {
+      "city": "Zürich, CH",
+      "address": "Löwenstrasse 12, 8001 Zürich\nSwitzerland"
+    },
+    "map": {
+      "label": "DISTRIBUTED BY DESIGN",
+      "text": "Operating across 14 zones"
+    },
+    "channels": [
+      { "id": "ch1", "icon": "alternate_email", "text": "protocols@xyn.eth" },
+      { "id": "ch2", "icon": "forum", "text": "t.me/xyn_official" },
+      { "id": "ch3", "icon": "terminal", "text": "github.com/xyn-nodes" }
+    ]
+  }
+}

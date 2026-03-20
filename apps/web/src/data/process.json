@@ -1,0 +1,87 @@
+{
+  "hero": {
+    "label": "Operations Framework",
+    "headline": "The Strategic \nFlow.",
+    "description": "A monolithic approach to engineering excellence. We've compressed the traditional lifecycle into five synaptic phases."
+  },
+  "phases": [
+    {
+      "id": "p1",
+      "span": "md:col-span-3",
+      "bg": "",
+      "padding": "p-10",
+      "minH": "min-h-[400px]",
+      "phase": "Phase 01",
+      "title": "Strategic Inquiry",
+      "icon": "search_check",
+      "description": "Deep-dive alignment sessions where we dissect your business logic, technical debt, and scaling ambitions. No vague requirements; only concrete architectural mandates.",
+      "metric": {
+        "label": "Standard Velocity",
+        "value": "48h Response Window"
+      }
+    },
+    {
+      "id": "s1",
+      "isSideCard": true,
+      "span": "md:col-span-1",
+      "bg": "bg-surface-container-high",
+      "padding": "p-8",
+      "icon": "hub",
+      "title": "Alignment",
+      "description": "Zero-friction onboarding through automated stakeholder synchronization."
+    },
+    {
+      "id": "p2",
+      "span": "md:col-span-2",
+      "bg": "",
+      "padding": "p-10",
+      "minH": "min-h-[450px]",
+      "phase": "Phase 02",
+      "title": "Architecture\n& Design",
+      "icon": "architecture",
+      "description": "The blueprinting of the digital monolith. We utilize low-latency design patterns and modular schemas.",
+      "tags": ["Microservices", "Schema First", "Edge Optimized"]
+    },
+    {
+      "id": "p3",
+      "span": "md:col-span-2",
+      "bg": "",
+      "padding": "p-10",
+      "minH": "min-h-[450px]",
+      "phase": "Phase 03",
+      "title": "Iterative\nDevelopment",
+      "icon": "terminal",
+      "description": "High-velocity execution cycles. Bi-weekly sprints that yield tangible, production-ready increments. Quality is verified through automated test suites.",
+      "metric": {
+        "label": "Build Integrity",
+        "value": "99.9% Test Coverage"
+      }
+    }
+  ],
+  "phase4": {
+    "sideCard": {
+      "icon": "rocket_launch",
+      "title": "Zero Downtime",
+      "description": "Blue-green deployment strategies as standard."
+    },
+    "mainCard": {
+      "phase": "Phase 04",
+      "title": "Synaptic Deployment",
+      "metrics": [
+        { "label": "Global Latency", "value": "< 50ms" },
+        { "label": "Infrastructure", "value": "Terraform" }
+      ]
+    }
+  },
+  "phase5": {
+    "phase": "Phase 05",
+    "title": "Continuous \nOptimization",
+    "description": "The journey doesn't end at launch. We monitor, profile, and refine performance to ensure the architecture evolves with your user base.",
+    "features": [
+      { "icon": "monitoring", "title": "Real-time Logs" },
+      { "icon": "speed", "title": "Vitals Tuning" },
+      { "icon": "security", "title": "Hardening" },
+      { "icon": "update", "title": "Patch Cycles" }
+    ]
+  }
+}

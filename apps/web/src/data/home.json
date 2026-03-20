@@ -1,0 +1,134 @@
+{
+  "hero": {
+    "version": "v2.5 Neural Core Live",
+    "headline": "The Architecture of Pure Performance.",
+    "description": "XYN provides the low-latency infrastructure required for next-generation synaptic computing and distributed ecosystem management."
+  },
+  "trust": {
+    "title": "Trusted by Global Innovators",
+    "clients": ["VERTEX", "QUANTUM", "NEXUS.IO", "SYNAPSE", "CORE.SYS"]
+  },
+  "stats": {
+    "deployments": {
+      "value": "50+",
+      "label": "Global Deployments",
+      "description": "Strategic infrastructure nodes distributed across six continents for ultra-low latency response."
+    },
+    "clients": {
+      "value": "12+",
+      "label": "Strategic Clients",
+      "description": "Partnering with industry leaders to redefine the boundaries of synaptic computation."
+    }
+  },
+  "services": {
+    "tagline": "Specialized solutions for a connected world.",
+    "items": [
+      {
+        "id": "synaptic-routing",
+        "title": "Synaptic Routing",
+        "description": "Advanced packet distribution systems optimized for sub-millisecond neural network communication.",
+        "icon": "hub",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBd2Rnk3Tq9_5hXkBzjUR64oCwjPJrK4CoNmhXKU_iOXijDng-1DK_aXEdkQM-1_D63UEIkXgq55aUfkuZBGf1RHJOWFVO7JPNbi2iH6a3rG2rxTKDaE8DrlDkHxIFSywoV052uryOYscaMBtkLtGW8VU4YGuek5L1TQ-bUl8VGmie0UvIsZmMh3tm2lHicaaBSPX1A_2GAIVm-o66YCT_CFz2scpYgRGJXdgS0Uo5bzXy6KUtlzLauzU_PDsA7O6yPY2UqmNoVKUY"
+      },
+      {
+        "id": "distributed-ledger",
+        "title": "Distributed Ledger",
+        "description": "High-integrity consensus mechanisms for secure, decentralized ecosystem governance.",
+        "icon": "dataset",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuDnFpez7dIK63My52uG9jD724wbPEaPGMTiR8Ads4Z-6m_vXqnQDoeoyta381rSuS_hbXS5Qx22kXZMB0QMFgFechmwl_qHgpG6W-pqn5HGe_YS-LI4HiHMn4EJpNpWPnpTKlgtnBgypS-kcErgmEJSxBR3ET4p2jFhFmPtLT5_c7p65VOax6T42rPswlm0Vd07XOnXlMCjNjNeyC9-diXx1wZOyfYPKmdKy9NQXZNykqyUepJIKH353nsra2DupDWbzvul5B4aquw"
+      },
+      {
+        "id": "edge-compute",
+        "title": "Edge Compute",
+        "description": "Localized processing units that minimize data transit times and maximize operational efficiency.",
+        "icon": "memory",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuDZR5mZiCVDvN1PXCrUlbE_2wzlTEZNQdPxyIp33XJ6CWL6_q1voPQxmL4swtqx2iGpz46JWUydg5G8GZ4S5exr5wr41J2tdS-B5-gIzBusk0yOFnvmhQVZaJqrix0_wRnpES64Hds7Vh8oOomaKqJgI-rAyr3CqVqT93uDpSbT3vB8f4PRrTuvoUQ042U_uqbRdIhL_ndZRiMmmt9nN-EDbMz8n0oDCrZUUAN_CiutXBASeXI4NctbM-ID8_wW_fMK-KK8uZaL40k"
+      }
+    ]
+  },
+  "works": {
+    "title": "Proven implementations.",
+    "projects": [
+      {
+        "id": "alpha",
+        "label": "Project Alpha",
+        "title": "Global Quantum Grid",
+        "description": "Securing cross-continental financial transactions with zero-latency verification protocols.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuChrUihlWy9ExjKnOesL3jyU7kMLkHFXI-ifGyIw4rPqVhQ7kVaiGoMeDWrW-xladqU_OURmtFsEn4L8bX-Ye31Xl99yNONCFCksCV4HOKB7tEVr53RpVAS3-3_jUn8s2gzlQBDASzmr6z0as2jaUXQppm_DLlqmBqSLmds07UOgqoL1_JX9hm79I2FUuuFkdoxG3D1NT3RPhZGszloP7NSX6JdY3r-nceSimBubLSZ0TWui33KUm5_1qR3y3jOy4OuUsVebVjoY3Y"
+      },
+      {
+        "id": "mesh",
+        "label": "Case Study #04",
+        "title": "Neural Data Mesh",
+        "description": "Connecting distributed AI clusters into a singular, cohesive processing organism.",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuBYARelEpIWsJDqVb3Q7ODOsEC6-9K6Q6CYJhGKytY3RMiMzYDX3ogu7hCjG4G2S_cfydDxOuNP1Cw31wIPs__yDVtpUt9e4VfALPqQBSIHhlpY4SFdYFlBNCTYsuRGBYuP2ieqlU7_LeQ0SVCdokQS1gX4k7lvvAX6YvB-lJDq8PSrv9a6uO2IwQN0QQ8hftmnFQIZaiZIEz8P4wAbn8NGW70n0a466NEiUYOHsF1gmEiDrImaBS12U8WGhyWIQg96mvnOabxExyE"
+      }
+    ]
+  },
+  "testimonials": {
+    "title": "What our clients say.",
+    "items": [
+      {
+        "id": 1,
+        "quote": "XYN has fundamentally transformed how we handle cross-continental data sync. Their latency reduction isn't just a metric; it's a competitive advantage.",
+        "author": { "name": "Alexander Müller", "role": "CTO, Vertex Quantum", "initials": "AM" },
+        "span": "col-span-12 md:col-span-7"
+      },
+      {
+        "id": 2,
+        "quote": "The most stable synaptic routing protocol we've ever integrated. Security and speed in a single package.",
+        "author": { "name": "Sarah Koenig", "role": "Head of Infrastructure, Synapse", "initials": "SK" },
+        "span": "col-span-12 md:col-span-5"
+      },
+      {
+        "id": 3,
+        "quote": "Sovereign control of our data was non-negotiable. XYN delivered exactly what was promised.",
+        "author": { "name": "James Low", "role": "Lead Architect, Core.Sys", "initials": "JL" },
+        "span": "col-span-12 md:col-span-4"
+      },
+      {
+        "id": 4,
+        "quote": "Predictive scaling has saved us countless hours of manual resource adjustment. It's like having an automated engineering team that never sleeps.",
+        "author": { "name": "Raymond Holt", "role": "VP Engineering, Nexus.IO", "initials": "RH" },
+        "span": "col-span-12 md:col-span-8"
+      }
+    ]
+  },
+  "whyUs": {
+    "title": "Why engineering teams choose XYN.",
+    "description": "We don't just build software; we architect the physical and logical layers of the future. Our commitment to performance is uncompromising.",
+    "features": [
+      { "id": "01", "title": "Native Performance", "description": "Built from the ground up in systems-level languages for maximum resource utilization." },
+      { "id": "02", "title": "Sovereign Control", "description": "Complete ownership of your data and infrastructure with no vendor lock-in mechanisms." },
+      { "id": "03", "title": "Predictive Scaling", "description": "AI-driven resource allocation that anticipates demand before it affects your systems." }
+    ]
+  },
+  "cta": {
+    "label": "Project Integration Phase",
+    "headline": "Ready to transcend?",
+    "description": "Join 400+ leading enterprises already scaling on XYN's neural framework. Deploy your first node in minutes."
+  },
+  "faq": [
+    {
+      "question": "What is the typical deployment timeline?",
+      "answer": "Standard node integration takes approximately 15 minutes. Complex multi-region mesh topologies can be fully provisioned and verified within 48 hours."
+    },
+    {
+      "question": "How do you ensure 99.9% uptime?",
+      "answer": "Our infrastructure utilizes self-healing nodal protocols. If a node fails, traffic is rerouted synaptically in under 0.1ms while redundant processes initialize automatically."
+    },
+    {
+      "question": "Do you offer custom API integrations?",
+      "answer": "Yes. Our framework is API-agnostic. We provide a robust SDK for C++, Rust, and Python to ensure deep integration with your existing technological stack."
+    },
+    {
+      "question": "Is data sovereignty guaranteed?",
+      "answer": "Absolutely. XYN operates on a zero-trust architecture. You retain 100% ownership of your private keys and nodal data. We have no access to your encrypted payloads."
+    }
+  ],
+  "contactInfo": {
+    "phone": "+1 (888) XYN-NODE",
+    "availability": "Active 24/7/365",
+    "address": "One Infinite Way,\nSilicon Heights, CA 94025"
+  }
+}
