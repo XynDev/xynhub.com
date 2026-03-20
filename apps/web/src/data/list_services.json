@@ -1,0 +1,71 @@
+{
+  "hero": {
+    "label": "Core Proficiencies",
+    "headline": "Functional\nStack.",
+    "status": {
+      "text": "System Status: Optimal"
+    }
+  },
+  "web": {
+    "icon": "terminal",
+    "title": "Web & Ecosystem Development",
+    "number": "01",
+    "description": "Engineering high-performance web applications with modular architecture and sub-second latency. We build for scale, ensuring your digital infrastructure remains robust under peak loads.",
+    "metrics": [
+      { "label": "Latency", "value": "<150ms" },
+      { "label": "Uptime", "value": "99.99%" },
+      { "label": "Type-Safe", "value": "Strict" },
+      { "label": "Testing", "value": "100%" }
+    ]
+  },
+  "tooling": {
+    "title": "Tooling & Environment",
+    "stack": [
+      { "name": "TypeScript" },
+      { "name": "React / Next.js" },
+      { "name": "Node.js / Bun" },
+      { "name": "PostgreSQL" },
+      { "name": "Redis Cache" }
+    ]
+  },
+  "app": {
+    "icon": "install_mobile",
+    "title": "Native & Hybrid Application Design",
+    "description": "Crafting intuitive mobile experiences that bridge the gap between complex functionality and seamless interaction.",
+    "platforms": [
+      "iOS Swift Native",
+      "Android Kotlin",
+      "React Native Hybrid"
+    ]
+  },
+  "cloud": {
+    "icon": "cloud_done",
+    "title": "Cloud Systems & Infrastructure",
+    "number": "02",
+    "features": [
+      {
+        "title": "Provisioning",
+        "description": "Automated CI/CD pipelines and Infrastructure as Code (Terraform/Ansible) for immutable deployments."
+      },
+      {
+        "title": "Scalability",
+        "description": "Auto-scaling Kubernetes clusters and serverless functions designed for elastic demand."
+      }
+    ],
+    "technologies": [
+      "AWS",
+      "Google Cloud",
+      "Docker",
+      "Kubernetes",
+      "Vercel"
+    ]
+  },
+  "cta": {
+    "title": "Initialize Your Project",
+    "description": "Ready to deploy a high-performance digital ecosystem? Connect with our engineering team to audit your current stack.",
+    "buttons": [
+      { "text": "Start Build", "variant": "primary" },
+      { "text": "View Specs", "variant": "secondary" }
+    ]
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "hero": {
+    "label": "Engineering Ethos",
+    "title": "Web & App Development",
+    "description": "We don't build features; we engineer ironclad ecosystems. Our development standards are rooted in mathematical certainty and memory-safe architecture."
+  },
+  "security": {
+    "icon": "shield_lock",
+    "title": "Zero-Trust Security",
+    "description": "Every transaction, every data packet, and every user interaction is verified at the edge. We assume the environment is hostile and build accordingly.",
+    "modules": [
+      {
+        "name": "IDENTITY_VERIFICATION_MODULE",
+        "status": "active"
+      },
+      {
+        "name": "ENCRYPTED_STATE_MANAGEMENT",
+        "status": "passive"
+      }
+    ]
+  },
+  "memory": {
+    "icon": "memory",
+    "title": "Memory Safety",
+    "description": "Eliminating entire classes of vulnerabilities through strict typing and ownership models. We utilize Rust and low-level optimizations to ensure performance without compromise.",
+    "metrics": [
+      {
+        "label": "Leak Prevention",
+        "value": "100%"
+      }
+    ]
+  },
+  "routing": {
+    "icon": "alt_route",
+    "title": "Deterministic Routing",
+    "description": "Predictable, high-frequency request handling. Our ecosystems ensure that the shortest path is always the safest path."
+  },
+  "stress": {
+    "titlePrefix": "PROVEN BY",
+    "titleHighlight": "STRESS.",
+    "description": "Our systems undergo rigorous chaos engineering to simulate extreme load and failure scenarios before a single line of code reaches production."
+  },
+  "habits": [
+    {
+      "id": "h1",
+      "label": "Habit 01",
+      "title": "Immutable Infrastructure",
+      "description": "We never patch live systems. We redeploy from verified source-of-truth images."
+    },
+    {
+      "id": "h2",
+      "label": "Habit 02",
+      "title": "Strict Linting & Testing",
+      "description": "CI/CD pipelines that reject anything below 98% coverage and zero warnings."
+    },
+    {
+      "id": "h3",
+      "label": "Habit 03",
+      "title": "Observability First",
+      "description": "Detailed telemetry is a prerequisite for deployment. If it's not logged, it's not launched."
+    }
+  ],
+  "cta": {
+    "title": "Ready for the Scale?",
+    "description": "Connect with our engineering lead to discuss your ecosystem architecture and how we can implement deterministic standards across your stack.",
+    "buttonText": "Inquire for Engineering"
+  }
+}
