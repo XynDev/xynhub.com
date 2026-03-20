@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+@source "./**/*.{js,ts,jsx,tsx}";
+
+@variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-surface-tint: #c6c6c7;
+  --color-primary-fixed-dim: #454747;
+  --color-tertiary-fixed: #5e5e5e;
+  --color-on-tertiary: #1b1b1b;
+  --color-on-error: #690005;
+  --color-on-surface-variant: #c6c6c6;
+  --color-on-surface: #e5e1e4;
+  --color-on-background: #e5e1e4;
+  --color-tertiary-fixed-dim: #474747;
+  --color-inverse-on-surface: #313032;
+  --color-surface-dim: #131315;
+  --color-on-primary: #1a1c1c;
+  --color-on-primary-fixed-variant: #e2e2e2;
+  --color-surface-container-lowest: #0e0e10;
+  --color-on-error-container: #ffdad6;
+  --color-on-tertiary-container: #000000;
+  --color-on-primary-fixed: #ffffff;
+  --color-secondary-fixed: #c8c6c9;
+  --color-surface-variant: #353437;
+  --color-inverse-surface: #e5e1e4;
+  --color-on-tertiary-fixed-variant: #e2e2e2;
+  --color-surface: #131315;
+  --color-on-secondary-fixed: #1b1b1e;
+  --color-surface-bright: #39393b;
+  --color-tertiary-container: #919191;
+  --color-surface-container-low: #1c1b1d;
+  --color-primary: #ffffff;
+  --color-surface-container: #201f22;
+  --color-on-secondary-fixed-variant: #3b3b3e;
+  --color-tertiary: #e2e2e2;
+  --color-primary-container: #d4d4d4;
+  --color-inverse-primary: #5d5f5f;
+  --color-secondary-fixed-dim: #acaaae;
+  --color-on-primary-container: #000000;
+  --color-surface-container-high: #2a2a2c;
+  --color-outline: #919191;
+  --color-on-tertiary-fixed: #ffffff;
+  --color-background: #131315;
+  --color-primary-fixed: #5d5f5f;
+  --color-outline-variant: #474747;
+  --color-surface-container-highest: #353437;
+  --color-error-container: #93000a;
+  --color-secondary-container: #47464a;
+  --color-on-secondary-container: #e4e1e5;
+  --color-error: #ffb4ab;
+  --color-secondary: #c8c6c9;
+  --color-on-secondary: #1b1b1e;
+
+  --font-headline: "Inter", "sans-serif";
+  --font-body: "Inter", "sans-serif";
+  --font-label: "Inter", "sans-serif";
+
+  --radius-DEFAULT: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2.5rem;
+  --radius-full: 9999px;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-on-surface);
+    font-family: var(--font-body);
+  }
+}
+
+@layer utilities {
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+  }
+  
+  .glass-nav {
+    background: rgba(9, 9, 11, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  
+  .bento-card {
+    background: var(--color-surface-container);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .bento-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+}
