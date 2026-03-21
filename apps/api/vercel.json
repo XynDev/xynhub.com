@@ -1,6 +1,8 @@
 {
-  "buildCommand": "echo 'pre-built bundle ready'",
-  "installCommand": "echo 'no install needed'",
+  "framework": null,
+  "buildCommand": "",
+  "installCommand": "",
+  "outputDirectory": ".",
   "rewrites": [
     { "source": "/(.*)", "destination": "/api" }
   ]
