@@ -68,6 +68,7 @@ app.get("/api/openapi.json", (c) => {
     },
     servers: [
       { url: "http://localhost:3000", description: "Local Development" },
+      { url: "https://api.xynhub.com", description: "Production" },
     ],
     tags: [
       { name: "Public - Pages", description: "Static page content" },

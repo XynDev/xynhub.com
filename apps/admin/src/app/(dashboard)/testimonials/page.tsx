@@ -22,7 +22,7 @@ export default function TestimonialsPage() {
       columns={[
         { key: "author_name", label: "Author" },
         { key: "author_role", label: "Role" },
-        { key: "quote", label: "Quote", render: (item) => (item.quote as string).slice(0, 60) + "..." },
+        { key: "quote", label: "Quote", render: (item: Testimonial) => item.quote.slice(0, 60) + "..." },
         { key: "sort_order", label: "Order" },
       ]}
       formFields={[

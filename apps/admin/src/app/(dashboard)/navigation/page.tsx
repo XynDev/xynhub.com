@@ -23,7 +23,7 @@ export default function NavigationPage() {
         { key: "label", label: "Label" },
         { key: "path", label: "Path" },
         { key: "sort_order", label: "Order" },
-        { key: "is_active", label: "Active", render: (item) => item.is_active ? "Yes" : "No" },
+        { key: "is_active", label: "Active", render: (item: NavigationItem) => item.is_active ? "Yes" : "No" },
       ]}
       formFields={[
         { key: "label", label: "Label", required: true },

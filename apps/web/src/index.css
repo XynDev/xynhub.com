@@ -53,9 +53,9 @@
   --color-secondary: #3b3b3e;
   --color-on-secondary: #ffffff;
 
-  --font-headline: "Inter", "sans-serif";
-  --font-body: "Inter", "sans-serif";
-  --font-label: "Inter", "sans-serif";
+  --font-headline: "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
 
   --radius-DEFAULT: 1rem;
   --radius-lg: 1.5rem;

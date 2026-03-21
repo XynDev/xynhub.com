@@ -18,7 +18,7 @@ interface MediaItem {
 
 export default function MediaPage() {
   const queryClient = useQueryClient();
-  const fileRef = useRef<HTMLInputElement>(null);
+  const fileRef = useRef<HTMLInputElement | null>(null);
   const [altText, setAltText] = useState("");
 
   const { data, isLoading } = useQuery({
@@ -37,7 +37,7 @@ export default function MediaPage() {
 
       return apiFetch<{ data: MediaItem }>("/api/v1/admin/media/upload", {
         method: "POST",
-        body: formData,
+        body: formData as unknown as BodyInit,
       });
     },
     onSuccess: () => {

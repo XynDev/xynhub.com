@@ -161,32 +161,26 @@ This monorepo deploys as 3 separate Vercel projects.
 
 ### Deploy API (`apps/api`)
 
+The API uses Hono with Vercel serverless functions via `hono/vercel` adapter.
+The `api/index.ts` file serves as the serverless entry point, and `vercel.json` rewrites all routes to it.
+
 1. Go to [vercel.com](https://vercel.com) > **Add New Project**
 2. Import your GitHub repository
 3. Configure:
    - **Framework Preset**: Other
    - **Root Directory**: `apps/api`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
+   - **Build Command**: leave empty (Vercel auto-detects `api/` directory)
+   - **Output Directory**: leave empty
 4. Add environment variables:
    ```
    SUPABASE_URL=https://<project-id>.supabase.co
    SUPABASE_ANON_KEY=<your-anon-key>
    SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
    ALLOWED_ADMIN_EMAILS=ilhamram332@gmail.com
-   CORS_ORIGINS=https://your-web-domain.vercel.app,https://your-admin-domain.vercel.app
-   PORT=3000
+   CORS_ORIGINS=https://xynhub.com,https://admin.xynhub.com
    ```
 5. Deploy
-
-> **Note**: For Vercel serverless deployment, you may need to add a `vercel.json` in `apps/api/`:
-> ```json
-> {
->   "buildCommand": "npm run build",
->   "outputDirectory": "dist",
->   "installCommand": "npm install"
-> }
-> ```
+6. Set custom domain: `api.xynhub.com`
 
 ### Deploy Admin CMS (`apps/admin`)
 

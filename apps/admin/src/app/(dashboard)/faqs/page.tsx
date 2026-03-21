@@ -20,10 +20,10 @@ export default function FAQsPage() {
       items={data?.data || []}
       isLoading={isLoading}
       columns={[
-        { key: "question", label: "Question", render: (item) => (item.question as string).slice(0, 50) + "..." },
+        { key: "question", label: "Question", render: (item: FAQ) => item.question.slice(0, 50) + "..." },
         { key: "page_slug", label: "Page" },
         { key: "sort_order", label: "Order" },
-        { key: "is_active", label: "Active", render: (item) => item.is_active ? "Yes" : "No" },
+        { key: "is_active", label: "Active", render: (item: FAQ) => item.is_active ? "Yes" : "No" },
       ]}
       formFields={[
         { key: "question", label: "Question", required: true },

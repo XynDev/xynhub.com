@@ -8,14 +8,14 @@ interface SEOProps {
   url?: string;
 }
 
-export function SEO({ 
+export function SEO({
   title = "XYN - Professional Web & Mobile Development",
   description = "A premium software house mapping the future through precise engineering. We build web applications, mobile developments, and robust enterprise server architectures. Base of operations: Solo, Jogja, Jawa Tengah.",
   keywords = "software house, web development, mobile development, jasa pembuatan web, aplikasi server, coding, solo, jogja, jawa tengah",
   image = "/og-xynhub.png",
   url = "https://xynhub.com"
 }: SEOProps) {
-  const finalTitle = title.includes("XYN") ? title : `${title} | XYN`;
+  const finalTitle = (title ?? "").includes("XYN") ? title : `${title} | XYN`;
 
   return (
     <Helmet>

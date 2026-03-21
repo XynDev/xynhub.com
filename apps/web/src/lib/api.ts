@@ -16,6 +16,9 @@ interface PaginatedResponse<T> {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyData = Record<string, any>
+
 const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_TTL = 60 * 1000; // 1 minute
 
@@ -33,10 +36,8 @@ async function fetchApi<T>(endpoint: string): Promise<T> {
 }
 
 // Page content (returns flat object keyed by section)
-export async function getPageContent<T = Record<string, unknown>>(
-  slug: string
-): Promise<T> {
-  const res = await fetchApi<ApiResponse<T>>(`/api/v1/pages/${slug}`);
+export async function getPageContent(slug: string): Promise<AnyData> {
+  const res = await fetchApi<ApiResponse<AnyData>>(`/api/v1/pages/${slug}`);
   return res.data;
 }
 
@@ -46,64 +47,54 @@ export async function getBlogs(params?: {
   per_page?: number;
   category?: string;
   featured?: string;
-}) {
+}): Promise<PaginatedResponse<AnyData>> {
   const query = new URLSearchParams();
   if (params?.page) query.set("page", String(params.page));
   if (params?.per_page) query.set("per_page", String(params.per_page));
   if (params?.category) query.set("category", params.category);
   if (params?.featured) query.set("featured", params.featured);
   const qs = query.toString();
-  return fetchApi<PaginatedResponse<Record<string, unknown>>>(
+  return fetchApi<PaginatedResponse<AnyData>>(
     `/api/v1/blogs${qs ? `?${qs}` : ""}`
   );
 }
 
-export async function getBlogBySlug(slug: string) {
-  return fetchApi<ApiResponse<Record<string, unknown>>>(
-    `/api/v1/blogs/${slug}`
-  );
+export async function getBlogBySlug(slug: string): Promise<ApiResponse<AnyData>> {
+  return fetchApi<ApiResponse<AnyData>>(`/api/v1/blogs/${slug}`);
 }
 
 // Portfolios
-export async function getPortfolios() {
-  return fetchApi<ApiResponse<Record<string, unknown>[]>>(
-    `/api/v1/portfolios`
-  );
+export async function getPortfolios(): Promise<ApiResponse<AnyData[]>> {
+  return fetchApi<ApiResponse<AnyData[]>>(`/api/v1/portfolios`);
 }
 
-export async function getPortfolioBySlug(slug: string) {
-  return fetchApi<ApiResponse<Record<string, unknown>>>(
-    `/api/v1/portfolios/${slug}`
-  );
+export async function getPortfolioBySlug(slug: string): Promise<ApiResponse<AnyData>> {
+  return fetchApi<ApiResponse<AnyData>>(`/api/v1/portfolios/${slug}`);
 }
 
 // Other
-export async function getNavigation() {
-  return fetchApi<ApiResponse<Record<string, unknown>[]>>(
-    `/api/v1/navigation`
-  );
+export async function getNavigation(): Promise<ApiResponse<AnyData[]>> {
+  return fetchApi<ApiResponse<AnyData[]>>(`/api/v1/navigation`);
 }
 
-export async function getFooter() {
-  return fetchApi<ApiResponse<Record<string, unknown>>>(`/api/v1/footer`);
+export async function getFooter(): Promise<ApiResponse<AnyData>> {
+  return fetchApi<ApiResponse<AnyData>>(`/api/v1/footer`);
 }
 
-export async function getSettings() {
-  return fetchApi<ApiResponse<Record<string, unknown>>>(`/api/v1/settings`);
+export async function getSettings(): Promise<ApiResponse<AnyData>> {
+  return fetchApi<ApiResponse<AnyData>>(`/api/v1/settings`);
 }
 
-export async function getTestimonials() {
-  return fetchApi<ApiResponse<Record<string, unknown>[]>>(
-    `/api/v1/testimonials`
-  );
+export async function getTestimonials(): Promise<ApiResponse<AnyData[]>> {
+  return fetchApi<ApiResponse<AnyData[]>>(`/api/v1/testimonials`);
 }
 
-export async function getTeam() {
-  return fetchApi<ApiResponse<Record<string, unknown>>>(`/api/v1/team`);
+export async function getTeam(): Promise<ApiResponse<AnyData>> {
+  return fetchApi<ApiResponse<AnyData>>(`/api/v1/team`);
 }
 
-export async function getFaqs(page?: string) {
-  return fetchApi<ApiResponse<Record<string, unknown>[]>>(
+export async function getFaqs(page?: string): Promise<ApiResponse<AnyData[]>> {
+  return fetchApi<ApiResponse<AnyData[]>>(
     `/api/v1/faqs${page ? `?page=${page}` : ""}`
   );
 }

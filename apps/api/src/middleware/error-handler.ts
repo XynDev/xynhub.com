@@ -1,4 +1,5 @@
 import type { Context } from "hono";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
 
@@ -8,7 +9,7 @@ export function errorHandler(err: Error, c: Context) {
   if (err instanceof HTTPException) {
     return c.json(
       { success: false, error: err.message },
-      err.status as 400 | 401 | 403 | 404 | 500
+      err.status as ContentfulStatusCode
     );
   }
 
@@ -22,9 +23,9 @@ export function errorHandler(err: Error, c: Context) {
           message: e.message,
         })),
       },
-      400
+      400 as ContentfulStatusCode
     );
   }
 
-  return c.json({ success: false, error: "Internal server error" }, 500);
+  return c.json({ success: false, error: "Internal server error" }, 500 as ContentfulStatusCode);
 }

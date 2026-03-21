@@ -20,20 +20,29 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
+const VALID_THEMES: Theme[] = ["dark", "light", "system"];
+
+function getStoredTheme(key: string, fallback: Theme): Theme {
+  const stored = localStorage.getItem(key);
+  if (stored && VALID_THEMES.includes(stored as Theme)) {
+    return stored as Theme;
+  }
+  return fallback;
+}
+
 export function ThemeProvider({
   children,
   defaultTheme = "dark",
   storageKey = "xyn-ui-theme",
-  ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
+    () => getStoredTheme(storageKey, defaultTheme)
   );
 
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
-    
+
     if (theme === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
       root.classList.add(systemTheme);
@@ -43,16 +52,16 @@ export function ThemeProvider({
     root.classList.add(theme);
   }, [theme]);
 
-  const value = {
+  const value: ThemeProviderState = {
     theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
+    setTheme: (newTheme: Theme) => {
+      localStorage.setItem(storageKey, newTheme);
+      setTheme(newTheme);
     },
   };
 
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
+    <ThemeProviderContext.Provider value={value}>
       {children}
     </ThemeProviderContext.Provider>
   );
