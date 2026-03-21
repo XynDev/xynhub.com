@@ -5,53 +5,53 @@
 @variant dark (&:where(.dark, .dark *));
 
 @theme {
-  --color-surface-tint: #c6c6c7;
-  --color-primary-fixed-dim: #454747;
-  --color-tertiary-fixed: #5e5e5e;
-  --color-on-tertiary: #1b1b1b;
-  --color-on-error: #690005;
-  --color-on-surface-variant: #c6c6c6;
-  --color-on-surface: #e5e1e4;
-  --color-on-background: #e5e1e4;
-  --color-tertiary-fixed-dim: #474747;
-  --color-inverse-on-surface: #313032;
-  --color-surface-dim: #131315;
-  --color-on-primary: #1a1c1c;
-  --color-on-primary-fixed-variant: #e2e2e2;
-  --color-surface-container-lowest: #0e0e10;
-  --color-on-error-container: #ffdad6;
-  --color-on-tertiary-container: #000000;
+  --color-surface-tint: #4a4a4b;
+  --color-primary-fixed-dim: #c5c7c7;
+  --color-tertiary-fixed: #e2e2e2;
+  --color-on-tertiary: #ffffff;
+  --color-on-error: #ffffff;
+  --color-on-surface-variant: #52525b; 
+  --color-on-surface: #09090b; 
+  --color-on-background: #09090b;
+  --color-tertiary-fixed-dim: #c9c9c9;
+  --color-inverse-on-surface: #f4f4f5;
+  --color-surface-dim: #e4e4e7;
+  --color-on-primary: #ffffff;
+  --color-on-primary-fixed-variant: #1a1c1c;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-error-container: #410002;
+  --color-on-tertiary-container: #1b1b1b;
   --color-on-primary-fixed: #ffffff;
-  --color-secondary-fixed: #c8c6c9;
-  --color-surface-variant: #353437;
-  --color-inverse-surface: #e5e1e4;
-  --color-on-tertiary-fixed-variant: #e2e2e2;
-  --color-surface: #131315;
-  --color-on-secondary-fixed: #1b1b1e;
-  --color-surface-bright: #39393b;
-  --color-tertiary-container: #919191;
-  --color-surface-container-low: #1c1b1d;
-  --color-primary: #ffffff;
-  --color-surface-container: #201f22;
-  --color-on-secondary-fixed-variant: #3b3b3e;
-  --color-tertiary: #e2e2e2;
-  --color-primary-container: #d4d4d4;
-  --color-inverse-primary: #5d5f5f;
-  --color-secondary-fixed-dim: #acaaae;
-  --color-on-primary-container: #000000;
-  --color-surface-container-high: #2a2a2c;
-  --color-outline: #919191;
-  --color-on-tertiary-fixed: #ffffff;
-  --color-background: #131315;
-  --color-primary-fixed: #5d5f5f;
-  --color-outline-variant: #474747;
-  --color-surface-container-highest: #353437;
-  --color-error-container: #93000a;
-  --color-secondary-container: #47464a;
-  --color-on-secondary-container: #e4e1e5;
-  --color-error: #ffb4ab;
-  --color-secondary: #c8c6c9;
-  --color-on-secondary: #1b1b1e;
+  --color-secondary-fixed: #3b3b3e;
+  --color-surface-variant: #e4e4e7; 
+  --color-inverse-surface: #18181b;
+  --color-on-tertiary-fixed-variant: #1b1b1b;
+  --color-surface: #fafafa;
+  --color-on-secondary-fixed: #ffffff;
+  --color-surface-bright: #ffffff;
+  --color-tertiary-container: #e2e2e2;
+  --color-surface-container-low: #f4f4f5;
+  --color-primary: #09090b; 
+  --color-surface-container: #ffffff;
+  --color-on-secondary-fixed-variant: #1b1b1e;
+  --color-tertiary: #1b1b1b;
+  --color-primary-container: #1a1c1c;
+  --color-inverse-primary: #ffffff;
+  --color-secondary-fixed-dim: #1b1b1e;
+  --color-on-primary-container: #ffffff;
+  --color-surface-container-high: #f4f4f5; 
+  --color-outline: #a1a1aa; 
+  --color-on-tertiary-fixed: #1b1b1b;
+  --color-background: #fafafa;
+  --color-primary-fixed: #e2e2e2;
+  --color-outline-variant: #d4d4d8; 
+  --color-surface-container-highest: #e4e4e7; 
+  --color-error-container: #ffdad6;
+  --color-secondary-container: #c8c6c9;
+  --color-on-secondary-container: #1b1b1e;
+  --color-error: #ba1a1a;
+  --color-secondary: #3b3b3e;
+  --color-on-secondary: #ffffff;
 
   --font-headline: "Inter", "sans-serif";
   --font-body: "Inter", "sans-serif";
@@ -69,6 +69,56 @@
     color: var(--color-on-surface);
     font-family: var(--font-body);
   }
+
+  .dark {
+    --color-surface-tint: #c6c6c7;
+    --color-primary-fixed-dim: #454747;
+    --color-tertiary-fixed: #5e5e5e;
+    --color-on-tertiary: #1b1b1b;
+    --color-on-error: #690005;
+    --color-on-surface-variant: #c6c6c6;
+    --color-on-surface: #e5e1e4;
+    --color-on-background: #e5e1e4;
+    --color-tertiary-fixed-dim: #474747;
+    --color-inverse-on-surface: #313032;
+    --color-surface-dim: #131315;
+    --color-on-primary: #1a1c1c;
+    --color-on-primary-fixed-variant: #e2e2e2;
+    --color-surface-container-lowest: #0e0e10;
+    --color-on-error-container: #ffdad6;
+    --color-on-tertiary-container: #000000;
+    --color-on-primary-fixed: #ffffff;
+    --color-secondary-fixed: #c8c6c9;
+    --color-surface-variant: #353437;
+    --color-inverse-surface: #e5e1e4;
+    --color-on-tertiary-fixed-variant: #e2e2e2;
+    --color-surface: #131315;
+    --color-on-secondary-fixed: #1b1b1e;
+    --color-surface-bright: #39393b;
+    --color-tertiary-container: #919191;
+    --color-surface-container-low: #1c1b1d;
+    --color-primary: #ffffff;
+    --color-surface-container: #201f22;
+    --color-on-secondary-fixed-variant: #3b3b3e;
+    --color-tertiary: #e2e2e2;
+    --color-primary-container: #d4d4d4;
+    --color-inverse-primary: #5d5f5f;
+    --color-secondary-fixed-dim: #acaaae;
+    --color-on-primary-container: #000000;
+    --color-surface-container-high: #2a2a2c;
+    --color-outline: #919191;
+    --color-on-tertiary-fixed: #ffffff;
+    --color-background: #131315;
+    --color-primary-fixed: #5d5f5f;
+    --color-outline-variant: #474747;
+    --color-surface-container-highest: #353437;
+    --color-error-container: #93000a;
+    --color-secondary-container: #47464a;
+    --color-on-secondary-container: #e4e1e5;
+    --color-error: #ffb4ab;
+    --color-secondary: #c8c6c9;
+    --color-on-secondary: #1b1b1e;
+  }
 }
 
 @layer utilities {
@@ -77,19 +127,19 @@
   }
   
   .glass-nav {
-    background: rgba(9, 9, 11, 0.7);
+    background: var(--color-surface);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--color-outline-variant);
   }
   
   .bento-card {
     background: var(--color-surface-container);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--color-outline-variant);
     transition: all 0.3s ease;
   }
   
   .bento-card:hover {
-    border-color: rgba(255, 255, 255, 0.15);
+    border-color: var(--color-outline);
   }
 }

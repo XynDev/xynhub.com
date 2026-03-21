@@ -4,3 +4,10 @@ dist/
 dist-ssr/
 *.local
 coverage/
+.env
+.env.*
+!.env.example
+!.env.local.example
+.next/
+.idea/
+mass_replace.py

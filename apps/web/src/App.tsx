@@ -20,12 +20,12 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
-          <Route path="/services/:id" element={<ServiceDetail />} />
+          <Route path="/services/:slug" element={<ServiceDetail />} />
           <Route path="/process" element={<Process />} />
           <Route path="/portofolio" element={<Portofolio />} />
-          <Route path="/portofolio/:id" element={<PortofolioDetail />} />
+          <Route path="/portofolio/:slug" element={<PortofolioDetail />} />
           <Route path="/blogs" element={<Blogs />} />
-          <Route path="/blogs/:id" element={<BlogDetail />} />
+          <Route path="/blogs/:slug" element={<BlogDetail />} />
         </Routes>
       </div>
       <Footer />

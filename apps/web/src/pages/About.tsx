@@ -1,18 +1,71 @@
+import { useState, useEffect } from "react"
 import { cn } from "../lib/utils"
 import { BentoCard } from "../components/ui/BentoCard"
 import { Button } from "../components/ui/Button"
 import { PageHeader } from "../components/layout/PageHeader"
 import { SectionHeader } from "../components/layout/SectionHeader"
-import aboutData from "../data/about.json"
+import { SEO } from "../components/SEO"
+import { getPageContent, getTeam } from "../lib/api"
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyData = Record<string, any>
 
 export function About() {
+  const [pageData, setPageData] = useState<AnyData | null>(null)
+  const [teamData, setTeamData] = useState<AnyData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [page, team] = await Promise.all([
+          getPageContent("about"),
+          getTeam(),
+        ])
+        setPageData(page)
+        setTeamData(team.data)
+      } catch (err) {
+        console.error("Failed to load about data:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  if (loading || !pageData) {
+    return (
+      <main className="pt-48 pb-20 px-6 md:px-8 max-w-[1440px] w-full mx-auto flex items-center justify-center min-h-screen">
+        <div className="text-on-surface-variant text-sm uppercase tracking-widest animate-pulse">Loading...</div>
+      </main>
+    )
+  }
+
+  const hero = pageData.hero || {}
+  const timeline = pageData.timeline || {}
+  const tenets = pageData.tenets || {}
+  const culture = pageData.culture || {}
+  const leadership = pageData.leadership || {}
+  const ctaData = pageData.cta || {}
+  const contact = pageData.contact || {}
+
+  // Convert team API response (grouped object) to array format the UI expects
+  const teams = teamData
+    ? Object.entries(teamData).map(([group, members], idx) => ({
+        id: idx + 1,
+        group,
+        members: members as AnyData[],
+      }))
+    : leadership.teams || []
+
   return (
     <main className="pt-48 pb-20 px-6 md:px-8 max-w-[1440px] w-full mx-auto">
+      <SEO title="About Us" description="Architecting the invisible layer between human intent and machine execution." />
       {/* Hero Section */}
-      <PageHeader 
-        label={aboutData.hero.label}
-        headline={aboutData.hero.headline}
-        description={aboutData.hero.description}
+      <PageHeader
+        label={hero.label}
+        headline={hero.headline}
+        description={hero.description}
       />
 
       {/* Story Section: Bento Timeline */}
@@ -23,20 +76,20 @@ export function About() {
             <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60"></div>
             <div className="absolute bottom-12 left-12">
               <span className="label-sm text-primary tracking-widest">EST. 2021</span>
-              <h3 className="text-3xl font-bold tracking-tight text-primary mt-2">The Founding</h3>
+              <h3 className="text-xl md:text-3xl font-bold tracking-tight text-primary mt-2">The Founding</h3>
             </div>
           </BentoCard>
 
-          <BentoCard className="md:col-span-4 flex flex-col justify-center !rounded-[3rem] p-10">
-            <span className="text-4xl font-black text-outline/20 mb-4">{aboutData.timeline.milestones[0].id}</span>
-            <h4 className="text-xl font-bold text-primary mb-4">{aboutData.timeline.milestones[0].title}</h4>
-            <p className="text-on-surface-variant text-sm leading-relaxed">{aboutData.timeline.milestones[0].description}</p>
+          <BentoCard className="md:col-span-4 flex flex-col justify-center !rounded-[3rem] p-5 md:p-10">
+            <span className="text-2xl md:text-4xl font-black text-outline/20 mb-4">{timeline.milestones?.[0]?.id}</span>
+            <h4 className="text-xl font-bold text-primary mb-4">{timeline.milestones?.[0]?.title}</h4>
+            <p className="text-on-surface-variant text-sm leading-relaxed">{timeline.milestones?.[0]?.description}</p>
           </BentoCard>
 
-          <BentoCard className="md:col-span-4 flex flex-col justify-center order-last md:order-none bg-surface-container-low !rounded-[3rem] p-10">
-            <span className="text-4xl font-black text-outline/20 mb-4">{aboutData.timeline.milestones[1].id}</span>
-            <h4 className="text-xl font-bold text-primary mb-4">{aboutData.timeline.milestones[1].title}</h4>
-            <p className="text-on-surface-variant text-sm leading-relaxed">{aboutData.timeline.milestones[1].description}</p>
+          <BentoCard className="md:col-span-4 flex flex-col justify-center order-last md:order-none bg-surface-container-low !rounded-[3rem] p-5 md:p-10">
+            <span className="text-2xl md:text-4xl font-black text-outline/20 mb-4">{timeline.milestones?.[1]?.id}</span>
+            <h4 className="text-xl font-bold text-primary mb-4">{timeline.milestones?.[1]?.title}</h4>
+            <p className="text-on-surface-variant text-sm leading-relaxed">{timeline.milestones?.[1]?.description}</p>
           </BentoCard>
 
           <BentoCard className="md:col-span-8 h-[400px] p-0 relative group !rounded-[3rem]">
@@ -44,7 +97,7 @@ export function About() {
             <div className="absolute inset-0 bg-gradient-to-r from-surface to-transparent opacity-80"></div>
             <div className="absolute bottom-12 left-12">
               <span className="label-sm text-primary tracking-widest">PHASE 03</span>
-              <h3 className="text-3xl font-bold tracking-tight text-primary mt-2">Quantum Integration</h3>
+              <h3 className="text-xl md:text-3xl font-bold tracking-tight text-primary mt-2">Quantum Integration</h3>
             </div>
           </BentoCard>
         </div>
@@ -52,10 +105,10 @@ export function About() {
 
       {/* Values Section */}
       <section className="mb-32">
-        <SectionHeader title={aboutData.tenets.title} label={aboutData.tenets.label} />
+        <SectionHeader title={tenets.title} label={tenets.label} />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {aboutData.tenets.items.map((item) => (
-            <BentoCard key={item.id} className="bg-surface-container-low hover:bg-surface-container transition-colors duration-300 !rounded-[3rem] p-10 flex flex-col">
+          {tenets.items?.map((item: AnyData) => (
+            <BentoCard key={item.id} className="bg-surface-container-low hover:bg-surface-container transition-colors duration-300 !rounded-[3rem] p-5 md:p-10 flex flex-col">
               <div className="w-12 h-12 bg-surface-container-high rounded-2xl flex items-center justify-center mb-8">
                 <span className="material-symbols-outlined text-primary text-xl">{item.icon}</span>
               </div>
@@ -68,10 +121,10 @@ export function About() {
 
       {/* Engineering Ethos Section */}
       <section className="mb-32">
-        <SectionHeader title={aboutData.culture.title} label={aboutData.culture.label} />
+        <SectionHeader title={culture.title} label={culture.label} />
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {aboutData.culture.items.map((item) => (
-            <BentoCard key={item.id} className={cn(item.span, item.bg, "!rounded-[3rem] p-10 md:p-12 flex flex-col justify-center")}>
+          {culture.items?.map((item: AnyData) => (
+            <BentoCard key={item.id} className={cn(item.span, item.bg, "!rounded-[3rem] p-5 md:p-10 md:p-12 flex flex-col justify-center")}>
               <div className="relative z-10">
                 <h4 className="text-xl font-bold text-primary mb-4 uppercase tracking-tighter">{item.title}</h4>
                 <p className="text-on-surface-variant text-sm leading-relaxed max-w-lg">{item.description}</p>
@@ -86,13 +139,13 @@ export function About() {
 
       {/* Core Leadership Section */}
       <section className="mb-32">
-        <SectionHeader title={aboutData.leadership.title} label={aboutData.leadership.label} />
+        <SectionHeader title={leadership.title} label={leadership.label} />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {aboutData.leadership.teams.map((team) => (
+          {teams.map((team: AnyData) => (
             <div key={team.id}>
               <h3 className="text-xs font-bold uppercase tracking-[0.4em] text-outline mb-8">{team.group}</h3>
               <div className="space-y-4">
-                {team.members.map((member) => (
+                {team.members?.map((member: AnyData) => (
                   <div key={member.id} className="flex items-center gap-6 p-6 bg-surface-container-low rounded-2xl hover:bg-surface-container transition-all">
                     <div className="w-16 h-16 rounded-full overflow-hidden grayscale bg-surface-bright">
                       <img alt={member.name} className="w-full h-full object-cover" src={member.image} />
@@ -111,26 +164,26 @@ export function About() {
 
       {/* Join the Revolution Section */}
       <section className="mb-32">
-        <BentoCard className="bg-surface-container-high border border-white/5 p-16 flex flex-col md:flex-row items-center justify-between gap-12 !rounded-[3rem]">
+        <BentoCard className="bg-surface-container-high border border-outline-variant/30 p-16 flex flex-col md:flex-row items-center justify-between gap-12 !rounded-[3rem]">
           <div className="max-w-xl text-center md:text-left">
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter leading-none mb-6">{aboutData.cta.headline}</h2>
-            <p className="text-on-surface-variant font-medium">{aboutData.cta.description}</p>
+            <h2 className="text-2xl md:text-4xl md:text-5xl font-black tracking-tighter leading-none mb-6">{ctaData.headline}</h2>
+            <p className="text-on-surface-variant font-medium">{ctaData.description}</p>
           </div>
           <Button className="px-12 py-5 rounded-full text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-opacity whitespace-nowrap">
-            {aboutData.cta.buttonText}
+            {ctaData.buttonText}
           </Button>
         </BentoCard>
       </section>
 
       {/* Contact & Global Locations Section */}
       <section className="mb-32">
-        <SectionHeader title={aboutData.contact.title} label={aboutData.contact.label} />
+        <SectionHeader title={contact.title} label={contact.label} />
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          <BentoCard className="md:col-span-4 bg-surface-container-low !rounded-[3rem] p-10 flex flex-col">
+          <BentoCard className="md:col-span-4 bg-surface-container-low !rounded-[3rem] p-5 md:p-10 flex flex-col">
             <h4 className="text-xs font-bold text-outline uppercase tracking-widest mb-6">The Hub</h4>
             <div className="mt-auto">
-              <p className="text-2xl font-bold text-primary tracking-tighter mb-2">{aboutData.contact.hq.city}</p>
-              <p className="text-on-surface-variant text-sm leading-relaxed whitespace-pre-line">{aboutData.contact.hq.address}</p>
+              <p className="text-2xl font-bold text-primary tracking-tighter mb-2">{contact.hq?.city}</p>
+              <p className="text-on-surface-variant text-sm leading-relaxed whitespace-pre-line">{contact.hq?.address}</p>
             </div>
           </BentoCard>
 
@@ -143,17 +196,17 @@ export function About() {
                 <path d="M200 150 L500 200 L800 300" fill="none" stroke="white" strokeDasharray="4" strokeWidth="0.5"></path>
               </svg>
             </div>
-            <div className="absolute inset-0 flex items-center justify-center p-12">
+            <div className="absolute inset-0 flex items-center justify-center p-6 md:p-12">
               <div className="text-center">
-                <span className="label-sm text-outline tracking-[0.5em] block mb-4">{aboutData.contact.map.label}</span>
-                <h4 className="text-3xl font-bold text-primary tracking-tighter">{aboutData.contact.map.text}</h4>
+                <span className="label-sm text-outline tracking-[0.5em] block mb-4">{contact.map?.label}</span>
+                <h4 className="text-xl md:text-3xl font-bold text-primary tracking-tighter">{contact.map?.text}</h4>
               </div>
             </div>
           </BentoCard>
 
           <div className="md:col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            {aboutData.contact.channels.map((ch) => (
-              <BentoCard key={ch.id} className="!rounded-[2rem] bg-surface-container-lowest border border-outline-variant/20 p-8 flex flex-row items-center gap-4">
+            {contact.channels?.map((ch: AnyData) => (
+              <BentoCard key={ch.id} className="!rounded-[2rem] bg-surface-container-lowest border border-outline-variant/20 p-5 md:p-8 flex flex-row items-center gap-4">
                 <span className="material-symbols-outlined text-outline">{ch.icon}</span>
                 <span className="font-bold text-sm tracking-tight">{ch.text}</span>
               </BentoCard>

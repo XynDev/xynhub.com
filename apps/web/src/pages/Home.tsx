@@ -1,21 +1,70 @@
+import { useState, useEffect } from "react"
 import { cn } from "../lib/utils"
 import { BentoCard } from "../components/ui/BentoCard"
 import { Button } from "../components/ui/Button"
 import { Badge } from "../components/ui/Badge"
-import homeData from "../data/home.json"
+import { SEO } from "../components/SEO"
+import { getPageContent, getTestimonials, getFaqs } from "../lib/api"
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyData = Record<string, any>
 
 export function Home() {
+  const [pageData, setPageData] = useState<AnyData | null>(null)
+  const [testimonials, setTestimonials] = useState<AnyData[]>([])
+  const [faqs, setFaqs] = useState<AnyData[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [page, testimonialsRes, faqsRes] = await Promise.all([
+          getPageContent("home"),
+          getTestimonials(),
+          getFaqs("home"),
+        ])
+        setPageData(page)
+        setTestimonials(testimonialsRes.data)
+        setFaqs(faqsRes.data)
+      } catch (err) {
+        console.error("Failed to load home data:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  if (loading || !pageData) {
+    return (
+      <main className="pt-32 md:pt-48 pb-20 px-6 md:px-8 max-w-[1440px] w-full mx-auto flex items-center justify-center min-h-screen">
+        <div className="text-on-surface-variant text-sm uppercase tracking-widest animate-pulse">Loading...</div>
+      </main>
+    )
+  }
+
+  const hero = pageData.hero || {}
+  const trust = pageData.trust || {}
+  const stats = pageData.stats || {}
+  const services = pageData.services || {}
+  const works = pageData.works || {}
+  const testimonialsSection = pageData.testimonials || {}
+  const whyUs = pageData.whyUs || {}
+  const cta = pageData.cta || {}
+  const contactInfo = pageData.contactInfo || {}
+
   return (
-    <main className="pt-48 pb-20 px-6 md:px-8 max-w-[1440px] w-full mx-auto">
-        
+    <main className="pt-32 md:pt-48 pb-20 px-6 md:px-8 max-w-[1440px] w-full mx-auto">
+      <SEO title="Extended Synaptic" />
+
         {/* Hero Section */}
         <section className="mb-32 flex flex-col items-center text-center">
-          <Badge dot>{homeData.hero.version}</Badge>
+          <Badge dot>{hero.version}</Badge>
           <h1 className="text-[3.5rem] md:text-[5.5rem] font-extrabold tracking-tighter leading-[0.9] text-primary mb-8 max-w-4xl">
-            {homeData.hero.headline}
+            {hero.headline}
           </h1>
           <p className="text-on-surface-variant text-lg max-w-2xl mb-12 font-medium">
-            {homeData.hero.description}
+            {hero.description}
           </p>
           <div className="flex gap-4">
             <Button variant="primary" className="px-10 py-4">Start Building</Button>
@@ -26,11 +75,11 @@ export function Home() {
         {/* Logo Ticker */}
         <section className="mb-32">
           <p className="text-center label-sm font-bold uppercase tracking-[0.2em] text-outline mb-10 text-[0.7rem]">
-            {homeData.trust.title}
+            {trust.title}
           </p>
           <div className="flex flex-wrap justify-center gap-16 opacity-40 grayscale contrast-125">
-            {homeData.trust.clients.map((client) => (
-              <div key={client} className="text-2xl font-black tracking-tighter text-white">{client}</div>
+            {trust.clients?.map((client: string) => (
+              <div key={client} className="text-2xl font-black tracking-tighter text-primary">{client}</div>
             ))}
           </div>
         </section>
@@ -38,10 +87,10 @@ export function Home() {
         {/* High Density Bento Grid */}
         <div className="grid grid-cols-12 gap-6 mb-32">
           {/* Ecosystem Topology */}
-          <BentoCard className="col-span-12 lg:col-span-8 p-12 min-h-[500px] group">
+          <BentoCard className="col-span-12 lg:col-span-8 p-6 md:p-12 min-h-[500px] group">
             <div className="relative z-10 flex flex-col h-full">
               <span className="label-sm text-outline mb-4 block tracking-widest uppercase text-[0.7rem]">Network Infrastructure</span>
-              <h2 className="text-3xl font-bold tracking-tight text-primary mb-6">Ecosystem Topology</h2>
+              <h2 className="text-xl md:text-3xl font-bold tracking-tight text-primary mb-6">Ecosystem Topology</h2>
               <p className="text-on-surface-variant max-w-xs mb-auto">
                 Visualizing the multi-layered nodal connections across our distributed engineering environment.
               </p>
@@ -67,29 +116,29 @@ export function Home() {
           </BentoCard>
 
           {/* Deployments Metric */}
-          <BentoCard className="col-span-12 md:col-span-6 lg:col-span-4 p-10 flex flex-col justify-between">
+          <BentoCard className="col-span-12 md:col-span-6 lg:col-span-4 p-5 md:p-10 flex flex-col justify-between">
             <div className="relative z-10">
-              <span className="material-symbols-outlined text-primary text-3xl mb-8">cloud_done</span>
-              <div className="text-[5rem] font-black tracking-tighter leading-none mb-4">{homeData.stats.deployments.value}</div>
-              <div className="label-sm text-outline uppercase tracking-[0.2em] text-[0.65rem] mb-4">{homeData.stats.deployments.label}</div>
-              <p className="text-xs text-on-surface-variant leading-relaxed max-w-[200px]">{homeData.stats.deployments.description}</p>
+              <span className="material-symbols-outlined text-primary text-xl md:text-3xl mb-8">cloud_done</span>
+              <div className="text-[5rem] font-black tracking-tighter leading-none mb-4">{stats.deployments?.value}</div>
+              <div className="label-sm text-outline uppercase tracking-[0.2em] text-[0.65rem] mb-4">{stats.deployments?.label}</div>
+              <p className="text-xs text-on-surface-variant leading-relaxed max-w-[200px]">{stats.deployments?.description}</p>
             </div>
             <div className="absolute bottom-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mb-10 -mr-10"></div>
           </BentoCard>
 
           {/* Client Count */}
-          <BentoCard className="col-span-12 md:col-span-6 lg:col-span-4 p-10 flex flex-col justify-between">
+          <BentoCard className="col-span-12 md:col-span-6 lg:col-span-4 p-5 md:p-10 flex flex-col justify-between">
             <div className="relative z-10">
-              <span className="material-symbols-outlined text-primary text-3xl mb-8">groups</span>
-              <div className="text-[5rem] font-black tracking-tighter leading-none mb-4">{homeData.stats.clients.value}</div>
-              <div className="label-sm text-outline uppercase tracking-[0.2em] text-[0.65rem] mb-4">{homeData.stats.clients.label}</div>
-              <p className="text-xs text-on-surface-variant leading-relaxed max-w-[200px]">{homeData.stats.clients.description}</p>
+              <span className="material-symbols-outlined text-primary text-xl md:text-3xl mb-8">groups</span>
+              <div className="text-[5rem] font-black tracking-tighter leading-none mb-4">{stats.clients?.value}</div>
+              <div className="label-sm text-outline uppercase tracking-[0.2em] text-[0.65rem] mb-4">{stats.clients?.label}</div>
+              <p className="text-xs text-on-surface-variant leading-relaxed max-w-[200px]">{stats.clients?.description}</p>
             </div>
             <div className="absolute -top-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
           </BentoCard>
 
           {/* Performance Chart */}
-          <BentoCard className="col-span-12 lg:col-span-8 p-12">
+          <BentoCard className="col-span-12 lg:col-span-8 p-6 md:p-12">
             <div className="flex justify-between items-start mb-12">
               <div>
                 <span className="label-sm text-outline mb-2 block tracking-widest uppercase text-[0.7rem]">System Load</span>
@@ -123,22 +172,22 @@ export function Home() {
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
             <div className="max-w-xl">
               <span className="label-sm text-outline mb-4 block tracking-widest uppercase text-[0.7rem]">Core Services</span>
-              <h2 className="text-4xl font-extrabold tracking-tighter text-primary">{homeData.services.tagline}</h2>
+              <h2 className="text-2xl md:text-4xl font-extrabold tracking-tighter text-primary">{services.tagline}</h2>
             </div>
             <button className="text-xs font-bold uppercase tracking-widest border-b-2 border-primary pb-1">View Full Catalog</button>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {homeData.services.items.map(service => (
+            {services.items?.map((service: AnyData) => (
               <BentoCard key={service.id} className="flex flex-col">
-                <div className="h-64 bg-zinc-900 overflow-hidden relative">
+                <div className="h-64 bg-surface-container-low overflow-hidden relative">
                   <img alt={service.title} className="w-full h-full object-cover opacity-60 grayscale" src={service.image}/>
                   <div className="absolute inset-0 bg-gradient-to-t from-[#201f22] to-transparent"></div>
-                  <div className="absolute bottom-6 left-6 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10">
-                    <span className="material-symbols-outlined text-white">{service.icon}</span>
+                  <div className="absolute bottom-6 left-6 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-outline-variant/50">
+                    <span className="material-symbols-outlined text-primary">{service.icon}</span>
                   </div>
                 </div>
-                <div className="p-8 pt-2">
+                <div className="p-5 md:p-8 pt-2">
                   <h4 className="text-xl font-bold mb-3">{service.title}</h4>
                   <p className="text-on-surface-variant text-sm leading-relaxed">{service.description}</p>
                 </div>
@@ -151,18 +200,18 @@ export function Home() {
         <section className="mb-32">
           <div className="text-center mb-16">
             <span className="label-sm text-outline mb-4 block tracking-widest uppercase text-[0.7rem]">Featured Works</span>
-            <h2 className="text-4xl font-extrabold tracking-tighter text-primary">{homeData.works.title}</h2>
+            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tighter text-primary">{works.title}</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {homeData.works.projects.map(project => (
-              <BentoCard key={project.id} className="h-[500px] hover:border-outline-variant/30 transition-all flex flex-col justify-end p-10 group">
+            {works.projects?.map((project: AnyData) => (
+              <BentoCard key={project.id} className="h-[500px] hover:border-outline-variant/30 transition-all flex flex-col justify-end p-5 md:p-10 group">
                 <img alt={project.label} className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:scale-105 transition-transform duration-700" src={project.image}/>
                 <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/60 to-transparent"></div>
                 <div className="relative z-10">
                   <div className="text-xs font-bold text-outline uppercase tracking-[0.2em] mb-4">{project.label}</div>
-                  <h3 className="text-3xl font-bold mb-4">{project.title}</h3>
+                  <h3 className="text-xl md:text-3xl font-bold mb-4">{project.title}</h3>
                   <p className="text-on-surface-variant text-sm max-w-sm mb-6">{project.description}</p>
-                  <a className="material-symbols-outlined text-primary text-3xl block" href="#">arrow_forward</a>
+                  <a className="material-symbols-outlined text-primary text-xl md:text-3xl block" href="#">arrow_forward</a>
                 </div>
               </BentoCard>
             ))}
@@ -173,19 +222,19 @@ export function Home() {
         <section className="mb-32">
           <div className="text-center mb-16">
             <span className="label-sm text-outline mb-4 block tracking-widest uppercase text-[0.7rem]">Recognition</span>
-            <h2 className="text-4xl font-extrabold tracking-tighter text-primary">{homeData.testimonials.title}</h2>
+            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tighter text-primary">{testimonialsSection.title}</h2>
           </div>
           <div className="grid grid-cols-12 gap-6">
-            {homeData.testimonials.items.map(testimonial => (
-              <BentoCard key={testimonial.id} className={cn(testimonial.span, "p-10 flex flex-col justify-between")}>
-                <p className="text-xl lg:text-2xl font-medium text-white mb-10 italic leading-relaxed">"{testimonial.quote}"</p>
+            {testimonials.map((testimonial: AnyData) => (
+              <BentoCard key={testimonial.id} className={cn(testimonial.span_class || "col-span-12 md:col-span-6", "p-5 md:p-10 flex flex-col justify-between")}>
+                <p className="text-xl lg:text-2xl font-medium text-primary mb-10 italic leading-relaxed">"{testimonial.quote}"</p>
                 <div className="flex items-center gap-4 mt-auto">
                   <div className="w-12 h-12 rounded-full bg-surface-container-highest border border-outline-variant/20 flex items-center justify-center font-bold text-xs">
-                    {testimonial.author.initials}
+                    {testimonial.author_initials}
                   </div>
                   <div>
-                    <div className="text-sm font-bold text-white">{testimonial.author.name}</div>
-                    <div className="text-[0.65rem] text-outline uppercase tracking-wider">{testimonial.author.role}</div>
+                    <div className="text-sm font-bold text-primary">{testimonial.author_name}</div>
+                    <div className="text-[0.65rem] text-outline uppercase tracking-wider">{testimonial.author_role}</div>
                   </div>
                 </div>
               </BentoCard>
@@ -196,15 +245,15 @@ export function Home() {
         {/* Why Us Section */}
         <section className="mb-32 bg-surface-container-low rounded-lg p-16 md:p-24 flex flex-col md:flex-row gap-16 items-center border border-outline-variant/5">
           <div className="md:w-1/2">
-            <h2 className="text-5xl font-black tracking-tighter leading-none mb-8 text-white">{homeData.whyUs.title}</h2>
-            <p className="text-on-surface-variant font-medium text-lg leading-relaxed">{homeData.whyUs.description}</p>
+            <h2 className="text-xl md:text-3xl md:text-5xl font-black tracking-tighter leading-none mb-8 text-primary">{whyUs.title}</h2>
+            <p className="text-on-surface-variant font-medium text-lg leading-relaxed">{whyUs.description}</p>
           </div>
           <div className="md:w-1/2 grid grid-cols-1 gap-12">
-            {homeData.whyUs.features.map(feature => (
+            {whyUs.features?.map((feature: AnyData) => (
               <div key={feature.id} className="flex gap-6">
-                <div className="text-3xl font-black text-white/10">{feature.id}</div>
+                <div className="text-xl md:text-3xl font-black text-primary/10">{feature.id}</div>
                 <div>
-                  <h5 className="font-bold text-lg mb-2 text-white">{feature.title}</h5>
+                  <h5 className="font-bold text-lg mb-2 text-primary">{feature.title}</h5>
                   <p className="text-sm text-on-surface-variant">{feature.description}</p>
                 </div>
               </div>
@@ -216,15 +265,15 @@ export function Home() {
         <section className="mb-12 text-center py-24 bg-surface-container rounded-[3rem] border border-outline-variant/10 relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent opacity-50"></div>
           <div className="relative z-10 max-w-4xl mx-auto px-6">
-            <span className="label-sm text-primary mb-6 block tracking-widest uppercase text-[0.7rem] font-bold">{homeData.cta.label}</span>
-            <h2 className="text-[3.5rem] md:text-[5.5rem] font-extrabold tracking-tighter leading-none mb-8 text-white">
-              {homeData.cta.headline}
+            <span className="label-sm text-primary mb-6 block tracking-widest uppercase text-[0.7rem] font-bold">{cta.label}</span>
+            <h2 className="text-[3.5rem] md:text-[5.5rem] font-extrabold tracking-tighter leading-none mb-8 text-primary">
+              {cta.headline}
             </h2>
             <p className="text-on-surface-variant text-lg max-w-xl mx-auto mb-12">
-              {homeData.cta.description}
+              {cta.description}
             </p>
             <div className="flex flex-col md:flex-row justify-center gap-6">
-              <Button variant="primary" className="px-12 py-5 text-lg shadow-white/5">Get Started Now</Button>
+              <Button variant="primary" className="px-12 py-5 text-lg shadow-outline-variant/10">Get Started Now</Button>
               <Button variant="secondary" className="px-12 py-5 text-lg">Talk to Engineering</Button>
             </div>
           </div>
@@ -234,12 +283,12 @@ export function Home() {
         <section className="mb-32">
           <div className="text-center mb-16">
             <span className="label-sm text-outline mb-4 block tracking-widest uppercase text-[0.7rem]">Technical Briefing</span>
-            <h2 className="text-4xl font-extrabold tracking-tighter text-primary">Frequently Asked Questions.</h2>
+            <h2 className="text-2xl md:text-4xl font-extrabold tracking-tighter text-primary">Frequently Asked Questions.</h2>
           </div>
           <div className="max-w-4xl mx-auto space-y-4">
-            {homeData.faq.map((item, idx) => (
+            {faqs.map((item: AnyData, idx: number) => (
               <BentoCard key={idx} className="p-6">
-                <h4 className="text-white font-bold mb-2 flex justify-between items-center">
+                <h4 className="text-primary font-bold mb-2 flex justify-between items-center">
                   {item.question}
                   <span className="material-symbols-outlined text-outline text-sm">expand_more</span>
                 </h4>
@@ -252,24 +301,24 @@ export function Home() {
         {/* Contact Us Bento */}
         <section className="grid grid-cols-12 gap-6 mb-32">
           {/* Transmission Form */}
-          <BentoCard className="col-span-12 lg:col-span-8 p-12">
+          <BentoCard className="col-span-12 lg:col-span-8 p-6 md:p-12">
             <div className="mb-10">
-              <h3 className="text-2xl font-bold tracking-tight text-white mb-2">Initialize Transmission</h3>
+              <h3 className="text-2xl font-bold tracking-tight text-primary mb-2">Initialize Transmission</h3>
               <p className="text-sm text-on-surface-variant">Secure uplink to our architecture advisory board.</p>
             </div>
-            
+
             <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1">
                 <label className="text-[0.65rem] uppercase tracking-widest font-bold text-outline">Identity</label>
-                <input className="w-full bg-surface-container-high border-none outline-none rounded-lg p-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all text-white" placeholder="Full Name or Alias" type="text"/>
+                <input className="w-full bg-surface-container-high border-none outline-none rounded-lg p-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all text-primary" placeholder="Full Name or Alias" type="text"/>
               </div>
               <div className="space-y-1">
                 <label className="text-[0.65rem] uppercase tracking-widest font-bold text-outline">Uplink Address</label>
-                <input className="w-full bg-surface-container-high border-none outline-none rounded-lg p-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all text-white" placeholder="Email Address" type="email"/>
+                <input className="w-full bg-surface-container-high border-none outline-none rounded-lg p-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all text-primary" placeholder="Email Address" type="email"/>
               </div>
               <div className="col-span-1 md:col-span-2 space-y-1">
                 <label className="text-[0.65rem] uppercase tracking-widest font-bold text-outline">Details</label>
-                <textarea className="w-full bg-surface-container-high border-none outline-none rounded-lg p-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all text-white min-h-[120px]" placeholder="Project scope, technical requirements, or inquiry details..."></textarea>
+                <textarea className="w-full bg-surface-container-high border-none outline-none rounded-lg p-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all text-primary min-h-[120px]" placeholder="Project scope, technical requirements, or inquiry details..."></textarea>
               </div>
               <div className="col-span-1 md:col-span-2">
                 <Button className="w-full py-4 rounded-lg bg-primary text-on-primary">Send Transmission</Button>
@@ -279,22 +328,22 @@ export function Home() {
 
           {/* Direct Info */}
           <div className="col-span-12 lg:col-span-4 flex flex-col gap-6">
-            <BentoCard className="p-8 flex-1 flex flex-col justify-between">
+            <BentoCard className="p-5 md:p-8 flex-1 flex flex-col justify-between">
               <div>
                 <span className="material-symbols-outlined text-primary mb-6">call</span>
-                <h4 className="font-bold text-white mb-2">Direct Terminal</h4>
-                <p className="text-sm text-on-surface-variant">{homeData.contactInfo.phone}</p>
+                <h4 className="font-bold text-primary mb-2">Direct Terminal</h4>
+                <p className="text-sm text-on-surface-variant">{contactInfo.phone}</p>
               </div>
               <div className="mt-8">
-                <p className="text-[0.6rem] text-outline uppercase tracking-widest">{homeData.contactInfo.availability}</p>
+                <p className="text-[0.6rem] text-outline uppercase tracking-widest">{contactInfo.availability}</p>
               </div>
             </BentoCard>
-            
-            <BentoCard className="p-8 flex-1 flex flex-col justify-between">
+
+            <BentoCard className="p-5 md:p-8 flex-1 flex flex-col justify-between">
               <div>
                 <span className="material-symbols-outlined text-primary mb-6">location_on</span>
-                <h4 className="font-bold text-white mb-2">Nexus Core HQ</h4>
-                <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">{homeData.contactInfo.address}</p>
+                <h4 className="font-bold text-primary mb-2">Nexus Core HQ</h4>
+                <p className="text-sm text-on-surface-variant leading-relaxed whitespace-pre-line">{contactInfo.address}</p>
               </div>
               <div className="mt-8 flex gap-4">
                 <a className="text-[0.6rem] text-primary uppercase tracking-widest font-bold border-b border-primary/20" href="#">View Maps</a>

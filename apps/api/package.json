@@ -1,0 +1,24 @@
+{
+  "name": "@xynhub/api",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.0",
+    "@hono/swagger-ui": "^0.5.0",
+    "@hono/zod-openapi": "^0.19.0",
+    "@supabase/supabase-js": "^2.49.0",
+    "@xynhub/shared": "*",
+    "hono": "^4.7.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.0",
+    "tsx": "^4.19.0",
+    "typescript": "~5.9.3"
+  }
+}

@@ -7,6 +7,17 @@
     "doc": "docs"
   },
   "scripts": {
+    "dev:web": "npm run dev -w apps/web",
+    "dev:api": "npm run dev -w apps/api",
+    "dev:admin": "npm run dev -w apps/admin",
+    "dev": "npm run dev:api & npm run dev:web & npm run dev:admin",
+    "build:web": "npm run build -w apps/web",
+    "build:api": "npm run build -w apps/api",
+    "build:admin": "npm run build -w apps/admin",
+    "db:start": "npm run db:start -w packages/supabase",
+    "db:stop": "npm run db:stop -w packages/supabase",
+    "db:reset": "npm run db:reset -w packages/supabase",
+    "db:studio": "npm run db:studio -w packages/supabase",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
