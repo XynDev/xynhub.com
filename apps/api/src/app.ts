@@ -37,7 +37,7 @@ app.use("*", secureHeaders());
 app.use(
   "*",
   cors({
-    origin: (process.env.CORS_ORIGINS || "http://localhost:5173,http://localhost:3001").split(","),
+    origin: (process.env.CORS_ORIGINS || "http://localhost:5173,http://localhost:3001,https://xynhub.com,https://www.xynhub.com,https://admin.xynhub.com").split(","),
     allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
