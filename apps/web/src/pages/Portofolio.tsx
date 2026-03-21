@@ -9,6 +9,25 @@ import { getPageContent, getPortfolios } from "../lib/api"
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
 
+// Flatten portfolio data: merge tech_stack and metrics into top-level
+function flattenPortfolio(p: AnyData): AnyData {
+  const ts = p.tech_stack || {}
+  const m = p.metrics || {}
+  return {
+    ...p,
+    // For project 0 layout (featured)
+    tech1: ts.tech1,
+    tech2: ts.tech2,
+    metric: typeof m === "object" && !Array.isArray(m) && m.value ? m : undefined,
+    image: p.image_url,
+    // For project 1 layout (stack/memory)
+    stack: ts.stack || (Array.isArray(ts) ? ts : undefined),
+    memory: ts.memory,
+    // For project 2 layout (metrics array)
+    metrics: Array.isArray(m) ? m : (m.items || []),
+  }
+}
+
 export function Portofolio() {
   const [pageData, setPageData] = useState<AnyData | null>(null)
   const [projects, setProjects] = useState<AnyData[]>([])
@@ -22,7 +41,8 @@ export function Portofolio() {
           getPortfolios(),
         ])
         setPageData(page)
-        setProjects(portfoliosRes.data)
+        const raw = Array.isArray(portfoliosRes.data) ? portfoliosRes.data : []
+        setProjects(raw.map(flattenPortfolio))
       } catch (err) {
         console.error("Failed to load portfolio data:", err)
       } finally {
@@ -45,7 +65,6 @@ export function Portofolio() {
   const features = pageData.features || {}
   const contact = pageData.contact || {}
 
-  // features may be an object with items array
   const featureItems = Array.isArray(features) ? features : (features.items || [])
 
   return (
@@ -84,29 +103,37 @@ export function Portofolio() {
                 </div>
                 <h2 className="text-2xl md:text-4xl md:text-5xl font-bold tracking-tight text-primary">{projects[0].title}</h2>
               </div>
-              <div className="flex gap-4">
-                <div className="flex flex-col items-end">
-                  <span className="text-primary font-bold text-2xl">{projects[0].metric?.value}</span>
-                  <span className="text-outline text-[10px] uppercase font-bold tracking-widest">{projects[0].metric?.label}</span>
+              {projects[0].metric && (
+                <div className="flex gap-4">
+                  <div className="flex flex-col items-end">
+                    <span className="text-primary font-bold text-2xl">{projects[0].metric.value}</span>
+                    <span className="text-outline text-[10px] uppercase font-bold tracking-widest">{projects[0].metric.label}</span>
+                  </div>
                 </div>
+              )}
+            </div>
+            {projects[0].image && (
+              <div className="my-12 overflow-hidden rounded-lg bg-surface-container-low aspect-video relative">
+                <img alt="Project visualization" className="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700" src={projects[0].image} />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-container to-transparent opacity-60"></div>
               </div>
-            </div>
-            <div className="my-12 overflow-hidden rounded-lg bg-surface-container-low aspect-video relative">
-              <img alt="Project visualization" className="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700" src={projects[0].image} />
-              <div className="absolute inset-0 bg-gradient-to-t from-surface-container to-transparent opacity-60"></div>
-            </div>
+            )}
             <div className="flex flex-wrap justify-between items-end gap-6">
               <div className="flex gap-4">
-                <div className="flex flex-col bg-surface-container-high rounded-lg p-4 min-w-[120px]">
-                  <span className="material-symbols-outlined text-primary mb-2">{projects[0].tech1?.icon}</span>
-                  <span className="text-primary font-bold">{projects[0].tech1?.lang}</span>
-                  <span className="text-outline text-[10px] uppercase font-bold">{projects[0].tech1?.role}</span>
-                </div>
-                <div className="flex flex-col bg-surface-container-high rounded-lg p-4 min-w-[120px]">
-                  <span className="material-symbols-outlined text-primary mb-2">{projects[0].tech2?.icon}</span>
-                  <span className="text-primary font-bold">{projects[0].tech2?.lang}</span>
-                  <span className="text-outline text-[10px] uppercase font-bold">{projects[0].tech2?.role}</span>
-                </div>
+                {projects[0].tech1 && (
+                  <div className="flex flex-col bg-surface-container-high rounded-lg p-4 min-w-[120px]">
+                    <span className="material-symbols-outlined text-primary mb-2">{projects[0].tech1.icon}</span>
+                    <span className="text-primary font-bold">{projects[0].tech1.lang}</span>
+                    <span className="text-outline text-[10px] uppercase font-bold">{projects[0].tech1.role}</span>
+                  </div>
+                )}
+                {projects[0].tech2 && (
+                  <div className="flex flex-col bg-surface-container-high rounded-lg p-4 min-w-[120px]">
+                    <span className="material-symbols-outlined text-primary mb-2">{projects[0].tech2.icon}</span>
+                    <span className="text-primary font-bold">{projects[0].tech2.lang}</span>
+                    <span className="text-outline text-[10px] uppercase font-bold">{projects[0].tech2.role}</span>
+                  </div>
+                )}
               </div>
               <Link to={`/portofolio/${projects[0].slug}`}>
                 <Button className="bg-primary text-on-primary rounded-full px-8 py-4 font-bold text-sm tracking-tight flex items-center gap-3 transition-opacity hover:opacity-90">
@@ -168,18 +195,22 @@ export function Portofolio() {
               <p className="text-on-surface-variant text-sm">{projects[1].description}</p>
             </div>
             <div className="flex flex-col gap-3">
-              <div className="flex items-center gap-4 py-3 border-b border-outline-variant/10">
-                <span className="text-xs font-bold text-outline w-16">STACK</span>
-                <div className="flex gap-2">
-                  {projects[1].stack?.map((s: string) => (
-                    <span key={s} className="text-[10px] bg-surface-container-high px-2 py-0.5 rounded text-primary">{s}</span>
-                  ))}
+              {projects[1].stack && (
+                <div className="flex items-center gap-4 py-3 border-b border-outline-variant/10">
+                  <span className="text-xs font-bold text-outline w-16">STACK</span>
+                  <div className="flex gap-2">
+                    {projects[1].stack.map((s: string) => (
+                      <span key={s} className="text-[10px] bg-surface-container-high px-2 py-0.5 rounded text-primary">{s}</span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4 py-3">
-                <span className="text-xs font-bold text-outline w-16">MEMORY</span>
-                <span className="text-xs font-bold text-primary">{projects[1].memory}</span>
-              </div>
+              )}
+              {projects[1].memory && (
+                <div className="flex items-center gap-4 py-3">
+                  <span className="text-xs font-bold text-outline w-16">MEMORY</span>
+                  <span className="text-xs font-bold text-primary">{projects[1].memory}</span>
+                </div>
+              )}
             </div>
           </BentoCard>
         )}
@@ -195,19 +226,23 @@ export function Portofolio() {
               <p className="text-on-surface-variant text-sm leading-relaxed">
                 {projects[2].description}
               </p>
-              <div className="flex gap-6">
-                {projects[2].metrics?.map((m: AnyData) => (
-                  <div key={m.label} className="flex flex-col">
-                    <span className="text-xl font-bold text-primary">{m.value}</span>
-                    <span className="text-[10px] font-bold text-outline uppercase tracking-widest">{m.label}</span>
-                  </div>
-                ))}
+              {projects[2].metrics?.length > 0 && (
+                <div className="flex gap-6">
+                  {projects[2].metrics.map((m: AnyData) => (
+                    <div key={m.label} className="flex flex-col">
+                      <span className="text-xl font-bold text-primary">{m.value}</span>
+                      <span className="text-[10px] font-bold text-outline uppercase tracking-widest">{m.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {projects[2].image && (
+              <div className="w-full md:w-1/2 h-full min-h-[250px] bg-surface-container-low rounded-lg overflow-hidden relative">
+                <img alt="Visualization Dashboard" className="w-full h-full object-cover grayscale" src={projects[2].image} />
+                <div className="absolute inset-0 bg-primary/5 hover:bg-transparent transition-colors"></div>
               </div>
-            </div>
-            <div className="w-full md:w-1/2 h-full min-h-[250px] bg-surface-container-low rounded-lg overflow-hidden relative">
-              <img alt="Visualization Dashboard" className="w-full h-full object-cover grayscale" src={projects[2].image} />
-              <div className="absolute inset-0 bg-primary/5 hover:bg-transparent transition-colors"></div>
-            </div>
+            )}
           </BentoCard>
         )}
 

@@ -20,9 +20,10 @@ interface CrudListProps<T extends { id: string }> {
   formFields: {
     key: string;
     label: string;
-    type?: "text" | "textarea" | "number" | "checkbox" | "json";
+    type?: "text" | "textarea" | "number" | "checkbox" | "json" | "select";
     required?: boolean;
     placeholder?: string;
+    options?: { label: string; value: string }[];
   }[];
   defaultValues: Record<string, unknown>;
 }
@@ -154,6 +155,25 @@ export function CrudList<T extends { id: string }>({
                     onChange={(e) => setForm({ ...form, [field.key]: e.target.checked })}
                     className="w-4 h-4"
                   />
+                ) : field.type === "select" ? (
+                  <select
+                    value={(form[field.key] as string) || ""}
+                    onChange={(e) => setForm({ ...form, [field.key]: e.target.value })}
+                    className={inputClass}
+                  >
+                    {field.options ? field.options.map(o => (
+                      <option key={o.value} value={o.value}>{o.label}</option>
+                    )) : (
+                      <>
+                        <option value="col-span-12 md:col-span-6">Half Width (Default)</option>
+                        <option value="col-span-12 md:col-span-7">Wide (7/12)</option>
+                        <option value="col-span-12 md:col-span-5">Narrow (5/12)</option>
+                        <option value="col-span-12">Full Width</option>
+                        <option value="col-span-12 md:col-span-4">Third (4/12)</option>
+                        <option value="col-span-12 md:col-span-8">Two Thirds (8/12)</option>
+                      </>
+                    )}
+                  </select>
                 ) : field.type === "textarea" || field.type === "json" ? (
                   <textarea
                     value={(form[field.key] as string) || ""}

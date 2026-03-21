@@ -14,7 +14,7 @@ export default function TestimonialsPage() {
   return (
     <CrudList
       title="Testimonials"
-      description="Manage client testimonials"
+      description="Manage client testimonials displayed on the home page"
       queryKey="admin-testimonials"
       apiPath="/api/v1/admin/testimonials"
       items={data?.data || []}
@@ -22,14 +22,14 @@ export default function TestimonialsPage() {
       columns={[
         { key: "author_name", label: "Author" },
         { key: "author_role", label: "Role" },
-        { key: "quote", label: "Quote", render: (item: Testimonial) => item.quote.slice(0, 60) + "..." },
+        { key: "quote", label: "Quote", render: (item: Testimonial) => item.quote?.slice(0, 60) + "..." },
         { key: "sort_order", label: "Order" },
       ]}
       formFields={[
         { key: "author_name", label: "Author Name", required: true },
-        { key: "author_role", label: "Author Role" },
-        { key: "author_initials", label: "Initials" },
-        { key: "span_class", label: "Span Class", placeholder: "col-span-12 md:col-span-7" },
+        { key: "author_role", label: "Author Role", placeholder: "CEO at Company" },
+        { key: "author_initials", label: "Initials (for avatar)", placeholder: "JD" },
+        { key: "span_class", label: "Card Size", type: "select" as "text", placeholder: "col-span-12 md:col-span-6" },
         { key: "sort_order", label: "Sort Order", type: "number" },
         { key: "is_active", label: "Active", type: "checkbox" },
         { key: "quote", label: "Quote", type: "textarea", required: true },

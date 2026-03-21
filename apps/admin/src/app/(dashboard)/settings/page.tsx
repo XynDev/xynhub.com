@@ -12,22 +12,47 @@ interface Setting {
   value: Record<string, unknown>;
 }
 
-// Describe what each setting is used for
-const SETTING_DESCRIPTIONS: Record<string, string> = {
-  site_name: "The name of the website, used in SEO and metadata",
-  site_description: "Default meta description for the website",
-  contact_email: "Contact email displayed on the website",
-  social_links: "Social media links — { twitter: url, github: url, linkedin: url }",
-  analytics_id: "Google Analytics or tracking ID",
-  maintenance_mode: "Set { enabled: true } to show maintenance page",
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyVal = any;
+
+// Known settings with descriptions and their expected format
+const KNOWN_SETTINGS: Record<string, { description: string; type: "text" | "json" | "boolean"; fields?: string[] }> = {
+  site_name: { description: "Website name, used in SEO and browser tab title", type: "text" },
+  site_description: { description: "Default meta description for search engines", type: "text" },
+  contact_email: { description: "Contact email displayed on the website", type: "text" },
+  social_links: { description: "Social media links for the website footer", type: "json", fields: ["github", "telegram", "email", "twitter", "linkedin"] },
+  analytics_id: { description: "Google Analytics or tracking ID", type: "text" },
+  maintenance_mode: { description: "Enable to show maintenance page to visitors", type: "boolean" },
+  seo_default: { description: "Default SEO metadata for all pages", type: "json", fields: ["title", "description", "keywords", "image"] },
+  logo_light: { description: "Logo for light theme", type: "text" },
+  logo_dark: { description: "Logo for dark theme", type: "text" },
+  logo_icon_light: { description: "Icon logo for light theme", type: "text" },
+  logo_icon_dark: { description: "Icon logo for dark theme", type: "text" },
 };
+
+// Extract the display value from setting value (handles { value: "..." } and { url: "..." } wrappers)
+function getDisplayValue(val: AnyVal): string {
+  if (typeof val === "string") return val;
+  if (val?.value) return String(val.value);
+  if (val?.url) return String(val.url);
+  return JSON.stringify(val, null, 2);
+}
+
+// Wrap value back to the format the DB expects
+function wrapValue(key: string, val: string, original: AnyVal): AnyVal {
+  if (original?.url !== undefined) return { url: val };
+  if (original?.value !== undefined) return { value: val };
+  if (original?.enabled !== undefined) return { enabled: val === "true" };
+  return { value: val };
+}
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [editFields, setEditFields] = useState<Record<string, string>>({});
   const [newKey, setNewKey] = useState("");
-  const [newValue, setNewValue] = useState("{}");
+  const [newValue, setNewValue] = useState("");
   const [showNew, setShowNew] = useState(false);
 
   const { data, isLoading } = useQuery({
@@ -36,7 +61,7 @@ export default function SettingsPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ key, value }: { key: string; value: Record<string, unknown> }) =>
+    mutationFn: ({ key, value }: { key: string; value: AnyVal }) =>
       apiFetch(`/api/v1/admin/settings/${key}`, {
         method: "PUT",
         body: JSON.stringify({ value }),
@@ -58,44 +83,68 @@ export default function SettingsPage() {
     },
   });
 
-  const handleSave = (key: string) => {
-    try {
-      const parsed = JSON.parse(editValue);
-      updateMutation.mutate({ key, value: parsed });
-    } catch {
-      toast.error("Invalid JSON");
+  const handleSave = (setting: Setting) => {
+    const meta = KNOWN_SETTINGS[setting.key];
+    if (meta?.type === "json" && meta.fields) {
+      updateMutation.mutate({ key: setting.key, value: editFields });
+    } else if (meta?.type === "boolean") {
+      updateMutation.mutate({ key: setting.key, value: { enabled: editValue === "true" } });
+    } else if (meta?.type === "text") {
+      updateMutation.mutate({ key: setting.key, value: wrapValue(setting.key, editValue, setting.value) });
+    } else {
+      try {
+        updateMutation.mutate({ key: setting.key, value: JSON.parse(editValue) });
+      } catch {
+        toast.error("Invalid JSON");
+      }
     }
+  };
+
+  const startEdit = (setting: Setting) => {
+    const meta = KNOWN_SETTINGS[setting.key];
+    if (meta?.type === "json" && meta.fields) {
+      const fields: Record<string, string> = {};
+      meta.fields.forEach(f => { fields[f] = String((setting.value as AnyVal)?.[f] || ""); });
+      setEditFields(fields);
+    } else if (meta?.type === "boolean") {
+      setEditValue(String(!!(setting.value as AnyVal)?.enabled));
+    } else if (meta?.type === "text") {
+      setEditValue(getDisplayValue(setting.value));
+    } else {
+      setEditValue(JSON.stringify(setting.value, null, 2));
+    }
+    setEditingKey(setting.key);
   };
 
   const handleCreate = () => {
     if (!newKey.trim()) return toast.error("Key is required");
-    try {
-      const parsed = JSON.parse(newValue);
-      updateMutation.mutate({ key: newKey, value: parsed });
-      setNewKey("");
-      setNewValue("{}");
-      setShowNew(false);
-    } catch {
-      toast.error("Invalid JSON");
+    const meta = KNOWN_SETTINGS[newKey];
+    let val: AnyVal;
+    if (meta?.type === "text") {
+      val = { value: newValue };
+    } else if (meta?.type === "boolean") {
+      val = { enabled: false };
+    } else {
+      try { val = newValue ? JSON.parse(newValue) : {}; } catch { val = { value: newValue }; }
     }
+    updateMutation.mutate({ key: newKey, value: val });
+    setNewKey("");
+    setNewValue("");
+    setShowNew(false);
   };
 
-  const inputClass =
-    "w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]";
+  const inputClass = "w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]";
+  const existingKeys = new Set(data?.data?.map(s => s.key) || []);
+  const missingKnown = Object.keys(KNOWN_SETTINGS).filter(k => !existingKeys.has(k));
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Site Settings</h1>
-          <p className="text-[var(--muted-foreground)] mt-1">
-            Global configuration values used across the website. These are optional — the site works with default values.
-          </p>
+          <p className="text-[var(--muted-foreground)] mt-1">Global configuration for the website.</p>
         </div>
-        <button
-          onClick={() => setShowNew(!showNew)}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg text-sm font-medium hover:opacity-90"
-        >
+        <button onClick={() => setShowNew(!showNew)} className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg text-sm font-medium hover:opacity-90">
           <Plus className="w-4 h-4" /> Add Setting
         </button>
       </div>
@@ -103,109 +152,105 @@ export default function SettingsPage() {
       {showNew && (
         <div className="p-4 border border-[var(--border)] rounded-lg space-y-3">
           <h3 className="text-sm font-medium">New Setting</h3>
+          {missingKnown.length > 0 && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Quick Add</label>
+              <div className="flex flex-wrap gap-2">
+                {missingKnown.map(k => (
+                  <button key={k} type="button" onClick={() => { setNewKey(k); setNewValue(""); }} className={`px-3 py-1 text-xs rounded-full border ${newKey === k ? "bg-[var(--primary)] text-[var(--primary-foreground)]" : "border-[var(--border)] hover:bg-[var(--muted)]"}`}>
+                    {k}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium mb-1">Key</label>
-            <input
-              value={newKey}
-              onChange={(e) => setNewKey(e.target.value)}
-              placeholder="e.g. site_name, contact_email"
-              className={inputClass}
-            />
+            <input value={newKey} onChange={(e) => setNewKey(e.target.value)} placeholder="setting_key" className={inputClass} />
+            {KNOWN_SETTINGS[newKey] && <p className="text-xs text-[var(--muted-foreground)] mt-1"><Info className="w-3 h-3 inline mr-1" />{KNOWN_SETTINGS[newKey].description}</p>}
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Value (JSON)</label>
-            <textarea
-              value={newValue}
-              onChange={(e) => setNewValue(e.target.value)}
-              className={`${inputClass} h-24 font-mono`}
-              placeholder='e.g. "XYN Hub" or { "key": "value" }'
-            />
-            <p className="text-xs text-[var(--muted-foreground)] mt-1">
-              Simple values: use quotes like {'"My Value"'}. Objects: use JSON like {'{ "key": "value" }'}
-            </p>
-          </div>
+          {KNOWN_SETTINGS[newKey]?.type !== "boolean" && (
+            <div>
+              <label className="block text-sm font-medium mb-1">Value</label>
+              <input value={newValue} onChange={(e) => setNewValue(e.target.value)} className={inputClass} placeholder={KNOWN_SETTINGS[newKey]?.type === "text" ? "Your value here" : '{ "key": "value" }'} />
+            </div>
+          )}
           <div className="flex gap-2">
-            <button onClick={handleCreate} className="px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg text-sm">
-              Create
-            </button>
-            <button onClick={() => setShowNew(false)} className="px-4 py-2 border border-[var(--border)] rounded-lg text-sm hover:bg-[var(--muted)]">
-              Cancel
-            </button>
+            <button onClick={handleCreate} className="px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg text-sm">Create</button>
+            <button onClick={() => setShowNew(false)} className="px-4 py-2 border border-[var(--border)] rounded-lg text-sm hover:bg-[var(--muted)]">Cancel</button>
           </div>
         </div>
       )}
 
       {isLoading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-[var(--muted)] rounded-lg animate-pulse" />
-          ))}
-        </div>
+        <div className="space-y-3">{[1, 2, 3].map(i => <div key={i} className="h-20 bg-[var(--muted)] rounded-lg animate-pulse" />)}</div>
       ) : data?.data?.length === 0 ? (
         <div className="p-8 text-center border-2 border-dashed border-[var(--border)] rounded-lg">
           <p className="text-[var(--muted-foreground)]">No settings configured yet.</p>
-          <p className="text-sm text-[var(--muted-foreground)] mt-1">Settings are optional — click &quot;Add Setting&quot; to create one.</p>
+          <p className="text-sm text-[var(--muted-foreground)] mt-1">Click &quot;Add Setting&quot; or run the seed SQL to populate defaults.</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {data?.data?.map((setting) => (
-            <div key={setting.id} className="border border-[var(--border)] rounded-lg overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-3 bg-[var(--muted)]">
-                <div>
-                  <span className="font-mono text-sm font-medium">{setting.key}</span>
-                  {SETTING_DESCRIPTIONS[setting.key] && (
-                    <p className="text-xs text-[var(--muted-foreground)] mt-0.5 flex items-center gap-1">
-                      <Info className="w-3 h-3" />
-                      {SETTING_DESCRIPTIONS[setting.key]}
-                    </p>
-                  )}
+          {data?.data?.map((setting) => {
+            const meta = KNOWN_SETTINGS[setting.key];
+            const isEditing = editingKey === setting.key;
+            const displayVal = meta?.type === "json" && meta.fields
+              ? meta.fields.map(f => `${f}: ${(setting.value as AnyVal)?.[f] || "—"}`).join(" | ")
+              : meta?.type === "boolean"
+                ? (setting.value as AnyVal)?.enabled ? "Enabled" : "Disabled"
+                : getDisplayValue(setting.value);
+
+            return (
+              <div key={setting.id} className="border border-[var(--border)] rounded-lg overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-3 bg-[var(--muted)]">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-sm font-medium">{setting.key}</span>
+                      {!isEditing && <span className="text-xs text-[var(--muted-foreground)] truncate max-w-md">{displayVal}</span>}
+                    </div>
+                    {meta && <p className="text-xs text-[var(--muted-foreground)] mt-0.5 flex items-center gap-1"><Info className="w-3 h-3 shrink-0" />{meta.description}</p>}
+                  </div>
+                  <div className="flex gap-1 shrink-0 ml-2">
+                    <button onClick={() => isEditing ? setEditingKey(null) : startEdit(setting)} className="text-sm px-3 py-1 rounded border border-[var(--border)] hover:bg-[var(--background)]">
+                      {isEditing ? "Cancel" : "Edit"}
+                    </button>
+                    <button onClick={() => { if (confirm("Delete this setting?")) deleteMutation.mutate(setting.key); }} className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-950 text-[var(--destructive)]">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => {
-                      if (editingKey === setting.key) {
-                        setEditingKey(null);
-                      } else {
-                        setEditingKey(setting.key);
-                        setEditValue(JSON.stringify(setting.value, null, 2));
-                      }
-                    }}
-                    className="text-sm px-3 py-1 rounded border border-[var(--border)] hover:bg-[var(--background)]"
-                  >
-                    {editingKey === setting.key ? "Cancel" : "Edit"}
-                  </button>
-                  <button
-                    onClick={() => { if (confirm("Delete this setting?")) deleteMutation.mutate(setting.key); }}
-                    className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-950 text-[var(--destructive)]"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+
+                {isEditing && (
+                  <div className="p-4 space-y-3">
+                    {meta?.type === "json" && meta.fields ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {meta.fields.map(f => (
+                          <div key={f}>
+                            <label className="block text-xs font-medium mb-1 capitalize">{f.replace(/_/g, " ")}</label>
+                            <input value={editFields[f] || ""} onChange={e => setEditFields({ ...editFields, [f]: e.target.value })} className={inputClass} placeholder={f === "email" ? "email@example.com" : `https://...`} />
+                          </div>
+                        ))}
+                      </div>
+                    ) : meta?.type === "boolean" ? (
+                      <div className="flex items-center gap-3">
+                        <select value={editValue} onChange={e => setEditValue(e.target.value)} className={inputClass + " max-w-xs"}>
+                          <option value="false">Disabled</option>
+                          <option value="true">Enabled</option>
+                        </select>
+                      </div>
+                    ) : meta?.type === "text" ? (
+                      <input value={editValue} onChange={e => setEditValue(e.target.value)} className={inputClass} />
+                    ) : (
+                      <textarea value={editValue} onChange={e => setEditValue(e.target.value)} className={`${inputClass} h-48 font-mono`} spellCheck={false} />
+                    )}
+                    <button onClick={() => handleSave(setting)} disabled={updateMutation.isPending} className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50">
+                      <Save className="w-4 h-4" /> {updateMutation.isPending ? "Saving..." : "Save"}
+                    </button>
+                  </div>
+                )}
               </div>
-              {editingKey === setting.key ? (
-                <div className="p-4 space-y-3">
-                  <textarea
-                    value={editValue}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    className={`${inputClass} h-48 font-mono`}
-                    spellCheck={false}
-                  />
-                  <button
-                    onClick={() => handleSave(setting.key)}
-                    disabled={updateMutation.isPending}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
-                  >
-                    <Save className="w-4 h-4" />
-                    {updateMutation.isPending ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              ) : (
-                <pre className="p-4 text-xs font-mono overflow-auto max-h-32 text-[var(--muted-foreground)]">
-                  {JSON.stringify(setting.value, null, 2)}
-                </pre>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

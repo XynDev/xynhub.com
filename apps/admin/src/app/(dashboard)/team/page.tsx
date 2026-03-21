@@ -14,7 +14,7 @@ export default function TeamPage() {
   return (
     <CrudList
       title="Team Members"
-      description="Manage leadership team members"
+      description="Manage team members displayed on the About page"
       queryKey="admin-team"
       apiPath="/api/v1/admin/team"
       items={data?.data || []}
@@ -26,14 +26,14 @@ export default function TeamPage() {
         { key: "sort_order", label: "Order" },
       ]}
       formFields={[
-        { key: "name", label: "Name", required: true },
-        { key: "role", label: "Role", required: true },
-        { key: "group_name", label: "Group Name", required: true, placeholder: "Systems Architects" },
-        { key: "image_url", label: "Image URL" },
+        { key: "name", label: "Full Name", required: true },
+        { key: "role", label: "Job Title", required: true, placeholder: "Chief Architect" },
+        { key: "group_name", label: "Team Group", required: true, placeholder: "Systems Architects" },
+        { key: "image_url", label: "Photo URL", placeholder: "https://..." },
         { key: "sort_order", label: "Sort Order", type: "number" },
         { key: "is_active", label: "Active", type: "checkbox" },
       ]}
-      defaultValues={{ name: "", role: "", group_name: "", image_url: "", sort_order: 0, is_active: true }}
+      defaultValues={{ name: "", role: "", group_name: "Systems Architects", image_url: "", sort_order: 0, is_active: true }}
     />
   );
 }
