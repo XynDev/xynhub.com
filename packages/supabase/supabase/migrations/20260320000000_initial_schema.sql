@@ -3,14 +3,11 @@
 -- Scalable, secure, dynamic content management
 -- ============================================================
 
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- ============================================================
 -- 1. SITE SETTINGS - Global key-value configuration
 -- ============================================================
 CREATE TABLE site_settings (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     key VARCHAR(100) UNIQUE NOT NULL,
     value JSONB NOT NULL DEFAULT '{}',
     updated_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
@@ -24,7 +21,7 @@ CREATE INDEX idx_site_settings_key ON site_settings(key);
 -- 2. NAVIGATION - Menu items with self-referencing hierarchy
 -- ============================================================
 CREATE TABLE navigation_items (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     label VARCHAR(100) NOT NULL,
     path VARCHAR(255) NOT NULL,
     sort_order INTEGER NOT NULL DEFAULT 0,
@@ -41,7 +38,7 @@ CREATE INDEX idx_navigation_parent ON navigation_items(parent_id);
 -- 3. FOOTER SECTIONS - Dynamic footer content
 -- ============================================================
 CREATE TABLE footer_sections (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     section_key VARCHAR(100) UNIQUE NOT NULL,
     title VARCHAR(200) NOT NULL DEFAULT '',
     content JSONB NOT NULL DEFAULT '{}',
@@ -56,7 +53,7 @@ CREATE INDEX idx_footer_sort ON footer_sections(sort_order);
 -- 4. PAGE CONTENTS - JSONB-based content for static pages
 -- ============================================================
 CREATE TABLE page_contents (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     page_slug VARCHAR(100) NOT NULL,
     section_key VARCHAR(100) NOT NULL,
     content JSONB NOT NULL DEFAULT '{}',
@@ -74,7 +71,7 @@ CREATE INDEX idx_page_contents_lookup ON page_contents(page_slug, section_key);
 -- 5. BLOGS - Full blog management
 -- ============================================================
 CREATE TABLE blogs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     slug VARCHAR(255) UNIQUE NOT NULL,
     title VARCHAR(500) NOT NULL,
     category VARCHAR(100) NOT NULL DEFAULT 'general',
@@ -103,7 +100,7 @@ CREATE INDEX idx_blogs_published ON blogs(published_at DESC) WHERE is_active = t
 -- 6. PORTFOLIOS - Portfolio list items
 -- ============================================================
 CREATE TABLE portfolios (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     slug VARCHAR(255) UNIQUE NOT NULL,
     title VARCHAR(500) NOT NULL,
     tag VARCHAR(100) NOT NULL DEFAULT '',
@@ -124,7 +121,7 @@ CREATE INDEX idx_portfolios_sort ON portfolios(sort_order);
 -- 7. PORTFOLIO DETAILS - Extended portfolio detail content
 -- ============================================================
 CREATE TABLE portfolio_details (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     portfolio_id UUID UNIQUE NOT NULL REFERENCES portfolios(id) ON DELETE CASCADE,
     hero JSONB NOT NULL DEFAULT '{}',
     stats JSONB NOT NULL DEFAULT '{}',
@@ -143,7 +140,7 @@ CREATE INDEX idx_portfolio_details_portfolio ON portfolio_details(portfolio_id);
 -- 8. TESTIMONIALS
 -- ============================================================
 CREATE TABLE testimonials (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     quote TEXT NOT NULL,
     author_name VARCHAR(200) NOT NULL,
     author_role VARCHAR(200) NOT NULL DEFAULT '',
@@ -162,7 +159,7 @@ CREATE INDEX idx_testimonials_sort ON testimonials(sort_order);
 -- 9. TEAM MEMBERS
 -- ============================================================
 CREATE TABLE team_members (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(200) NOT NULL,
     role VARCHAR(200) NOT NULL,
     group_name VARCHAR(100) NOT NULL DEFAULT 'default',
@@ -180,7 +177,7 @@ CREATE INDEX idx_team_members_sort ON team_members(sort_order);
 -- 10. FAQS
 -- ============================================================
 CREATE TABLE faqs (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     question TEXT NOT NULL,
     answer TEXT NOT NULL,
     page_slug VARCHAR(100) NOT NULL DEFAULT 'home',
@@ -197,7 +194,7 @@ CREATE INDEX idx_faqs_sort ON faqs(sort_order);
 -- 11. MEDIA - File uploads tracking
 -- ============================================================
 CREATE TABLE media (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     file_name VARCHAR(500) NOT NULL,
     file_url TEXT NOT NULL,
     file_path TEXT NOT NULL,
