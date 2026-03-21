@@ -1,17 +1,18 @@
 import { build } from "esbuild";
 
-// Bundle for Vercel Edge Runtime — everything into one self-contained file
+// Bundle for Vercel Node.js Serverless — self-contained, Node.js built-ins external
 await build({
   entryPoints: ["src/vercel.ts"],
   bundle: true,
-  platform: "browser",
-  target: "es2022",
+  platform: "node",
+  target: "node20",
   format: "esm",
   outfile: "api/index.mjs",
-  external: [],
-  define: {
-    "process.env.NODE_ENV": '"production"',
+  // Don't set external:[] — let platform:"node" auto-externalize Node.js built-ins
+  // (http2, stream, crypto, etc.) while bundling all npm packages
+  banner: {
+    js: `import { createRequire } from 'module'; const require = createRequire(import.meta.url);`,
   },
 });
 
-console.log("✅ API bundled to api/index.mjs (self-contained for Vercel Edge)");
+console.log("✅ API bundled to api/index.mjs (Vercel Node.js Serverless)");
