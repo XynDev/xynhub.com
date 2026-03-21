@@ -5,8 +5,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
-import { Save } from "lucide-react";
+import { Save, Eye, EyeOff } from "lucide-react";
 import type { Blog } from "@xynhub/shared";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface BlogFormProps {
   blog?: Blog;
@@ -17,13 +19,21 @@ export function BlogForm({ blog }: BlogFormProps) {
   const queryClient = useQueryClient();
   const isEdit = !!blog;
 
+  // Blog content is stored as JSONB with markdown in each section
+  // We flatten it to a single markdown string for editing
+  const existingMarkdown = blog?.content
+    ? typeof (blog.content as Record<string, unknown>).body === "string"
+      ? (blog.content as Record<string, string>).body
+      : JSON.stringify(blog.content, null, 2)
+    : "";
+
   const [form, setForm] = useState({
     slug: blog?.slug || "",
     title: blog?.title || "",
     category: blog?.category || "Latest",
     tag: blog?.tag || "",
     description: blog?.description || "",
-    content: JSON.stringify(blog?.content || {}, null, 2),
+    body: existingMarkdown,
     author_name: blog?.author_name || "",
     author_role: blog?.author_role || "",
     author_image: blog?.author_image || "",
@@ -34,6 +44,8 @@ export function BlogForm({ blog }: BlogFormProps) {
     published_at: blog?.published_at?.slice(0, 16) || "",
     is_active: blog?.is_active ?? true,
   });
+
+  const [showPreview, setShowPreview] = useState(false);
 
   const mutation = useMutation({
     mutationFn: (data: Record<string, unknown>) =>
@@ -54,190 +66,261 @@ export function BlogForm({ blog }: BlogFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    let content;
-    try {
-      content = JSON.parse(form.content);
-    } catch {
-      toast.error("Invalid JSON in content field");
-      return;
-    }
+
+    // Store content as { body: "markdown..." } for the FE to render
+    const content = { body: form.body };
 
     mutation.mutate({
-      ...form,
+      slug: form.slug,
+      title: form.title,
+      category: form.category,
+      description: form.description,
       content,
       tag: form.tag || null,
+      author_name: form.author_name,
+      author_role: form.author_role || null,
       author_image: form.author_image || null,
       image_url: form.image_url || null,
       icon: form.icon || null,
+      is_featured: form.is_featured,
       read_time: form.read_time || null,
-      published_at: form.published_at ? new Date(form.published_at).toISOString() : null,
+      published_at: form.published_at
+        ? new Date(form.published_at).toISOString()
+        : null,
+      is_active: form.is_active,
     });
+  };
+
+  // Auto-generate slug from title
+  const generateSlug = () => {
+    const slug = form.title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .trim();
+    setForm({ ...form, slug });
   };
 
   const inputClass =
     "w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Title *</label>
-          <input
-            required
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Slug *</label>
-          <input
-            required
-            value={form.slug}
-            onChange={(e) => setForm({ ...form, slug: e.target.value })}
-            className={inputClass}
-            pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
-            placeholder="my-blog-post"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Category *</label>
-          <input
-            required
-            value={form.category}
-            onChange={(e) => setForm({ ...form, category: e.target.value })}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Tag</label>
-          <input
-            value={form.tag}
-            onChange={(e) => setForm({ ...form, tag: e.target.value })}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Author Name *</label>
-          <input
-            required
-            value={form.author_name}
-            onChange={(e) => setForm({ ...form, author_name: e.target.value })}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Author Role</label>
-          <input
-            value={form.author_role}
-            onChange={(e) => setForm({ ...form, author_role: e.target.value })}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Author Image URL</label>
-          <input
-            value={form.author_image}
-            onChange={(e) => setForm({ ...form, author_image: e.target.value })}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Cover Image URL</label>
-          <input
-            value={form.image_url}
-            onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Icon</label>
-          <input
-            value={form.icon}
-            onChange={(e) => setForm({ ...form, icon: e.target.value })}
-            className={inputClass}
-            placeholder="terminal, memory, science..."
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Read Time</label>
-          <input
-            value={form.read_time}
-            onChange={(e) => setForm({ ...form, read_time: e.target.value })}
-            className={inputClass}
-            placeholder="10 Min Read"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1.5">Published At</label>
-          <input
-            type="datetime-local"
-            value={form.published_at}
-            onChange={(e) => setForm({ ...form, published_at: e.target.value })}
-            className={inputClass}
-          />
-        </div>
-        <div className="flex items-center gap-6 pt-6">
-          <label className="flex items-center gap-2 text-sm">
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
+      {/* Basic Info */}
+      <fieldset className="border border-[var(--border)] rounded-lg p-4 space-y-4">
+        <legend className="text-sm font-semibold px-2">Basic Information</legend>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Title *</label>
             <input
-              type="checkbox"
-              checked={form.is_active}
-              onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
-              className="w-4 h-4"
+              required
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              onBlur={() => { if (!form.slug) generateSlug(); }}
+              className={inputClass}
+              placeholder="My Blog Post Title"
             />
-            Active
-          </label>
-          <label className="flex items-center gap-2 text-sm">
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Slug *
+              {!isEdit && form.title && !form.slug && (
+                <button type="button" onClick={generateSlug} className="ml-2 text-xs text-blue-500 hover:underline">
+                  Generate from title
+                </button>
+              )}
+            </label>
             <input
-              type="checkbox"
-              checked={form.is_featured}
-              onChange={(e) => setForm({ ...form, is_featured: e.target.checked })}
-              className="w-4 h-4"
+              required
+              value={form.slug}
+              onChange={(e) => setForm({ ...form, slug: e.target.value })}
+              className={`${inputClass} font-mono`}
+              pattern="^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              placeholder="my-blog-post"
             />
-            Featured
-          </label>
+            <p className="text-xs text-[var(--muted-foreground)] mt-1">URL: /blogs/{form.slug || "..."}</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Category *</label>
+            <select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              className={inputClass}
+            >
+              <option value="Latest">Latest</option>
+              <option value="Research">Research</option>
+              <option value="Infrastructure">Infrastructure</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Tag</label>
+            <input
+              value={form.tag}
+              onChange={(e) => setForm({ ...form, tag: e.target.value })}
+              className={inputClass}
+              placeholder="e.g. Engineering, Design"
+            />
+          </div>
         </div>
-      </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Short Description *</label>
+          <textarea
+            required
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            className={`${inputClass} h-20 resize-y`}
+            placeholder="A brief summary shown in blog listings..."
+          />
+        </div>
+      </fieldset>
 
-      <div>
-        <label className="block text-sm font-medium mb-1.5">Description *</label>
-        <textarea
-          required
-          value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-          className={`${inputClass} h-24 resize-y`}
-        />
-      </div>
+      {/* Author & Media */}
+      <fieldset className="border border-[var(--border)] rounded-lg p-4 space-y-4">
+        <legend className="text-sm font-semibold px-2">Author & Media</legend>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Author Name *</label>
+            <input
+              required
+              value={form.author_name}
+              onChange={(e) => setForm({ ...form, author_name: e.target.value })}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Author Role</label>
+            <input
+              value={form.author_role}
+              onChange={(e) => setForm({ ...form, author_role: e.target.value })}
+              className={inputClass}
+              placeholder="e.g. Lead Engineer"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Author Image URL</label>
+            <input
+              value={form.author_image}
+              onChange={(e) => setForm({ ...form, author_image: e.target.value })}
+              className={inputClass}
+              placeholder="https://... or upload in Media Library first"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Cover Image URL</label>
+            <input
+              value={form.image_url}
+              onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+              className={inputClass}
+              placeholder="https://... or upload in Media Library first"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Material Icon</label>
+            <input
+              value={form.icon}
+              onChange={(e) => setForm({ ...form, icon: e.target.value })}
+              className={inputClass}
+              placeholder="e.g. terminal, science, memory"
+            />
+            <p className="text-xs text-[var(--muted-foreground)] mt-1">Google Material Symbols icon name</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Read Time</label>
+            <input
+              value={form.read_time}
+              onChange={(e) => setForm({ ...form, read_time: e.target.value })}
+              className={inputClass}
+              placeholder="e.g. 10 Min Read"
+            />
+          </div>
+        </div>
+      </fieldset>
 
-      <div>
-        <label className="block text-sm font-medium mb-1.5">
-          Content (JSON)
-        </label>
-        <textarea
-          value={form.content}
-          onChange={(e) => setForm({ ...form, content: e.target.value })}
-          className={`${inputClass} h-64 font-mono resize-y`}
-          spellCheck={false}
-        />
-      </div>
+      {/* Publishing */}
+      <fieldset className="border border-[var(--border)] rounded-lg p-4 space-y-4">
+        <legend className="text-sm font-semibold px-2">Publishing</legend>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Publish Date</label>
+            <input
+              type="datetime-local"
+              value={form.published_at}
+              onChange={(e) => setForm({ ...form, published_at: e.target.value })}
+              className={inputClass}
+            />
+          </div>
+          <div className="flex items-end gap-6 pb-2">
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.is_active}
+                onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
+                className="w-4 h-4 rounded"
+              />
+              Published
+            </label>
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.is_featured}
+                onChange={(e) => setForm({ ...form, is_featured: e.target.checked })}
+                className="w-4 h-4 rounded"
+              />
+              Featured
+            </label>
+          </div>
+        </div>
+      </fieldset>
 
+      {/* Content - Markdown Editor */}
+      <fieldset className="border border-[var(--border)] rounded-lg p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <legend className="text-sm font-semibold px-2">Content (Markdown)</legend>
+          <button
+            type="button"
+            onClick={() => setShowPreview(!showPreview)}
+            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs rounded border border-[var(--border)] hover:bg-[var(--muted)]"
+          >
+            {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+            {showPreview ? "Edit" : "Preview"}
+          </button>
+        </div>
+
+        {showPreview ? (
+          <div className="prose prose-sm dark:prose-invert max-w-none p-4 border border-[var(--border)] rounded-lg min-h-[300px] bg-[var(--background)]">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {form.body || "*No content yet...*"}
+            </ReactMarkdown>
+          </div>
+        ) : (
+          <textarea
+            value={form.body}
+            onChange={(e) => setForm({ ...form, body: e.target.value })}
+            className={`${inputClass} h-[400px] font-mono resize-y`}
+            spellCheck={false}
+            placeholder={`# Introduction\n\nWrite your blog content here using **Markdown**.\n\n## Subheading\n\n- Bullet points\n- Are supported\n\n> Blockquotes too\n\n\`\`\`javascript\nconst code = "highlighted";\n\`\`\``}
+          />
+        )}
+        <p className="text-xs text-[var(--muted-foreground)]">
+          Supports full Markdown: headings, bold, italic, lists, code blocks, tables, links, images, and more.
+        </p>
+      </fieldset>
+
+      {/* Actions */}
       <div className="flex gap-3">
         <button
           type="submit"
           disabled={mutation.isPending}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-6 py-2.5 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
         >
           <Save className="w-4 h-4" />
-          {mutation.isPending
-            ? "Saving..."
-            : isEdit
-            ? "Update Blog"
-            : "Create Blog"}
+          {mutation.isPending ? "Saving..." : isEdit ? "Update Blog" : "Create Blog"}
         </button>
         <button
           type="button"
           onClick={() => router.push("/blogs")}
-          className="px-4 py-2 border border-[var(--border)] rounded-lg text-sm hover:bg-[var(--muted)]"
+          className="px-6 py-2.5 border border-[var(--border)] rounded-lg text-sm hover:bg-[var(--muted)]"
         >
           Cancel
         </button>
