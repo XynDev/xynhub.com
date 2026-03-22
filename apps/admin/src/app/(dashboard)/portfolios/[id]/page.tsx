@@ -6,6 +6,9 @@ import { apiFetch } from "@/lib/api";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save, Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
+import { MediaPicker } from "@/components/ui/media-picker";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
+import { ArrayField } from "@/components/ui/array-field";
 
 interface TechItem { icon: string; lang: string; role: string }
 interface MetricItem { value: string; label: string }
@@ -169,13 +172,11 @@ export default function EditPortfolioPage() {
               <input required value={form.tag} onChange={e => setForm({ ...form, tag: e.target.value })} className={inputClass} placeholder="e.g. Core Protocol, Frontend Engineering" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Image URL</label>
-              <input value={form.image_url} onChange={e => setForm({ ...form, image_url: e.target.value })} className={inputClass} placeholder="https://..." />
+              <MediaPicker label="Cover Image" value={form.image_url} onChange={(v) => setForm({ ...form, image_url: v })} />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Description</label>
-            <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className={`${inputClass} h-20`} />
+            <MarkdownEditor label="Description" value={form.description} onChange={(v) => setForm({ ...form, description: v })} minHeight="80px" placeholder="Project description (supports markdown)..." />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -253,7 +254,7 @@ export default function EditPortfolioPage() {
               <div><label className="block text-xs mb-1">Title</label><input value={detail.hero.title || ""} onChange={e => setDetail({ ...detail, hero: { ...detail.hero, title: e.target.value } })} className={inputClass} /></div>
             </div>
             <div><label className="block text-xs mb-1">Description</label><textarea value={detail.hero.description || ""} onChange={e => setDetail({ ...detail, hero: { ...detail.hero, description: e.target.value } })} className={`${inputClass} h-16`} /></div>
-            <div><label className="block text-xs mb-1">Image URL</label><input value={detail.hero.image || ""} onChange={e => setDetail({ ...detail, hero: { ...detail.hero, image: e.target.value } })} className={inputClass} /></div>
+            <MediaPicker label="Hero Image" value={detail.hero.image || ""} onChange={(v) => setDetail({ ...detail, hero: { ...detail.hero, image: v } })} />
           </CollapsibleSection>
 
           {/* Stats */}
@@ -296,16 +297,16 @@ export default function EditPortfolioPage() {
 
           {/* Gallery */}
           <CollapsibleSection title="Gallery" isOpen={openSections.has("gallery")} onToggle={() => toggleSection("gallery")}>
-            {detail.gallery.map((g, i) => (
-              <div key={i} className="grid grid-cols-4 gap-2 items-end">
-                <div><label className="block text-xs mb-1">Label</label><input value={g.label} onChange={e => { const n = [...detail.gallery]; n[i] = { ...n[i], label: e.target.value }; setDetail({ ...detail, gallery: n }); }} className={inputClass} /></div>
-                <div className="col-span-2"><label className="block text-xs mb-1">Image URL</label><input value={g.image} onChange={e => { const n = [...detail.gallery]; n[i] = { ...n[i], image: e.target.value }; setDetail({ ...detail, gallery: n }); }} className={inputClass} /></div>
-                <button type="button" onClick={() => setDetail({ ...detail, gallery: detail.gallery.filter((_, j) => j !== i) })} className="p-2 text-[var(--destructive)] rounded"><Trash2 className="w-4 h-4" /></button>
-              </div>
-            ))}
-            <button type="button" onClick={() => setDetail({ ...detail, gallery: [...detail.gallery, { id: crypto.randomUUID(), label: "", image: "" }] })} className="inline-flex items-center gap-1 text-sm text-[var(--primary)] hover:underline">
-              <Plus className="w-3 h-3" /> Add Gallery Image
-            </button>
+            <ArrayField
+              items={detail.gallery}
+              onChange={(gallery) => setDetail({ ...detail, gallery: gallery as typeof detail.gallery })}
+              fields={[
+                { key: "label", label: "Label", placeholder: "MODULE_ALPHA" },
+                { key: "image", label: "Image", type: "media", colSpan: 2 },
+              ]}
+              defaultItem={{ id: "", label: "", image: "" }}
+              renderMediaPicker={(val, onChangeVal) => <MediaPicker value={val} onChange={onChangeVal} />}
+            />
           </CollapsibleSection>
 
           {/* CTA */}

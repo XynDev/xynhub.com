@@ -3,9 +3,10 @@
 import { useParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Save, ChevronDown, ChevronRight, Info } from "lucide-react";
+import { Save, ChevronDown, ChevronRight, Info, Code } from "lucide-react";
+import { getSectionForm, SECTION_DESCRIPTIONS } from "@/components/sections/registry";
 
 interface PageSection {
   id: string;
@@ -14,54 +15,6 @@ interface PageSection {
   content: Record<string, unknown>;
   sort_order: number;
 }
-
-// Describe what each section does so the user understands
-const SECTION_DESCRIPTIONS: Record<string, Record<string, string>> = {
-  home: {
-    hero: "Main hero banner at top of home page — title, subtitle, description, and CTA buttons",
-    manifesto: "Manifesto/mission section — headline and description text",
-    services: "Services overview cards — title, description, and list of service items with icon/title/description",
-    about: "About section — title, description, image, and stats/metrics",
-    methodology: "Methodology section — title, description, and list of methodology items",
-    testimonials_header: "Header text above testimonials section — title and subtitle",
-    faq_header: "Header text above FAQ section — title and subtitle",
-    cta: "Call-to-action section at bottom — title, description, and buttons",
-  },
-  about: {
-    hero: "Page header — label, title, and description",
-    mission: "Mission statement section — title, description, and values list",
-    team_header: "Header text above team members section — title and subtitle",
-    stats: "Statistics/metrics section — list of stat items with label and value",
-    cta: "Call-to-action section — title, description, and buttons",
-  },
-  services: {
-    hero: "Page header — label, title, and description",
-    services: "List of service cards — each with icon, title, description, slug for detail link",
-    cta: "Call-to-action section — title, description, and buttons",
-  },
-  "service-detail": {
-    hero: "Page header for service detail — label, title, description",
-    habits: "List of service habits/features — items with title and description",
-    cta: "Call-to-action section — title, description, and buttons",
-  },
-  process: {
-    hero: "Page header — label, title, and description",
-    phases: "Process phases/steps — items with number, title, description, and detail points",
-    cta: "Call-to-action section — title, description, and buttons",
-  },
-  blogs: {
-    hero: "Page header for blogs listing — label, title, and description",
-    latest: "Section header for latest posts — title and meta text",
-    research: "Section header for research posts — title and meta text",
-    infrastructure: "Section header for infrastructure posts — title and meta text",
-  },
-  portofolio: {
-    header: "Page header — label, title, and description",
-    proficiency: "Proficiency/skills section — title, description, and skill items",
-    features: "Key features section — title, description, and feature items",
-    contact: "Contact/CTA section — title, description, and buttons",
-  },
-};
 
 export default function PageEditorPage() {
   const params = useParams();
@@ -74,7 +27,9 @@ export default function PageEditorPage() {
   });
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
-  const [editContent, setEditContent] = useState("");
+  const [editData, setEditData] = useState<Record<string, unknown>>({});
+  const [jsonMode, setJsonMode] = useState(false);
+  const [jsonText, setJsonText] = useState("");
 
   const updateMutation = useMutation({
     mutationFn: ({ section, content, sort_order }: { section: string; content: Record<string, unknown>; sort_order: number }) =>
@@ -85,18 +40,30 @@ export default function PageEditorPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-page", slug] });
       setEditingSection(null);
+      setJsonMode(false);
       toast.success("Section updated");
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
   const handleSave = (section: PageSection) => {
-    try {
-      const parsed = JSON.parse(editContent);
-      updateMutation.mutate({ section: section.section_key, content: parsed, sort_order: section.sort_order });
-    } catch {
-      toast.error("Invalid JSON — please check your syntax");
+    if (jsonMode) {
+      try {
+        const parsed = JSON.parse(jsonText);
+        updateMutation.mutate({ section: section.section_key, content: parsed, sort_order: section.sort_order });
+      } catch {
+        toast.error("Invalid JSON — please check your syntax");
+      }
+    } else {
+      updateMutation.mutate({ section: section.section_key, content: editData, sort_order: section.sort_order });
     }
+  };
+
+  const openSection = (section: PageSection) => {
+    setEditingSection(section.section_key);
+    setEditData(structuredClone(section.content));
+    setJsonText(JSON.stringify(section.content, null, 2));
+    setJsonMode(false);
   };
 
   const pageTitles: Record<string, string> = {
@@ -163,6 +130,7 @@ export default function PageEditorPage() {
         {sections.map((section) => {
           const isEditing = editingSection === section.section_key;
           const desc = descriptions[section.section_key];
+          const FormComponent = getSectionForm(slug, section.section_key);
 
           return (
             <div key={section.id} className="border border-[var(--border)] rounded-lg overflow-hidden">
@@ -171,9 +139,9 @@ export default function PageEditorPage() {
                 onClick={() => {
                   if (isEditing) {
                     setEditingSection(null);
+                    setJsonMode(false);
                   } else {
-                    setEditingSection(section.section_key);
-                    setEditContent(JSON.stringify(section.content, null, 2));
+                    openSection(section);
                   }
                 }}
                 className="w-full flex items-center justify-between px-4 py-3 bg-[var(--muted)] hover:bg-[var(--muted)]/80 transition-colors text-left"
@@ -183,6 +151,9 @@ export default function PageEditorPage() {
                     {isEditing ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                     <span className="font-mono text-sm font-medium">{section.section_key}</span>
                     <span className="text-xs text-[var(--muted-foreground)]">#{section.sort_order}</span>
+                    {FormComponent && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-600 font-medium">Visual Editor</span>
+                    )}
                   </div>
                   {desc && (
                     <p className="text-xs text-[var(--muted-foreground)] mt-1 ml-6 flex items-start gap-1">
@@ -194,18 +165,64 @@ export default function PageEditorPage() {
               </button>
 
               {isEditing && (
-                <div className="p-4 space-y-3 border-t border-[var(--border)]">
-                  <p className="text-xs text-[var(--muted-foreground)]">
-                    Edit the JSON content below. Each key-value pair maps to a UI element on the website.
-                  </p>
-                  <textarea
-                    value={editContent}
-                    onChange={(e) => setEditContent(e.target.value)}
-                    className="w-full h-96 font-mono text-sm p-3 rounded-lg border border-[var(--border)] bg-[var(--background)] resize-y focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-                    spellCheck={false}
-                  />
-                  <div className="flex gap-2">
+                <div className="p-4 space-y-4 border-t border-[var(--border)]">
+                  {/* Mode toggle */}
+                  {FormComponent && (
+                    <div className="flex items-center justify-end">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!jsonMode) {
+                            setJsonText(JSON.stringify(editData, null, 2));
+                          } else {
+                            try {
+                              setEditData(JSON.parse(jsonText));
+                            } catch {
+                              toast.error("Invalid JSON — can't switch to visual mode");
+                              return;
+                            }
+                          }
+                          setJsonMode(!jsonMode);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded border border-[var(--border)] hover:bg-[var(--muted)]"
+                      >
+                        <Code className="w-3 h-3" />
+                        {jsonMode ? "Visual Editor" : "JSON Editor"}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Form content */}
+                  {jsonMode || !FormComponent ? (
+                    <div className="space-y-2">
+                      <p className="text-xs text-[var(--muted-foreground)]">
+                        Edit the raw JSON content. Each key-value pair maps to a UI element on the website.
+                      </p>
+                      <textarea
+                        value={jsonMode ? jsonText : JSON.stringify(editData, null, 2)}
+                        onChange={(e) => {
+                          if (jsonMode) {
+                            setJsonText(e.target.value);
+                          } else {
+                            setJsonText(e.target.value);
+                            try { setEditData(JSON.parse(e.target.value)); } catch { /* ignore while typing */ }
+                          }
+                        }}
+                        className="w-full h-96 font-mono text-sm p-3 rounded-lg border border-[var(--border)] bg-[var(--background)] resize-y focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
+                        spellCheck={false}
+                      />
+                    </div>
+                  ) : (
+                    <FormComponent
+                      data={editData}
+                      onChange={setEditData}
+                    />
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex gap-2 pt-2 border-t border-[var(--border)]">
                     <button
+                      type="button"
                       onClick={() => handleSave(section)}
                       disabled={updateMutation.isPending}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
@@ -214,7 +231,8 @@ export default function PageEditorPage() {
                       {updateMutation.isPending ? "Saving..." : "Save Changes"}
                     </button>
                     <button
-                      onClick={() => setEditingSection(null)}
+                      type="button"
+                      onClick={() => { setEditingSection(null); setJsonMode(false); }}
                       className="px-4 py-2 border border-[var(--border)] rounded-lg text-sm hover:bg-[var(--muted)]"
                     >
                       Cancel

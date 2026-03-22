@@ -5,10 +5,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
-import { Save, Eye, EyeOff } from "lucide-react";
+import { Save } from "lucide-react";
 import type { Blog } from "@xynhub/shared";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { MediaPicker } from "@/components/ui/media-picker";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
 
 interface BlogFormProps {
   blog?: Blog;
@@ -44,8 +44,6 @@ export function BlogForm({ blog }: BlogFormProps) {
     published_at: blog?.published_at?.slice(0, 16) || "",
     is_active: blog?.is_active ?? true,
   });
-
-  const [showPreview, setShowPreview] = useState(false);
 
   const mutation = useMutation({
     mutationFn: (data: Record<string, unknown>) =>
@@ -198,22 +196,10 @@ export function BlogForm({ blog }: BlogFormProps) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Author Image URL</label>
-            <input
-              value={form.author_image}
-              onChange={(e) => setForm({ ...form, author_image: e.target.value })}
-              className={inputClass}
-              placeholder="https://... or upload in Media Library first"
-            />
+            <MediaPicker label="Author Image" value={form.author_image} onChange={(v) => setForm({ ...form, author_image: v })} placeholder="Author avatar URL" />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Cover Image URL</label>
-            <input
-              value={form.image_url}
-              onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-              className={inputClass}
-              placeholder="https://... or upload in Media Library first"
-            />
+            <MediaPicker label="Cover Image" value={form.image_url} onChange={(v) => setForm({ ...form, image_url: v })} placeholder="Cover image URL" />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Material Icon</label>
@@ -275,33 +261,13 @@ export function BlogForm({ blog }: BlogFormProps) {
 
       {/* Content - Markdown Editor */}
       <fieldset className="border border-[var(--border)] rounded-lg p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <legend className="text-sm font-semibold px-2">Content (Markdown)</legend>
-          <button
-            type="button"
-            onClick={() => setShowPreview(!showPreview)}
-            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs rounded border border-[var(--border)] hover:bg-[var(--muted)]"
-          >
-            {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-            {showPreview ? "Edit" : "Preview"}
-          </button>
-        </div>
-
-        {showPreview ? (
-          <div className="prose prose-sm dark:prose-invert max-w-none p-4 border border-[var(--border)] rounded-lg min-h-[300px] bg-[var(--background)]">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {form.body || "*No content yet...*"}
-            </ReactMarkdown>
-          </div>
-        ) : (
-          <textarea
-            value={form.body}
-            onChange={(e) => setForm({ ...form, body: e.target.value })}
-            className={`${inputClass} h-[400px] font-mono resize-y`}
-            spellCheck={false}
-            placeholder={`# Introduction\n\nWrite your blog content here using **Markdown**.\n\n## Subheading\n\n- Bullet points\n- Are supported\n\n> Blockquotes too\n\n\`\`\`javascript\nconst code = "highlighted";\n\`\`\``}
-          />
-        )}
+        <legend className="text-sm font-semibold px-2">Content (Markdown)</legend>
+        <MarkdownEditor
+          value={form.body}
+          onChange={(v) => setForm({ ...form, body: v })}
+          minHeight="400px"
+          placeholder={`# Introduction\n\nWrite your blog content here using **Markdown**.\n\n## Subheading\n\n- Bullet points\n- Are supported\n\n> Blockquotes too\n\n\`\`\`javascript\nconst code = "highlighted";\n\`\`\``}
+        />
         <p className="text-xs text-[var(--muted-foreground)]">
           Supports full Markdown: headings, bold, italic, lists, code blocks, tables, links, images, and more.
         </p>

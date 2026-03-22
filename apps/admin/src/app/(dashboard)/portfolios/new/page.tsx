@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import { toast } from "sonner";
 import { Save, Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
+import { MediaPicker } from "@/components/ui/media-picker";
+import { MarkdownEditor } from "@/components/ui/markdown-editor";
+import { ArrayField } from "@/components/ui/array-field";
+import { inputClass } from "@/components/ui/form-field";
 
 interface TechItem { icon: string; lang: string; role: string }
 interface MetricItem { value: string; label: string }
@@ -73,8 +77,6 @@ export default function NewPortfolioPage() {
     setOpenSections(next);
   };
 
-  const inputClass = "w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]";
-
   return (
     <div className="space-y-6 max-w-4xl">
       <h1 className="text-2xl font-bold tracking-tight">New Portfolio</h1>
@@ -90,20 +92,18 @@ export default function NewPortfolioPage() {
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Slug *</label>
-              <input required value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} className={inputClass} />
+              <input required value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} className={`${inputClass} font-mono`} />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Tag *</label>
               <input required value={form.tag} onChange={e => setForm({ ...form, tag: e.target.value })} className={inputClass} placeholder="e.g. Core Protocol" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Image URL</label>
-              <input value={form.image_url} onChange={e => setForm({ ...form, image_url: e.target.value })} className={inputClass} placeholder="https://..." />
+              <MediaPicker label="Cover Image" value={form.image_url} onChange={(v) => setForm({ ...form, image_url: v })} />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Description</label>
-            <textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className={`${inputClass} h-20`} />
+            <MarkdownEditor label="Description" value={form.description} onChange={(v) => setForm({ ...form, description: v })} minHeight="80px" placeholder="Project description (supports markdown)..." />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -155,7 +155,20 @@ export default function NewPortfolioPage() {
               <div><label className="block text-xs mb-1">Title</label><input value={detail.hero.title} onChange={e => setDetail({ ...detail, hero: { ...detail.hero, title: e.target.value } })} className={inputClass} /></div>
             </div>
             <div><label className="block text-xs mb-1">Description</label><textarea value={detail.hero.description} onChange={e => setDetail({ ...detail, hero: { ...detail.hero, description: e.target.value } })} className={`${inputClass} h-16`} /></div>
-            <div><label className="block text-xs mb-1">Image URL</label><input value={detail.hero.image} onChange={e => setDetail({ ...detail, hero: { ...detail.hero, image: e.target.value } })} className={inputClass} /></div>
+            <MediaPicker label="Hero Image" value={detail.hero.image} onChange={(v) => setDetail({ ...detail, hero: { ...detail.hero, image: v } })} />
+          </CollapsibleSection>
+
+          <CollapsibleSection title="Gallery" isOpen={openSections.has("gallery")} onToggle={() => toggleSection("gallery")}>
+            <ArrayField
+              items={detail.gallery}
+              onChange={(gallery) => setDetail({ ...detail, gallery: gallery as typeof detail.gallery })}
+              fields={[
+                { key: "label", label: "Label", placeholder: "MODULE_ALPHA" },
+                { key: "image", label: "Image", type: "media", colSpan: 2 },
+              ]}
+              defaultItem={{ id: "", label: "", image: "" }}
+              renderMediaPicker={(val, onChangeVal) => <MediaPicker value={val} onChange={onChangeVal} />}
+            />
           </CollapsibleSection>
 
           <CollapsibleSection title="Tags" isOpen={openSections.has("tags")} onToggle={() => toggleSection("tags")}>
