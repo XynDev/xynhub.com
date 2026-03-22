@@ -3,7 +3,7 @@
 import type { ComponentType } from "react";
 
 // Home
-import { HomeHero, HomeTrust, HomeStats, HomeServices, HomeWorks, HomeWhyUs, HomeCta, HomeContactInfo } from "./home";
+import { HomeHero, HomeTrust, HomeStats, HomeServices, HomeWorks, HomeWhyUs, HomeCta, HomeTestimonials, HomeFaq, HomeContactInfo } from "./home";
 // About
 import { AboutHero, AboutTimeline, AboutTenets, AboutCulture, AboutLeadership, AboutCta, AboutContact } from "./about";
 // Services
@@ -31,6 +31,8 @@ const registry: Record<string, Record<string, SectionForm>> = {
     services: HomeServices,
     works: HomeWorks,
     whyUs: HomeWhyUs,
+    testimonials: HomeTestimonials,
+    faq: HomeFaq,
     cta: HomeCta,
     contactInfo: HomeContactInfo,
   },
@@ -96,6 +98,8 @@ export const SECTION_DESCRIPTIONS: Record<string, Record<string, string>> = {
     services: "Service cards — tagline and list of services with icon, title, description, image",
     works: "Featured works — title and project cards with label, title, description, image",
     whyUs: "Why choose us — title, description, and numbered feature list",
+    testimonials: "Testimonials header — section title (items managed in Testimonials page)",
+    faq: "FAQ header — section title (items managed in FAQs page)",
     cta: "Call-to-action banner — label, headline, description",
     contactInfo: "Contact info — phone, availability, address",
   },

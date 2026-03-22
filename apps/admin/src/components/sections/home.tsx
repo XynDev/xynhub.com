@@ -172,6 +172,36 @@ export function HomeCta({ data, onChange }: Props) {
 }
 
 // ============================================================
+// HOME > TESTIMONIALS (header only — items managed in /testimonials)
+// ============================================================
+export function HomeTestimonials({ data, onChange }: Props) {
+  return (
+    <div className="space-y-4">
+      <TextField label="Section Title" value={data.title ?? ""} onChange={(v) => onChange({ ...data, title: v })} placeholder="What industry leaders say." />
+      <TextAreaField label="Description (optional)" value={data.description ?? ""} onChange={(v) => onChange({ ...data, description: v })} rows={2} placeholder="Optional subtitle for testimonials section" />
+      <p className="text-xs text-[var(--muted-foreground)] bg-[var(--muted)] px-3 py-2 rounded-lg">
+        Testimonial items are managed separately in <a href="/testimonials" className="underline font-medium">Testimonials</a> page.
+      </p>
+    </div>
+  );
+}
+
+// ============================================================
+// HOME > FAQ (header only — items managed in /faqs)
+// ============================================================
+export function HomeFaq({ data, onChange }: Props) {
+  return (
+    <div className="space-y-4">
+      <TextField label="Section Title" value={data.title ?? ""} onChange={(v) => onChange({ ...data, title: v })} placeholder="Frequently Asked Questions." />
+      <TextAreaField label="Description (optional)" value={data.description ?? ""} onChange={(v) => onChange({ ...data, description: v })} rows={2} placeholder="Optional subtitle for FAQ section" />
+      <p className="text-xs text-[var(--muted-foreground)] bg-[var(--muted)] px-3 py-2 rounded-lg">
+        FAQ items are managed separately in <a href="/faqs" className="underline font-medium">FAQs</a> page.
+      </p>
+    </div>
+  );
+}
+
+// ============================================================
 // HOME > CONTACT INFO
 // ============================================================
 export function HomeContactInfo({ data, onChange }: Props) {

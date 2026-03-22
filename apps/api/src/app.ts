@@ -40,13 +40,30 @@ const app = new Hono();
 // Global middleware
 app.use("*", logger());
 app.use("*", secureHeaders());
+// Build allowed origins list (trim whitespace from env values)
+const allowedOrigins = (
+  process.env.CORS_ORIGINS ||
+  "http://localhost:5173,http://localhost:3001,https://xynhub.com,https://www.xynhub.com,https://admin.xynhub.com"
+)
+  .split(",")
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 app.use(
   "*",
   cors({
-    origin: (process.env.CORS_ORIGINS || "http://localhost:5173,http://localhost:3001,https://xynhub.com,https://www.xynhub.com,https://admin.xynhub.com").split(","),
+    origin: (requestOrigin) => {
+      // Allow requests with no origin (server-to-server, curl, etc.)
+      if (!requestOrigin) return allowedOrigins[0];
+      // Check if the request origin is in our allowed list
+      if (allowedOrigins.includes(requestOrigin)) return requestOrigin;
+      // Fallback: deny
+      return allowedOrigins[0];
+    },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
+    maxAge: 86400,
   })
 );
 

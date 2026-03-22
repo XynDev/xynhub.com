@@ -85,6 +85,29 @@ app.post("/upload", async (c) => {
   return c.json({ success: true, data: media }, 201);
 });
 
+// POST /api/v1/admin/media/cleanup - Delete file from storage by URL
+// Used when CMS image fields are replaced/removed
+app.post("/cleanup", async (c) => {
+  const { url } = await c.req.json<{ url: string }>();
+  if (!url) return c.json({ success: false, error: "No URL provided" }, 400);
+
+  // Find media record by URL
+  const { data: media } = await supabaseAdmin
+    .from("media")
+    .select("id, file_path")
+    .eq("file_url", url)
+    .single();
+
+  if (media) {
+    // Remove from storage
+    await supabaseAdmin.storage.from("media").remove([media.file_path]);
+    // Remove from database
+    await supabaseAdmin.from("media").delete().eq("id", media.id);
+  }
+
+  return c.json({ success: true, message: "Cleaned up" });
+});
+
 // DELETE /api/v1/admin/media/:id
 app.delete("/:id", async (c) => {
   const id = c.req.param("id");

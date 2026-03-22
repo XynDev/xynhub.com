@@ -36,6 +36,25 @@ export function MediaPicker({ value, onChange, label, placeholder }: MediaPicker
     enabled: open,
   });
 
+  // Cleanup old image from storage when replaced/removed
+  const cleanupMutation = useMutation({
+    mutationFn: async (url: string) => {
+      if (!url || !url.includes("/storage/")) return; // Only cleanup storage URLs
+      return apiFetch("/api/v1/admin/media/cleanup", {
+        method: "POST",
+        body: JSON.stringify({ url }),
+      });
+    },
+  });
+
+  const handleChange = (newUrl: string) => {
+    // If replacing an existing storage image, clean it up
+    if (value && value !== newUrl && value.includes("/storage/")) {
+      cleanupMutation.mutate(value);
+    }
+    onChange(newUrl);
+  };
+
   const uploadMutation = useMutation({
     mutationFn: async (file: File) => {
       const formData = new FormData();
@@ -49,7 +68,7 @@ export function MediaPicker({ value, onChange, label, placeholder }: MediaPicker
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["admin-media-picker"] });
       queryClient.invalidateQueries({ queryKey: ["admin-media"] });
-      onChange(res.data.file_url);
+      handleChange(res.data.file_url);
       toast.success("Uploaded & selected");
       setAltText("");
       if (fileRef.current) fileRef.current.value = "";
@@ -97,7 +116,7 @@ export function MediaPicker({ value, onChange, label, placeholder }: MediaPicker
           />
           <button
             type="button"
-            onClick={() => onChange("")}
+            onClick={() => handleChange("")}
             className="absolute -top-1.5 -right-1.5 p-0.5 rounded-full bg-[var(--destructive)] text-white"
           >
             <X className="w-3 h-3" />
@@ -174,7 +193,7 @@ export function MediaPicker({ value, onChange, label, placeholder }: MediaPicker
                         key={item.id}
                         type="button"
                         onClick={() => {
-                          onChange(item.file_url);
+                          handleChange(item.file_url);
                           setOpen(false);
                         }}
                         className={`relative aspect-square rounded-lg border-2 overflow-hidden transition-all hover:border-[var(--primary)] ${

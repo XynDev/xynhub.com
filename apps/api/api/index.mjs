@@ -24660,6 +24660,16 @@ app23.post("/upload", async (c) => {
   }
   return c.json({ success: true, data: media }, 201);
 });
+app23.post("/cleanup", async (c) => {
+  const { url } = await c.req.json();
+  if (!url) return c.json({ success: false, error: "No URL provided" }, 400);
+  const { data: media } = await supabaseAdmin.from("media").select("id, file_path").eq("file_url", url).single();
+  if (media) {
+    await supabaseAdmin.storage.from("media").remove([media.file_path]);
+    await supabaseAdmin.from("media").delete().eq("id", media.id);
+  }
+  return c.json({ success: true, message: "Cleaned up" });
+});
 app23.delete("/:id", async (c) => {
   const id = c.req.param("id");
   const { data: media } = await supabaseAdmin.from("media").select("file_path").eq("id", id).single();
@@ -24713,13 +24723,19 @@ var newsletter_default2 = app25;
 var app26 = new Hono2();
 app26.use("*", logger());
 app26.use("*", secureHeaders());
+var allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173,http://localhost:3001,https://xynhub.com,https://www.xynhub.com,https://admin.xynhub.com").split(",").map((o) => o.trim()).filter(Boolean);
 app26.use(
   "*",
   cors({
-    origin: (process.env.CORS_ORIGINS || "http://localhost:5173,http://localhost:3001,https://xynhub.com,https://www.xynhub.com,https://admin.xynhub.com").split(","),
+    origin: (requestOrigin) => {
+      if (!requestOrigin) return allowedOrigins[0];
+      if (allowedOrigins.includes(requestOrigin)) return requestOrigin;
+      return allowedOrigins[0];
+    },
     allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
-    credentials: true
+    credentials: true,
+    maxAge: 86400
   })
 );
 app26.get(
