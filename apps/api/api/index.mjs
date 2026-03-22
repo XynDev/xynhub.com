@@ -19739,6 +19739,14 @@ var getAllowedEmails = () => {
   const emails = process.env.ALLOWED_ADMIN_EMAILS || "";
   return emails.split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
 };
+function withTimeout(promise, ms, label) {
+  return Promise.race([
+    promise,
+    new Promise(
+      (_, reject) => setTimeout(() => reject(new HTTPException(504, { message: `${label} timed out after ${ms}ms` })), ms)
+    )
+  ]);
+}
 var authMiddleware = createMiddleware(async (c, next) => {
   const token = c.req.header("Authorization")?.replace("Bearer ", "");
   if (!token) {
@@ -19747,7 +19755,11 @@ var authMiddleware = createMiddleware(async (c, next) => {
   const {
     data: { user },
     error
-  } = await supabaseAdmin.auth.getUser(token);
+  } = await withTimeout(
+    supabaseAdmin.auth.getUser(token),
+    7e3,
+    "Auth verification"
+  );
   if (error || !user) {
     throw new HTTPException(401, { message: "Invalid or expired token" });
   }
@@ -24636,31 +24648,17 @@ var newsletter_default2 = app25;
 
 // src/app.ts
 var app26 = new Hono2();
-var allowedOrigins = (process.env.CORS_ORIGINS || "http://localhost:5173,http://localhost:3001,https://xynhub.com,https://www.xynhub.com,https://admin.xynhub.com").replace(/^["']|["']$/g, "").split(",").map((o) => o.trim()).filter(Boolean);
-function getCorsHeaders(origin) {
-  const matched = origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
-  return {
-    "Access-Control-Allow-Origin": matched,
-    "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,PATCH,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type,Authorization",
-    "Access-Control-Allow-Credentials": "true",
-    "Access-Control-Max-Age": "86400"
-  };
-}
-app26.options("*", (c) => {
-  const origin = c.req.header("Origin");
-  const headers = getCorsHeaders(origin);
-  return new Response(null, { status: 204, headers });
-});
+var CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Max-Age": "86400"
+};
+app26.options("*", (c) => new Response(null, { status: 204, headers: CORS_HEADERS }));
 app26.use("*", async (c, next) => {
-  const origin = c.req.header("Origin");
-  const headers = getCorsHeaders(origin);
-  try {
-    await next();
-  } finally {
-    for (const [key, val] of Object.entries(headers)) {
-      c.res.headers.set(key, val);
-    }
+  await next();
+  for (const [key, val] of Object.entries(CORS_HEADERS)) {
+    c.res.headers.set(key, val);
   }
 });
 app26.use("*", logger());

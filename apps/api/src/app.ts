@@ -36,45 +36,25 @@ import adminNewsletter from "./routes/admin/newsletter.js";
 
 const app = new Hono();
 
-// ── CORS: manual implementation (bulletproof — works even on error responses) ──
-const allowedOrigins = (
-  process.env.CORS_ORIGINS ||
-  "http://localhost:5173,http://localhost:3001,https://xynhub.com,https://www.xynhub.com,https://admin.xynhub.com"
-)
-  .replace(/^["']|["']$/g, "") // strip wrapping quotes if user added them in env
-  .split(",")
-  .map((o) => o.trim())
-  .filter(Boolean);
+// ── CORS ──
+// Primary CORS is handled by vercel.json headers (infrastructure level).
+// This in-code handler is a backup for local dev and non-Vercel environments.
+// Uses Access-Control-Allow-Origin: * (safe because clients don't use credentials mode).
+const CORS_HEADERS: Record<string, string> = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type,Authorization",
+  "Access-Control-Max-Age": "86400",
+};
 
-function getCorsHeaders(origin: string | undefined | null): Record<string, string> {
-  const matched = origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
-  return {
-    "Access-Control-Allow-Origin": matched,
-    "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,PATCH,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type,Authorization",
-    "Access-Control-Allow-Credentials": "true",
-    "Access-Control-Max-Age": "86400",
-  };
-}
+// Preflight: return 204 immediately — before ANY other middleware
+app.options("*", (c) => new Response(null, { status: 204, headers: CORS_HEADERS }));
 
-// 1) Preflight: return 204 immediately with CORS headers — before ANY other middleware
-app.options("*", (c) => {
-  const origin = c.req.header("Origin");
-  const headers = getCorsHeaders(origin);
-  return new Response(null, { status: 204, headers });
-});
-
-// 2) CORS headers on ALL responses (including errors)
+// Add CORS headers to all responses (backup for local dev)
 app.use("*", async (c, next) => {
-  const origin = c.req.header("Origin");
-  const headers = getCorsHeaders(origin);
-  try {
-    await next();
-  } finally {
-    // Always set CORS headers — even if next() threw or returned an error
-    for (const [key, val] of Object.entries(headers)) {
-      c.res.headers.set(key, val);
-    }
+  await next();
+  for (const [key, val] of Object.entries(CORS_HEADERS)) {
+    c.res.headers.set(key, val);
   }
 });
 
