@@ -107,27 +107,30 @@ export function Home() {
           <p className="text-center label-sm font-bold uppercase tracking-[0.2em] text-outline mb-10 text-[0.7rem]">
             {trust.title}
           </p>
-          {trust.logos && trust.logos.length > 0 ? (
-            <div className="overflow-hidden relative">
-              <div className="flex gap-16 animate-scroll-x">
-                {[...trust.logos, ...trust.logos, ...trust.logos].map((item: AnyData, idx: number) => (
-                  <div key={idx} className="flex-shrink-0 flex items-center justify-center h-12 opacity-40 grayscale hover:opacity-70 hover:grayscale-0 transition-all">
-                    {item.logo ? (
-                      <img src={item.logo} alt={item.name || ""} className="h-10 w-auto max-w-[140px] object-contain" />
-                    ) : (
-                      <div className="text-2xl font-black tracking-tighter text-primary">{item.name}</div>
-                    )}
-                  </div>
-                ))}
+          {(() => {
+            // Support both trust.logos (CMS editor) and trust.clients (seed data)
+            // Each item can be a string ("VERTEX") or object ({name, logo})
+            const items = trust.logos || trust.clients || []
+            const normalized = items.map((item: string | AnyData) =>
+              typeof item === "string" ? { name: item, logo: "" } : item
+            )
+            if (normalized.length === 0) return null
+            return (
+              <div className="overflow-hidden relative">
+                <div className="flex gap-16 animate-scroll-x">
+                  {[...normalized, ...normalized, ...normalized].map((item: AnyData, idx: number) => (
+                    <div key={idx} className="flex-shrink-0 flex items-center justify-center h-12 opacity-40 grayscale hover:opacity-70 hover:grayscale-0 transition-all">
+                      {item.logo ? (
+                        <img src={item.logo} alt={item.name || ""} className="h-10 w-auto max-w-[140px] object-contain" />
+                      ) : (
+                        <div className="text-2xl font-black tracking-tighter text-primary whitespace-nowrap">{item.name}</div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="flex flex-wrap justify-center gap-16 opacity-40 grayscale contrast-125">
-              {(trust.clients || []).map((client: string) => (
-                <div key={client} className="text-2xl font-black tracking-tighter text-primary">{client}</div>
-              ))}
-            </div>
-          )}
+            )
+          })()}
         </section>
 
         {/* High Density Bento Grid */}
