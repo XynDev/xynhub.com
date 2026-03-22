@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { swaggerUI } from "@hono/swagger-ui";
@@ -37,35 +36,51 @@ import adminNewsletter from "./routes/admin/newsletter.js";
 
 const app = new Hono();
 
-// Global middleware
-app.use("*", logger());
-app.use("*", secureHeaders());
-// Build allowed origins list (trim whitespace from env values)
+// ── CORS: manual implementation (bulletproof — works even on error responses) ──
 const allowedOrigins = (
   process.env.CORS_ORIGINS ||
   "http://localhost:5173,http://localhost:3001,https://xynhub.com,https://www.xynhub.com,https://admin.xynhub.com"
 )
+  .replace(/^["']|["']$/g, "") // strip wrapping quotes if user added them in env
   .split(",")
   .map((o) => o.trim())
   .filter(Boolean);
 
-app.use(
-  "*",
-  cors({
-    origin: (requestOrigin) => {
-      // Allow requests with no origin (server-to-server, curl, etc.)
-      if (!requestOrigin) return allowedOrigins[0];
-      // Check if the request origin is in our allowed list
-      if (allowedOrigins.includes(requestOrigin)) return requestOrigin;
-      // Fallback: deny
-      return allowedOrigins[0];
-    },
-    allowMethods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-    maxAge: 86400,
-  })
-);
+function getCorsHeaders(origin: string | undefined | null): Record<string, string> {
+  const matched = origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
+  return {
+    "Access-Control-Allow-Origin": matched,
+    "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type,Authorization",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Max-Age": "86400",
+  };
+}
+
+// 1) Preflight: return 204 immediately with CORS headers — before ANY other middleware
+app.options("*", (c) => {
+  const origin = c.req.header("Origin");
+  const headers = getCorsHeaders(origin);
+  return new Response(null, { status: 204, headers });
+});
+
+// 2) CORS headers on ALL responses (including errors)
+app.use("*", async (c, next) => {
+  const origin = c.req.header("Origin");
+  const headers = getCorsHeaders(origin);
+  try {
+    await next();
+  } finally {
+    // Always set CORS headers — even if next() threw or returned an error
+    for (const [key, val] of Object.entries(headers)) {
+      c.res.headers.set(key, val);
+    }
+  }
+});
+
+// Global middleware
+app.use("*", logger());
+app.use("*", secureHeaders());
 
 // Health check
 app.get("/", (c) =>
