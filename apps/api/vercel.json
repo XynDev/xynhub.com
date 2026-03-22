@@ -3,6 +3,11 @@
   "buildCommand": "",
   "installCommand": "",
   "outputDirectory": ".",
+  "functions": {
+    "api/index.mjs": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
     { "source": "/(.*)", "destination": "/api" }
   ]

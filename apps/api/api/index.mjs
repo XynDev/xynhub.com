@@ -1827,7 +1827,7 @@ var require_RealtimeChannel = __commonJS({
           const postgres_changes = (_b = (_a = this.bindings.postgres_changes) === null || _a === void 0 ? void 0 : _a.map((r) => r.filter)) !== null && _b !== void 0 ? _b : [];
           const presence_enabled = !!this.bindings[REALTIME_LISTEN_TYPES.PRESENCE] && this.bindings[REALTIME_LISTEN_TYPES.PRESENCE].length > 0 || ((_c = this.params.config.presence) === null || _c === void 0 ? void 0 : _c.enabled) === true;
           const accessTokenPayload = {};
-          const config = {
+          const config2 = {
             broadcast,
             presence: Object.assign(Object.assign({}, presence), { enabled: presence_enabled }),
             postgres_changes,
@@ -1838,7 +1838,7 @@ var require_RealtimeChannel = __commonJS({
           }
           this._onError((e) => callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, e));
           this._onClose(() => callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CLOSED));
-          this.updateJoinPayload(Object.assign({ config }, accessTokenPayload));
+          this.updateJoinPayload(Object.assign({ config: config2 }, accessTokenPayload));
           this.joinedOnce = true;
           this._rejoin(timeout);
           this.joinPush.receive("ok", async ({ postgres_changes: postgres_changes2 }) => {
@@ -14074,12 +14074,12 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   *   })
   * ```
   */
-  textSearch(column, query, { config, type } = {}) {
+  textSearch(column, query, { config: config2, type } = {}) {
     let typePart = "";
     if (type === "plain") typePart = "pl";
     else if (type === "phrase") typePart = "ph";
     else if (type === "websearch") typePart = "w";
-    const configPart = config === void 0 ? "" : `(${config})`;
+    const configPart = config2 === void 0 ? "" : `(${config2})`;
     this.url.searchParams.append(column, `${typePart}fts${configPart}.${query}`);
     return this;
   }
@@ -25087,7 +25087,11 @@ app26.notFound(
 var app_default = app26;
 
 // src/vercel.ts
+var config = {
+  maxDuration: 30
+};
 var vercel_default = handle(app_default);
 export {
+  config,
   vercel_default as default
 };

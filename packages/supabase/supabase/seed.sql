@@ -1,6 +1,8 @@
 -- ============================================================
--- XYNHub CMS Seed Data
--- Populated from frontend mock JSON data
+-- XYNHub CMS Seed Data (Complete)
+-- Includes: settings, navigation, footer, pages, blogs,
+--   portfolios, testimonials, team, faqs, services,
+--   privacy-policy, terms-of-service
 -- ============================================================
 
 -- ============================================================
@@ -14,7 +16,9 @@ INSERT INTO site_settings (key, value) VALUES
 ('logo_icon_light', '{"url": "/logo-only-dark.png"}'),
 ('logo_icon_dark', '{"url": "/logo-only-white.png"}'),
 ('seo_default', '{"title": "XYNHub - The Architecture of Pure Performance", "description": "XYN provides the low-latency infrastructure required for next-generation synaptic computing and distributed ecosystem management.", "keywords": "infrastructure, low-latency, synaptic computing, distributed systems", "image": "/og-xynhub.png"}'),
-('social_links', '{"github": "https://github.com/xyn-nodes", "telegram": "https://t.me/xyn_official", "email": "protocols@xyn.eth"}');
+('social_links', '{"github": "https://github.com/xyn-nodes", "telegram": "https://t.me/xyn_official", "email": "protocols@xyn.eth"}'),
+('header_cta', '{"value": {"text": "Get Started", "url": "/services"}}'),
+('contact_email', '{"value": "hello@xynhub.com"}');
 
 -- ============================================================
 -- NAVIGATION ITEMS
@@ -31,11 +35,11 @@ INSERT INTO navigation_items (label, path, sort_order, is_active) VALUES
 -- FOOTER SECTIONS
 -- ============================================================
 INSERT INTO footer_sections (section_key, title, content, sort_order) VALUES
-('brand', 'XYNHub', '{"description": "Engineering the next generation of digital monoliths. We architect the invisible infrastructure that powers tomorrow.", "logo_light": "/logo-text-dark.png", "logo_dark": "/logo-text-white.png"}', 1),
-('platform', 'Platform', '{"links": [{"label": "Infrastructure", "url": "#"}, {"label": "Security", "url": "#"}, {"label": "Ecosystem", "url": "#"}]}', 2),
-('company', 'Company', '{"links": [{"label": "About Us", "url": "/about"}, {"label": "Careers", "url": "#"}, {"label": "Legal", "url": "#"}]}', 3),
-('newsletter', 'Newsletter', '{"description": "Get the latest system updates.", "placeholder": "Enter your email", "button_text": "Join"}', 4),
-('bottom', 'Bottom', '{"copyright": "© 2024 XYN Engineering Ecosystem. All rights reserved.", "links": [{"label": "Privacy Policy", "url": "#"}, {"label": "Terms of Service", "url": "#"}]}', 5);
+('brand', 'XYNHub', '{"description": "Engineering the next generation of digital monoliths. We architect the invisible infrastructure that powers tomorrow."}', 1),
+('platform', 'Platform', '{"links": [{"label": "Infrastructure", "url": "#"}, {"label": "Security", "url": "#"}, {"label": "Ecosystem", "url": "#"}, {"label": "Services", "url": "/services"}]}', 2),
+('company', 'Company', '{"links": [{"label": "About Us", "url": "/about"}, {"label": "Process", "url": "/process"}, {"label": "Portfolio", "url": "/portofolio"}, {"label": "Blog", "url": "/blogs"}]}', 3),
+('newsletter', 'Newsletter', '{"description": "Get the latest system updates.", "placeholder": "Email Address", "button_text": "Join"}', 4),
+('bottom', 'Bottom', '{"copyright": "\u00a9 2026 XYN Engineering Ecosystem. All rights reserved.", "links": [{"label": "Privacy Policy", "url": "/privacy-policy"}, {"label": "Terms of Service", "url": "/terms-of-service"}]}', 5);
 
 -- ============================================================
 -- HOME PAGE CONTENT
@@ -48,7 +52,13 @@ INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
 }', 1),
 ('home', 'trust', '{
   "title": "Trusted by Global Innovators",
-  "clients": ["VERTEX", "QUANTUM", "NEXUS.IO", "SYNAPSE", "CORE.SYS"]
+  "clients": [
+    {"name": "VERTEX", "logo": ""},
+    {"name": "QUANTUM", "logo": ""},
+    {"name": "NEXUS.IO", "logo": ""},
+    {"name": "SYNAPSE", "logo": ""},
+    {"name": "CORE.SYS", "logo": ""}
+  ]
 }', 2),
 ('home', 'stats', '{
   "deployments": {
@@ -107,6 +117,9 @@ INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
     }
   ]
 }', 5),
+('home', 'testimonials', '{
+  "title": "What industry leaders say."
+}', 6),
 ('home', 'whyUs', '{
   "title": "Why engineering teams choose XYN.",
   "description": "We don''t just build software; we architect the physical and logical layers of the future. Our commitment to performance is uncompromising.",
@@ -115,17 +128,28 @@ INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
     { "id": "02", "title": "Sovereign Control", "description": "Complete ownership of your data and infrastructure with no vendor lock-in mechanisms." },
     { "id": "03", "title": "Predictive Scaling", "description": "AI-driven resource allocation that anticipates demand before it affects your systems." }
   ]
-}', 6),
+}', 7),
 ('home', 'cta', '{
   "label": "Project Integration Phase",
   "headline": "Ready to transcend?",
-  "description": "Join 400+ leading enterprises already scaling on XYN''s neural framework. Deploy your first node in minutes."
-}', 7),
+  "description": "Join 400+ leading enterprises already scaling on XYN''s neural framework. Deploy your first node in minutes.",
+  "buttons": [
+    { "text": "Get Started Now", "url": "/services", "variant": "primary" },
+    { "text": "Talk to Engineering", "url": "/about", "variant": "secondary" }
+  ]
+}', 8),
+('home', 'faq', '{
+  "title": "Frequently Asked Questions."
+}', 9),
 ('home', 'contactInfo', '{
   "phone": "+1 (888) XYN-NODE",
+  "phone_title": "Direct Terminal",
   "availability": "Active 24/7/365",
-  "address": "One Infinite Way,\nSilicon Heights, CA 94025"
-}', 8);
+  "address": "One Infinite Way,\nSilicon Heights, CA 94025",
+  "address_title": "Nexus Core HQ",
+  "maps_link": "https://maps.google.com",
+  "maps_text": "View Maps"
+}', 10);
 
 -- ============================================================
 -- ABOUT PAGE CONTENT
@@ -197,7 +221,7 @@ INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
 }', 7);
 
 -- ============================================================
--- SERVICES PAGE CONTENT
+-- SERVICES PAGE CONTENT (hero + CTA only, services from table)
 -- ============================================================
 INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
 ('services', 'hero', '{
@@ -205,99 +229,14 @@ INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
   "headline": "Functional\nStack.",
   "status": { "text": "System Status: Optimal" }
 }', 1),
-('services', 'web', '{
-  "icon": "terminal",
-  "title": "Web & Ecosystem Development",
-  "number": "01",
-  "description": "Engineering high-performance web applications with modular architecture and sub-second latency. We build for scale, ensuring your digital infrastructure remains robust under peak loads.",
-  "metrics": [
-    { "label": "Latency", "value": "<150ms" },
-    { "label": "Uptime", "value": "99.99%" },
-    { "label": "Type-Safe", "value": "Strict" },
-    { "label": "Testing", "value": "100%" }
-  ]
-}', 2),
-('services', 'tooling', '{
-  "title": "Tooling & Environment",
-  "stack": [
-    { "name": "TypeScript" },
-    { "name": "React / Next.js" },
-    { "name": "Node.js / Bun" },
-    { "name": "PostgreSQL" },
-    { "name": "Redis Cache" }
-  ]
-}', 3),
-('services', 'app', '{
-  "icon": "install_mobile",
-  "title": "Native & Hybrid Application Design",
-  "description": "Crafting intuitive mobile experiences that bridge the gap between complex functionality and seamless interaction.",
-  "platforms": ["iOS Swift Native", "Android Kotlin", "React Native Hybrid"]
-}', 4),
-('services', 'cloud', '{
-  "icon": "cloud_done",
-  "title": "Cloud Systems & Infrastructure",
-  "number": "02",
-  "features": [
-    { "title": "Provisioning", "description": "Automated CI/CD pipelines and Infrastructure as Code (Terraform/Ansible) for immutable deployments." },
-    { "title": "Scalability", "description": "Auto-scaling Kubernetes clusters and serverless functions designed for elastic demand." }
-  ],
-  "technologies": ["AWS", "Google Cloud", "Docker", "Kubernetes", "Vercel"]
-}', 5),
 ('services', 'cta', '{
   "title": "Initialize Your Project",
   "description": "Ready to deploy a high-performance digital ecosystem? Connect with our engineering team to audit your current stack.",
   "buttons": [
-    { "text": "Start Build", "variant": "primary" },
-    { "text": "View Specs", "variant": "secondary" }
+    { "text": "Start Build", "url": "/services", "variant": "primary" },
+    { "text": "View Specs", "url": "/about", "variant": "secondary" }
   ]
-}', 6);
-
--- ============================================================
--- SERVICE DETAIL PAGE CONTENT
--- ============================================================
-INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
-('service-detail', 'hero', '{
-  "label": "Engineering Ethos",
-  "title": "Web & App Development",
-  "description": "We don''t build features; we engineer ironclad ecosystems. Our development standards are rooted in mathematical certainty and memory-safe architecture."
-}', 1),
-('service-detail', 'security', '{
-  "icon": "shield_lock",
-  "title": "Zero-Trust Security",
-  "description": "Every transaction, every data packet, and every user interaction is verified at the edge. We assume the environment is hostile and build accordingly.",
-  "modules": [
-    { "name": "IDENTITY_VERIFICATION_MODULE", "status": "active" },
-    { "name": "ENCRYPTED_STATE_MANAGEMENT", "status": "passive" }
-  ]
-}', 2),
-('service-detail', 'memory', '{
-  "icon": "memory",
-  "title": "Memory Safety",
-  "description": "Eliminating entire classes of vulnerabilities through strict typing and ownership models. We utilize Rust and low-level optimizations to ensure performance without compromise.",
-  "metrics": [{ "label": "Leak Prevention", "value": "100%" }]
-}', 3),
-('service-detail', 'routing', '{
-  "icon": "alt_route",
-  "title": "Deterministic Routing",
-  "description": "Predictable, high-frequency request handling. Our ecosystems ensure that the shortest path is always the safest path."
-}', 4),
-('service-detail', 'stress', '{
-  "titlePrefix": "PROVEN BY",
-  "titleHighlight": "STRESS.",
-  "description": "Our systems undergo rigorous chaos engineering to simulate extreme load and failure scenarios before a single line of code reaches production."
-}', 5),
-('service-detail', 'habits', '{
-  "items": [
-    { "id": "h1", "label": "Habit 01", "title": "Immutable Infrastructure", "description": "We never patch live systems. We redeploy from verified source-of-truth images." },
-    { "id": "h2", "label": "Habit 02", "title": "Strict Linting & Testing", "description": "CI/CD pipelines that reject anything below 98% coverage and zero warnings." },
-    { "id": "h3", "label": "Habit 03", "title": "Observability First", "description": "Detailed telemetry is a prerequisite for deployment. If it''s not logged, it''s not launched." }
-  ]
-}', 6),
-('service-detail', 'cta', '{
-  "title": "Ready for the Scale?",
-  "description": "Connect with our engineering lead to discuss your ecosystem architecture and how we can implement deterministic standards across your stack.",
-  "buttonText": "Inquire for Engineering"
-}', 7);
+}', 2);
 
 -- ============================================================
 -- PROCESS PAGE CONTENT
@@ -386,17 +325,17 @@ INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
 }', 4);
 
 -- ============================================================
--- BLOGS PAGE CONTENT (hero only, posts are in blogs table)
+-- BLOGS PAGE CONTENT
 -- ============================================================
 INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
 ('blogs', 'hero', '{
-  "label": "Archive // 2024",
+  "label": "Archive // 2026",
   "title": "XYN INTEL.",
   "description": "Documentation of technical breakthroughs, theoretical frameworks, and infrastructure deployments across the XYN ecosystem."
 }', 1);
 
 -- ============================================================
--- PORTFOLIO PAGE CONTENT (header + proficiency + features + contact)
+-- PORTFOLIO PAGE CONTENT
 -- ============================================================
 INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
 ('portofolio', 'header', '{
@@ -430,15 +369,98 @@ INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
   ]
 }', 3),
 ('portofolio', 'contact', '{
-  "label": "Infrastucture Ready",
+  "label": "Infrastructure Ready",
   "title": "Scale your architecture to the edge.",
-  "description": "I build low-latency, high-performance systems for the next generation of the web. Available for architectural consulting and senior engineering roles.",
+  "description": "We build low-latency, high-performance systems for the next generation of the web. Available for architectural consulting and senior engineering roles.",
   "actionPrimary": "Initialize Project",
   "links": ["GitHub", "LinkedIn"]
 }', 4);
 
 -- ============================================================
--- BLOGS (Dynamic content)
+-- PRIVACY POLICY PAGE
+-- ============================================================
+INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
+('privacy-policy', 'content', '{
+  "title": "Privacy Policy",
+  "body": "# Privacy Policy\n\nLast updated: March 22, 2026\n\nYour privacy is important to us. This Privacy Policy explains how XYNHub (\"we\", \"us\", or \"our\") collects, uses, and protects your information when you visit our website or use our services.\n\n## Information We Collect\n\n### Information You Provide\n- **Contact Information**: Name, email address, and messages submitted through our contact form\n- **Newsletter**: Email address when you subscribe to our newsletter\n- **Project Inquiries**: Details about your project requirements\n\n### Automatically Collected Information\n- Browser type and version\n- Pages visited and time spent\n- Referring website\n- IP address (anonymized)\n\n## How We Use Your Information\n\n- To respond to your inquiries and provide requested services\n- To send newsletters and updates (only if you have subscribed)\n- To improve our website and services\n- To comply with legal obligations\n\n## Data Protection\n\nWe implement appropriate technical and organizational security measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.\n\n## Third-Party Services\n\nWe use the following third-party services:\n- **Vercel**: Website hosting and analytics\n- **Supabase**: Database and authentication\n\n## Your Rights\n\nYou have the right to:\n- Access your personal data\n- Request correction of inaccurate data\n- Request deletion of your data\n- Withdraw consent for newsletter subscriptions\n\n## Cookies\n\nWe use essential cookies only to ensure the website functions properly. We do not use tracking cookies.\n\n## Changes to This Policy\n\nWe may update this Privacy Policy from time to time. Changes will be posted on this page with an updated revision date.\n\n## Contact Us\n\nIf you have questions about this Privacy Policy, please contact us at hello@xynhub.com."
+}', 1);
+
+-- ============================================================
+-- TERMS OF SERVICE PAGE
+-- ============================================================
+INSERT INTO page_contents (page_slug, section_key, content, sort_order) VALUES
+('terms-of-service', 'content', '{
+  "title": "Terms of Service",
+  "body": "# Terms of Service\n\nLast updated: March 22, 2026\n\nBy accessing and using the XYNHub website and services, you agree to be bound by these Terms of Service.\n\n## 1. Services\n\nXYNHub provides web development, mobile application development, cloud infrastructure solutions, and related technology consulting services.\n\n## 2. Use of Website\n\nYou agree to use our website and services in compliance with all applicable laws and regulations. You may not:\n- Use our services for any unlawful purpose\n- Attempt to gain unauthorized access to our systems\n- Interfere with the proper working of the website\n- Transmit any malicious code or harmful content\n\n## 3. Intellectual Property\n\nAll content, designs, code, and materials on this website are the property of XYNHub unless otherwise stated. You may not reproduce, distribute, or create derivative works without our written permission.\n\n## 4. Project Agreements\n\nSpecific project engagements will be governed by separate service agreements that outline scope, deliverables, timelines, and payment terms.\n\n## 5. Limitation of Liability\n\nXYNHub shall not be liable for any indirect, incidental, special, consequential, or punitive damages arising from your use of our website or services.\n\n## 6. Disclaimer\n\nOur website and services are provided \"as is\" without warranties of any kind, either express or implied.\n\n## 7. Indemnification\n\nYou agree to indemnify and hold harmless XYNHub from any claims, damages, or expenses arising from your use of our services or violation of these terms.\n\n## 8. Governing Law\n\nThese Terms shall be governed by and construed in accordance with applicable laws.\n\n## 9. Changes to Terms\n\nWe reserve the right to modify these terms at any time. Continued use of our services after changes constitutes acceptance of the new terms.\n\n## 10. Contact Us\n\nFor questions about these Terms of Service, please contact us at hello@xynhub.com."
+}', 1);
+
+-- ============================================================
+-- SERVICES (Dynamic content from services table)
+-- ============================================================
+INSERT INTO services (slug, title, description, short_description, icon, image_url, number, metrics, tooling, features, is_featured, sort_order, is_active) VALUES
+(
+  'web-development',
+  'Web & Ecosystem Development',
+  'Engineering high-performance web applications with modular architecture and sub-second latency. We build for scale, ensuring your digital infrastructure remains robust under peak loads. Our approach combines type-safe development with rigorous testing to deliver production-grade systems.',
+  'High-performance web applications with modular architecture and sub-second latency.',
+  'terminal',
+  NULL,
+  '01',
+  '[{"label": "Latency", "value": "<150ms"}, {"label": "Uptime", "value": "99.99%"}, {"label": "Type-Safe", "value": "Strict"}, {"label": "Testing", "value": "100%"}]',
+  '["TypeScript", "React / Next.js", "Node.js / Bun", "PostgreSQL", "Redis Cache"]',
+  '[{"title": "Server-Side Rendering", "description": "Optimized SSR and SSG for maximum performance and SEO."}, {"title": "Real-Time Features", "description": "WebSocket and Server-Sent Events for live data streaming."}, {"title": "API Architecture", "description": "RESTful and GraphQL APIs with OpenAPI documentation."}, {"title": "Progressive Web Apps", "description": "Offline-first PWAs with service workers and caching strategies."}]',
+  true,
+  1,
+  true
+),
+(
+  'mobile-development',
+  'Native & Hybrid Application Design',
+  'Crafting intuitive mobile experiences that bridge the gap between complex functionality and seamless interaction. We develop native and cross-platform applications that leverage device capabilities while maintaining a consistent user experience across platforms.',
+  'Intuitive mobile experiences bridging complex functionality and seamless interaction.',
+  'install_mobile',
+  NULL,
+  '02',
+  '[{"label": "Platforms", "value": "3"}, {"label": "App Rating", "value": "4.9★"}, {"label": "Downloads", "value": "1M+"}]',
+  '["Swift", "Kotlin", "React Native", "Flutter", "Firebase"]',
+  '[{"title": "iOS Native", "description": "Swift-based iOS apps with native UI components and performance."}, {"title": "Android Native", "description": "Kotlin-first Android development with Material Design 3."}, {"title": "Cross-Platform", "description": "React Native and Flutter for shared codebases across platforms."}, {"title": "App Store Optimization", "description": "ASO strategies for maximum visibility and downloads."}]',
+  true,
+  2,
+  true
+),
+(
+  'cloud-infrastructure',
+  'Cloud Systems & Infrastructure',
+  'Automated CI/CD pipelines and Infrastructure as Code for immutable deployments. Auto-scaling Kubernetes clusters and serverless functions designed for elastic demand. We architect cloud-native solutions that optimize cost while maximizing performance and reliability.',
+  'Automated infrastructure with auto-scaling clusters and serverless architecture.',
+  'cloud_done',
+  NULL,
+  '03',
+  '[{"label": "Uptime", "value": "99.999%"}, {"label": "Deploy Time", "value": "<2min"}, {"label": "Cost Saved", "value": "40%"}, {"label": "Regions", "value": "14"}]',
+  '["AWS", "Google Cloud", "Docker", "Kubernetes", "Vercel", "Terraform"]',
+  '[{"title": "Provisioning", "description": "Automated CI/CD pipelines and Infrastructure as Code (Terraform/Ansible) for immutable deployments."}, {"title": "Scalability", "description": "Auto-scaling Kubernetes clusters and serverless functions designed for elastic demand."}, {"title": "Monitoring", "description": "Comprehensive observability with Prometheus, Grafana, and custom alerting."}, {"title": "Security", "description": "Zero-trust architecture with encrypted communication and secret management."}]',
+  true,
+  3,
+  true
+),
+(
+  'ui-ux-design',
+  'UI/UX Design & Branding',
+  'We craft digital experiences that are not only beautiful but also functional. Our design process is rooted in user research and data-driven decision making, ensuring every pixel serves a purpose.',
+  'Data-driven design that balances aesthetics with functionality.',
+  'palette',
+  NULL,
+  '04',
+  '[{"label": "NPS Score", "value": "92"}, {"label": "Conversion", "value": "+35%"}]',
+  '["Figma", "Framer", "After Effects", "Principle"]',
+  '[{"title": "User Research", "description": "In-depth user interviews, surveys, and usability testing."}, {"title": "Design Systems", "description": "Scalable component libraries with consistent design tokens."}, {"title": "Prototyping", "description": "Interactive prototypes for rapid validation and iteration."}, {"title": "Brand Identity", "description": "Complete brand systems from logo to comprehensive style guides."}]',
+  false,
+  4,
+  true
+);
+
+-- ============================================================
+-- BLOGS
 -- ============================================================
 INSERT INTO blogs (slug, title, category, tag, description, content, author_name, author_role, author_image, image_url, icon, is_featured, read_time, published_at, is_active) VALUES
 (
@@ -447,7 +469,7 @@ INSERT INTO blogs (slug, title, category, tag, description, content, author_name
   'Latest',
   'Featured',
   'A deep dive into the consensus mechanisms driving our latest infrastructure update, focusing on latency reduction in multi-regional clusters.',
-  '{}',
+  '{"body": "# Architecting the Core: Distributed Systems at Scale\n\nA deep dive into the consensus mechanisms driving our latest infrastructure update, focusing on latency reduction in multi-regional clusters.\n\n## The Challenge\n\nModern distributed systems face an inherent tension between consistency, availability, and partition tolerance. As our infrastructure grew to span 14 global regions, we needed to rethink our consensus mechanisms.\n\n## Our Approach\n\nWe implemented a hybrid consensus model that combines Raft for local cluster coordination with a custom gossip protocol for cross-regional state synchronization.\n\n## Results\n\n- **Latency reduction**: 60% improvement in cross-region queries\n- **Consistency**: Strong consistency within regions, eventual consistency across regions\n- **Availability**: 99.999% uptime maintained during the migration"}',
   'Dr. Elias Thorne',
   'Chief Systems Architect',
   NULL,
@@ -464,48 +486,10 @@ INSERT INTO blogs (slug, title, category, tag, description, content, author_name
   'Deployment Log',
   'TECHNICAL MONOGRAPH // 071',
   'As the proliferation of high-frequency data generators accelerates, the traditional centralized cloud model faces an existential latency wall.',
-  '{
-    "intro": "As the proliferation of high-frequency data generators—from autonomous vehicular arrays to industrial IoT clusters—accelerates, the traditional centralized cloud model faces an existential latency wall. Real-time inference is no longer a luxury; it is a structural necessity for the next generation of autonomous logic.",
-    "dilemma": {
-      "title": "The Latency Dilemma",
-      "paragraph": "In traditional architectures, data packets traverse multiple hops across backhaul networks before reaching a centralized GPU cluster for processing. While fiber-optic speeds are impressive, the physical distance introduces a deterministic floor on latency—typically ranging from 50ms to 200ms. In a world where sub-10ms decisions are required for collision avoidance, this gap is untenable."
-    },
-    "diagram1": {
-      "centralized": { "title": "Centralized Decay", "description": "High latency spikes due to multi-hop routing and congestion at the core network." },
-      "edge": { "title": "Edge Synthesis", "description": "Decentralized nodes perform immediate inference, reducing the round-trip time to local microseconds." }
-    },
-    "fog": {
-      "title": "Architecting the Fog",
-      "paragraph": "The transition to edge-native inference requires a radical rethinking of model deployment. We are no longer pushing monolithic weights to a single cluster. Instead, we are implementing tiered \"Fog\" layers where lightweight quantized models reside at the extreme edge, with larger, more complex models distributed across regional POPs (Points of Presence).",
-      "quote": "The edge is not a location; it is a computational philosophy that prioritizes proximity over capacity."
-    },
-    "diagram2": {
-      "stack": {
-        "title": "Protocol Stack",
-        "items": [
-          { "label": "Inference Engine", "value": "v4.2.0-STABLE" },
-          { "label": "Quantization Layer", "value": "INT8-COMPRESSED" },
-          { "label": "Synchronization Meta", "value": "ASYNC-MESH" }
-        ]
-      },
-      "hardware": {
-        "title": "Node Hardware",
-        "label": "Industrial Grade",
-        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuDqS_mvX7OBbkNAIE1663JFrGdeFbtEH9rtm5OltI0r4XvpKO5a7p-Cn-Bljdb3H8bOxqESPPCSc-iXCU0tXh3eBArLStrs6ohyNTj42vPaEZb3aRNYu0zUbNf8nsDzJUpdm2niy87FPXvUPqw7FHRiQLg1Tve6WDoQrKFopoqTNH__U0WKcZyHRFsSWdgZsov6DwXaormrzOQVyg9DH0-spBFD3E0aGtXwtwaR7HJ4xog2d2BYBEq3OW55WC8pEZUFI2tbTnfiEjk"
-      }
-    },
-    "conclusion": "In conclusion, bridging the gap for real-time inference is the primary engineering challenge of the decade. By moving logic closer to the photon, we aren''t just making systems faster—we''re making them capable of behaviors that were previously impossible. The era of the monolithic cloud is ending; the era of the distributed intelligence has begun.",
-    "cta": {
-      "title": "Join the Collective.",
-      "description": "We are building the future of distributed engineering. Subscribe to our technical monographs and join a network of over 45,000 systems architects.",
-      "placeholder": "engineering@org.com",
-      "buttonText": "SYNCHRONIZE",
-      "disclaimer": "Encryption guaranteed. No noise, just signal."
-    }
-  }',
+  '{"body": "# Edge Computing: Bridging the Gap in Real-Time Inference\n\nAs the proliferation of high-frequency data generators accelerates, the traditional centralized cloud model faces an existential latency wall. Real-time inference is no longer a luxury; it is a structural necessity for the next generation of autonomous logic.\n\n## The Latency Dilemma\n\nIn traditional architectures, data packets traverse multiple hops across backhaul networks before reaching a centralized GPU cluster for processing. While fiber-optic speeds are impressive, the physical distance introduces a deterministic floor on latency.\n\n## Architecting the Fog\n\nThe transition to edge-native inference requires a radical rethinking of model deployment. We implement tiered Fog layers where lightweight quantized models reside at the extreme edge.\n\n> The edge is not a location; it is a computational philosophy that prioritizes proximity over capacity.\n\n## Conclusion\n\nBridging the gap for real-time inference is the primary engineering challenge of the decade. By moving logic closer to the photon, we aren''t just making systems faster—we''re making them capable of behaviors that were previously impossible."}',
   'Dr. Elias Thorne',
-  'Chief Systems Architect, Technical Engineering Corp.',
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuDV1D9f6eJcZ8CZjWsPgZHYNteIKXr7nQA0mkbtt00pwOdE5_N2uNAEs1d8jwK5zIvn4IpMG4lBmDQPHcuDy8BI53VGOpG6fvy7TG00j4-sLAcWEgoNOLSouv9VQrF5bKMiI6YcW4P6T-jtaEQ7-SQk5FQddWvdkYdWlx0dVnoGSfVt5JMrovoAZlGY7FE16zmE7Ro6eVj-fPMp2opgzGqfYUqHD0dTEfPApxhZVkVPIruuIWuAGcV3Rox8652vEwVi9dnJAeUmE84',
+  'Chief Systems Architect',
+  NULL,
   NULL,
   'terminal',
   false,
@@ -519,7 +503,7 @@ INSERT INTO blogs (slug, title, category, tag, description, content, author_name
   'System Optimization',
   NULL,
   'Techniques for managing memory efficiently in high-throughput data processing environments.',
-  '{}',
+  '{"body": "# Memory Management in High-Throughput Environments\n\nEfficient memory management is critical in high-throughput systems. This article explores techniques for optimizing memory allocation, garbage collection, and buffer management in production systems."}',
   'XYN Engineering',
   'Engineering Team',
   NULL,
@@ -536,7 +520,7 @@ INSERT INTO blogs (slug, title, category, tag, description, content, author_name
   'Research',
   'Paper #442',
   'Quantifying the structural efficiency of non-linear network configurations in adaptive learning models.',
-  '{}',
+  '{"body": "# Neural Topology and Information Entropy\n\nQuantifying the structural efficiency of non-linear network configurations in adaptive learning models. This paper presents our findings on optimizing network topology for maximum information throughput."}',
   'DR, KA',
   'Research Team',
   NULL,
@@ -553,7 +537,7 @@ INSERT INTO blogs (slug, title, category, tag, description, content, author_name
   'Research',
   'Pre-Print',
   'An evaluation of lattice-based security protocols in future-proofing decentralised ledger technology.',
-  '{}',
+  '{"body": "# Quantum Resilient Cryptographic Standards\n\nAn evaluation of lattice-based security protocols in future-proofing decentralised ledger technology. We analyze the viability of post-quantum cryptographic algorithms."}',
   'LH',
   'Research Team',
   NULL,
@@ -570,7 +554,7 @@ INSERT INTO blogs (slug, title, category, tag, description, content, author_name
   'Infrastructure',
   NULL,
   'Status update on our South-East Asian node deployment and routing optimization.',
-  '{}',
+  '{"body": "# Global CDN Expansion\n\nWe''re excited to announce the expansion of our CDN infrastructure into South-East Asia. This deployment reduces latency for users in the region by up to 70%."}',
   'XYN Engineering',
   'Infrastructure Team',
   NULL,
@@ -587,7 +571,7 @@ INSERT INTO blogs (slug, title, category, tag, description, content, author_name
   'Infrastructure',
   NULL,
   'Transitioning internal authentication to a stateless, hardware-verified architecture.',
-  '{}',
+  '{"body": "# Zero-Trust Implementation\n\nTransitioning internal authentication to a stateless, hardware-verified architecture. This article details our migration to a zero-trust security model."}',
   'XYN Engineering',
   'Security Team',
   NULL,
@@ -604,7 +588,7 @@ INSERT INTO blogs (slug, title, category, tag, description, content, author_name
   'Infrastructure',
   NULL,
   'Integrating data center consumption with localized green energy harvesting systems.',
-  '{}',
+  '{"body": "# Renewable Grid Sync\n\nIntegrating data center consumption with localized green energy harvesting systems. Our approach to sustainable infrastructure management."}',
   'XYN Engineering',
   'Infrastructure Team',
   NULL,
@@ -617,18 +601,20 @@ INSERT INTO blogs (slug, title, category, tag, description, content, author_name
 );
 
 -- ============================================================
--- PORTFOLIOS (Dynamic content)
+-- PORTFOLIOS
 -- ============================================================
-INSERT INTO portfolios (slug, title, tag, description, image_url, tech_stack, metrics, sort_order, is_active) VALUES
+INSERT INTO portfolios (slug, title, tag, description, short_description, image_url, tech_stack, metrics, sort_order, is_active, is_featured) VALUES
 (
   'aether-net',
   'Aether_Net',
   'Core Protocol',
   NULL,
+  'Global low-latency communication network with quantum-resistant encryption.',
   'https://lh3.googleusercontent.com/aida-public/AB6AXuADEkUUCejDZn_LCG3xSpaSatiTbs161BdmuPZnJ8fWN5M3g2UpBI0xD3X-I7znn_HC1NTLuidIKA16kf0CiZY-Kl-JRU86-nYfnOFZdQam6Y0kAMz95zN0FQpMqKG2YLHF6AeqnNNMnkERbghJBw9Z9EUVrzFz_NNpZivBksb_FXy6J_DpAKQ4-gNNkUwkhmkVtk6jRV4aV7vWIeMqaBr7uvrWHfnaLl5GbUaXJW_a0ZnUy0hs8FZkaHgwX89NUmtkwT5OuFvQip4',
   '{"tech1": {"icon": "terminal", "lang": "Rust", "role": "Engine"}, "tech2": {"icon": "dataset", "lang": "gRPC", "role": "Transport"}}',
   '{"value": "0.02ms", "label": "P99 Latency"}',
   1,
+  true,
   true
 ),
 (
@@ -636,21 +622,25 @@ INSERT INTO portfolios (slug, title, tag, description, image_url, tech_stack, me
   'Synapse_OS',
   'Module: 02',
   'Microkernel architecture for edge computing devices.',
+  'Ultra-lightweight microkernel for edge computing with 4.2KB memory footprint.',
   NULL,
   '{"stack": ["Zig", "ARM64"], "memory": "4.2KB Baseline"}',
   NULL,
   2,
-  true
+  true,
+  false
 ),
 (
   'quantum-ui',
   'Quantum_UI',
   'Frontend Engineering',
   'High-fidelity component library designed for real-time data visualization. Built on top of Next.js 14 and WebGL for zero-lag rendering.',
+  'High-fidelity component library for real-time data visualization with 60FPS rendering.',
   'https://lh3.googleusercontent.com/aida-public/AB6AXuDLYA2UXE_67Hoq5WAjStXFo4fZaXX6gmnpipJDlY-t-jQxSgYnbDwDDpKEwbxm4RCjp4_NswXaGg4c6dDMe8fjqckdiJOB27K4bUl399Ewxjz_KVMkVkSkImNkFw02WpIMOLQ5Wv4ifMdeWiSmKVRhBVC5NOLKA3_q1LfVJnv37_mcvEL7_1R4BTqZ09uafMpO9aMk_tXgPECQdTgEar_FbTRAHsqcRy0Mjri0W5nZ6Y94Zk7bEJ88isJgquyzcvG8UUFT6kMPgWI',
   NULL,
   '{"items": [{"value": "60FPS", "label": "Locked"}, {"value": "0kb", "label": "Runtime CSS"}]}',
   3,
+  true,
   true
 );
 
@@ -709,11 +699,11 @@ FROM portfolios p WHERE p.slug = 'aether-net';
 -- ============================================================
 -- TESTIMONIALS
 -- ============================================================
-INSERT INTO testimonials (quote, author_name, author_role, author_initials, span_class, sort_order, is_active) VALUES
-('XYN has fundamentally transformed how we handle cross-continental data sync. Their latency reduction isn''t just a metric; it''s a competitive advantage.', 'Alexander Müller', 'CTO, Vertex Quantum', 'AM', 'col-span-12 md:col-span-7', 1, true),
-('The most stable synaptic routing protocol we''ve ever integrated. Security and speed in a single package.', 'Sarah Koenig', 'Head of Infrastructure, Synapse', 'SK', 'col-span-12 md:col-span-5', 2, true),
-('Sovereign control of our data was non-negotiable. XYN delivered exactly what was promised.', 'James Low', 'Lead Architect, Core.Sys', 'JL', 'col-span-12 md:col-span-4', 3, true),
-('Predictive scaling has saved us countless hours of manual resource adjustment. It''s like having an automated engineering team that never sleeps.', 'Raymond Holt', 'VP Engineering, Nexus.IO', 'RH', 'col-span-12 md:col-span-8', 4, true);
+INSERT INTO testimonials (quote, author_name, author_role, author_initials, author_image, span_class, sort_order, is_active) VALUES
+('XYN has fundamentally transformed how we handle cross-continental data sync. Their latency reduction isn''t just a metric; it''s a competitive advantage.', 'Alexander Müller', 'CTO, Vertex Quantum', 'AM', NULL, 'col-span-12 md:col-span-7', 1, true),
+('The most stable synaptic routing protocol we''ve ever integrated. Security and speed in a single package.', 'Sarah Koenig', 'Head of Infrastructure, Synapse', 'SK', NULL, 'col-span-12 md:col-span-5', 2, true),
+('Sovereign control of our data was non-negotiable. XYN delivered exactly what was promised.', 'James Low', 'Lead Architect, Core.Sys', 'JL', NULL, 'col-span-12 md:col-span-4', 3, true),
+('Predictive scaling has saved us countless hours of manual resource adjustment. It''s like having an automated engineering team that never sleeps.', 'Raymond Holt', 'VP Engineering, Nexus.IO', 'RH', NULL, 'col-span-12 md:col-span-8', 4, true);
 
 -- ============================================================
 -- TEAM MEMBERS
