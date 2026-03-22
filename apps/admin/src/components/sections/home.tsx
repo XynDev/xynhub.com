@@ -30,19 +30,22 @@ export function HomeHero({ data, onChange }: Props) {
 // HOME > TRUST
 // ============================================================
 export function HomeTrust({ data, onChange }: Props) {
+  const logos = data.logos ?? [];
   return (
     <div className="space-y-4">
       <TextField label="Title" value={data.title ?? ""} onChange={(v) => onChange({ ...data, title: v })} placeholder="Trusted by Global Innovators" />
-      <div>
-        <label className="block text-sm font-medium mb-1">Client Names</label>
-        <input
-          value={(data.clients ?? []).join(", ")}
-          onChange={(e) => onChange({ ...data, clients: e.target.value.split(",").map((s: string) => s.trim()).filter(Boolean) })}
-          className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--background)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-          placeholder="VERTEX, QUANTUM, NEXUS.IO"
-        />
-        <p className="text-xs text-[var(--muted-foreground)] mt-1">Comma-separated list of client/company names</p>
-      </div>
+      <ArrayField
+        label="Company Logos"
+        items={logos}
+        onChange={(items) => onChange({ ...data, logos: items })}
+        fields={[
+          { key: "name", label: "Company Name", placeholder: "Acme Corp" },
+          { key: "logo", label: "Logo Image", type: "media", colSpan: 2 },
+        ]}
+        defaultItem={{ name: "", logo: "" }}
+        renderMediaPicker={(val, onChangeVal) => <MediaPicker value={val} onChange={onChangeVal} />}
+      />
+      <p className="text-xs text-[var(--muted-foreground)]">Upload company logos. They will be displayed in an infinite horizontal scroll animation on the landing page.</p>
     </div>
   );
 }
@@ -147,11 +150,23 @@ export function HomeWhyUs({ data, onChange }: Props) {
 // ============================================================
 export function HomeCta({ data, onChange }: Props) {
   const set = (key: string, val: string) => onChange({ ...data, [key]: val });
+  const buttons = data.buttons ?? [];
   return (
     <div className="space-y-4">
       <TextField label="Label" value={data.label ?? ""} onChange={(v) => set("label", v)} placeholder="Project Integration Phase" />
       <TextField label="Headline" value={data.headline ?? ""} onChange={(v) => set("headline", v)} placeholder="Ready to transcend?" />
       <TextAreaField label="Description" value={data.description ?? ""} onChange={(v) => set("description", v)} rows={3} />
+      <ArrayField
+        label="Buttons"
+        items={buttons}
+        onChange={(items) => onChange({ ...data, buttons: items })}
+        fields={[
+          { key: "text", label: "Button Text", placeholder: "Get Started Now" },
+          { key: "url", label: "URL / Link", placeholder: "/services or https://wa.me/..." },
+          { key: "variant", label: "Variant", placeholder: "primary or secondary" },
+        ]}
+        defaultItem={{ text: "", url: "", variant: "primary" }}
+      />
     </div>
   );
 }
@@ -163,9 +178,13 @@ export function HomeContactInfo({ data, onChange }: Props) {
   const set = (key: string, val: string) => onChange({ ...data, [key]: val });
   return (
     <div className="space-y-4">
-      <TextField label="Phone" value={data.phone ?? ""} onChange={(v) => set("phone", v)} placeholder="+1 (888) XYN-NODE" />
+      <TextField label="Phone Title" value={data.phone_title ?? ""} onChange={(v) => set("phone_title", v)} placeholder="Direct Terminal" />
+      <TextField label="Phone Number" value={data.phone ?? ""} onChange={(v) => set("phone", v)} placeholder="+1 (888) XYN-NODE" />
       <TextField label="Availability" value={data.availability ?? ""} onChange={(v) => set("availability", v)} placeholder="Active 24/7/365" />
+      <TextField label="Address Title" value={data.address_title ?? ""} onChange={(v) => set("address_title", v)} placeholder="Nexus Core HQ" />
       <TextAreaField label="Address" value={data.address ?? ""} onChange={(v) => set("address", v)} rows={3} placeholder="One Infinite Way,\nSilicon Heights, CA 94025" />
+      <TextField label="Maps Link" value={data.maps_link ?? ""} onChange={(v) => set("maps_link", v)} placeholder="https://maps.google.com/..." />
+      <TextField label="Maps Link Text" value={data.maps_text ?? ""} onChange={(v) => set("maps_text", v)} placeholder="View Maps" />
     </div>
   );
 }

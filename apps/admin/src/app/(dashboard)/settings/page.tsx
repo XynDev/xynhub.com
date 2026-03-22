@@ -5,6 +5,7 @@ import { apiFetch } from "@/lib/api";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Save, Plus, Trash2, Info } from "lucide-react";
+import { MediaPicker } from "@/components/ui/media-picker";
 
 interface Setting {
   id: string;
@@ -16,7 +17,9 @@ interface Setting {
 type AnyVal = any;
 
 // Known settings with descriptions and their expected format
-const KNOWN_SETTINGS: Record<string, { description: string; type: "text" | "json" | "boolean"; fields?: string[] }> = {
+const IMAGE_SETTINGS = new Set(["logo_light", "logo_dark", "logo_icon_light", "logo_icon_dark", "og_image"]);
+
+const KNOWN_SETTINGS: Record<string, { description: string; type: "text" | "json" | "boolean" | "image"; fields?: string[] }> = {
   site_name: { description: "Website name, used in SEO and browser tab title", type: "text" },
   site_description: { description: "Default meta description for search engines", type: "text" },
   contact_email: { description: "Contact email displayed on the website", type: "text" },
@@ -24,10 +27,12 @@ const KNOWN_SETTINGS: Record<string, { description: string; type: "text" | "json
   analytics_id: { description: "Google Analytics or tracking ID", type: "text" },
   maintenance_mode: { description: "Enable to show maintenance page to visitors", type: "boolean" },
   seo_default: { description: "Default SEO metadata for all pages", type: "json", fields: ["title", "description", "keywords", "image"] },
-  logo_light: { description: "Logo for light theme", type: "text" },
-  logo_dark: { description: "Logo for dark theme", type: "text" },
-  logo_icon_light: { description: "Icon logo for light theme", type: "text" },
-  logo_icon_dark: { description: "Icon logo for dark theme", type: "text" },
+  logo_light: { description: "Logo for light theme (upload image)", type: "image" },
+  logo_dark: { description: "Logo for dark theme (upload image)", type: "image" },
+  logo_icon_light: { description: "Icon logo for light theme (upload image)", type: "image" },
+  logo_icon_dark: { description: "Icon logo for dark theme (upload image)", type: "image" },
+  og_image: { description: "Default Open Graph image for social sharing", type: "image" },
+  header_cta: { description: "Header 'Get Started' button config", type: "json", fields: ["text", "url"] },
 };
 
 // Extract the display value from setting value (handles { value: "..." } and { url: "..." } wrappers)
@@ -85,7 +90,9 @@ export default function SettingsPage() {
 
   const handleSave = (setting: Setting) => {
     const meta = KNOWN_SETTINGS[setting.key];
-    if (meta?.type === "json" && meta.fields) {
+    if (meta?.type === "image") {
+      updateMutation.mutate({ key: setting.key, value: { url: editValue } });
+    } else if (meta?.type === "json" && meta.fields) {
       updateMutation.mutate({ key: setting.key, value: editFields });
     } else if (meta?.type === "boolean") {
       updateMutation.mutate({ key: setting.key, value: { enabled: editValue === "true" } });
@@ -102,7 +109,9 @@ export default function SettingsPage() {
 
   const startEdit = (setting: Setting) => {
     const meta = KNOWN_SETTINGS[setting.key];
-    if (meta?.type === "json" && meta.fields) {
+    if (meta?.type === "image") {
+      setEditValue((setting.value as AnyVal)?.url || getDisplayValue(setting.value));
+    } else if (meta?.type === "json" && meta.fields) {
       const fields: Record<string, string> = {};
       meta.fields.forEach(f => { fields[f] = String((setting.value as AnyVal)?.[f] || ""); });
       setEditFields(fields);
@@ -222,12 +231,19 @@ export default function SettingsPage() {
 
                 {isEditing && (
                   <div className="p-4 space-y-3">
-                    {meta?.type === "json" && meta.fields ? (
+                    {meta?.type === "image" ? (
+                      <MediaPicker
+                        label={meta.description}
+                        value={editValue}
+                        onChange={(v) => setEditValue(v)}
+                        placeholder="Select or upload image"
+                      />
+                    ) : meta?.type === "json" && meta.fields ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {meta.fields.map(f => (
                           <div key={f}>
                             <label className="block text-xs font-medium mb-1 capitalize">{f.replace(/_/g, " ")}</label>
-                            <input value={editFields[f] || ""} onChange={e => setEditFields({ ...editFields, [f]: e.target.value })} className={inputClass} placeholder={f === "email" ? "email@example.com" : `https://...`} />
+                            <input value={editFields[f] || ""} onChange={e => setEditFields({ ...editFields, [f]: e.target.value })} className={inputClass} placeholder={f === "email" ? "email@example.com" : f === "url" ? "https://..." : f} />
                           </div>
                         ))}
                       </div>

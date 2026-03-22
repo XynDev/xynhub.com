@@ -8962,8 +8962,8 @@ var getRequestListener = (fetchCallback, options = {}) => {
     }
   };
 };
-var handle = (app21) => {
-  return getRequestListener(app21.fetch);
+var handle = (app27) => {
+  return getRequestListener(app27.fetch);
 };
 
 // ../../node_modules/hono/dist/compose.js
@@ -10229,14 +10229,14 @@ var Hono = class _Hono {
    * app.route("/api", app2) // GET /api/user
    * ```
    */
-  route(path, app21) {
+  route(path, app27) {
     const subApp = this.basePath(path);
-    app21.routes.map((r) => {
+    app27.routes.map((r) => {
       let handler;
-      if (app21.errorHandler === errorHandler) {
+      if (app27.errorHandler === errorHandler) {
         handler = r.handler;
       } else {
-        handler = async (c, next) => (await compose([], app21.errorHandler)(c, () => r.handler(c, next))).res;
+        handler = async (c, next) => (await compose([], app27.errorHandler)(c, () => r.handler(c, next))).res;
         handler[COMPOSED_HANDLER] = r.handler;
       }
       subApp.#addRoute(r.method, r.path, handler);
@@ -23984,7 +23984,12 @@ var blogs_default = app2;
 // src/routes/public/portfolios.ts
 var app3 = new Hono2();
 app3.get("/", async (c) => {
-  const { data, error } = await supabasePublic.from("portfolios").select("*").eq("is_active", true).order("sort_order", { ascending: true });
+  const featured = c.req.query("featured");
+  let query = supabasePublic.from("portfolios").select("*").eq("is_active", true).order("sort_order", { ascending: true });
+  if (featured === "true") {
+    query = query.eq("is_featured", true);
+  }
+  const { data, error } = await query;
   if (error) {
     return c.json({ success: false, error: error.message }, 500);
   }
@@ -24004,20 +24009,40 @@ app3.get("/:slug", async (c) => {
 });
 var portfolios_default = app3;
 
-// src/routes/public/navigation.ts
+// src/routes/public/services.ts
 var app4 = new Hono2();
 app4.get("/", async (c) => {
+  const featured = c.req.query("featured");
+  let query = supabasePublic.from("services").select("*").eq("is_active", true).order("sort_order", { ascending: true });
+  if (featured === "true") {
+    query = query.eq("is_featured", true);
+  }
+  const { data, error } = await query;
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, data: data || [] });
+});
+app4.get("/:slug", async (c) => {
+  const slug = c.req.param("slug");
+  const { data, error } = await supabasePublic.from("services").select("*").eq("slug", slug).eq("is_active", true).single();
+  if (error) return c.json({ success: false, error: "Not found" }, 404);
+  return c.json({ success: true, data });
+});
+var services_default = app4;
+
+// src/routes/public/navigation.ts
+var app5 = new Hono2();
+app5.get("/", async (c) => {
   const { data, error } = await supabasePublic.from("navigation_items").select("*").eq("is_active", true).is("parent_id", null).order("sort_order", { ascending: true });
   if (error) {
     return c.json({ success: false, error: error.message }, 500);
   }
   return c.json({ success: true, data: data || [] });
 });
-var navigation_default = app4;
+var navigation_default = app5;
 
 // src/routes/public/settings.ts
-var app5 = new Hono2();
-app5.get("/", async (c) => {
+var app6 = new Hono2();
+app6.get("/", async (c) => {
   const { data, error } = await supabasePublic.from("site_settings").select("key, value");
   if (error) {
     return c.json({ success: false, error: error.message }, 500);
@@ -24028,11 +24053,11 @@ app5.get("/", async (c) => {
   }
   return c.json({ success: true, data: result });
 });
-var settings_default = app5;
+var settings_default = app6;
 
 // src/routes/public/faqs.ts
-var app6 = new Hono2();
-app6.get("/", async (c) => {
+var app7 = new Hono2();
+app7.get("/", async (c) => {
   const pageSlug = c.req.query("page") || "home";
   const { data, error } = await supabasePublic.from("faqs").select("id, question, answer, page_slug, sort_order").eq("page_slug", pageSlug).eq("is_active", true).order("sort_order", { ascending: true });
   if (error) {
@@ -24040,22 +24065,22 @@ app6.get("/", async (c) => {
   }
   return c.json({ success: true, data: data || [] });
 });
-var faqs_default = app6;
+var faqs_default = app7;
 
 // src/routes/public/testimonials.ts
-var app7 = new Hono2();
-app7.get("/", async (c) => {
+var app8 = new Hono2();
+app8.get("/", async (c) => {
   const { data, error } = await supabasePublic.from("testimonials").select("*").eq("is_active", true).order("sort_order", { ascending: true });
   if (error) {
     return c.json({ success: false, error: error.message }, 500);
   }
   return c.json({ success: true, data: data || [] });
 });
-var testimonials_default = app7;
+var testimonials_default = app8;
 
 // src/routes/public/team.ts
-var app8 = new Hono2();
-app8.get("/", async (c) => {
+var app9 = new Hono2();
+app9.get("/", async (c) => {
   const { data, error } = await supabasePublic.from("team_members").select("*").eq("is_active", true).order("sort_order", { ascending: true });
   if (error) {
     return c.json({ success: false, error: error.message }, 500);
@@ -24069,11 +24094,11 @@ app8.get("/", async (c) => {
   }
   return c.json({ success: true, data: grouped });
 });
-var team_default = app8;
+var team_default = app9;
 
 // src/routes/public/footer.ts
-var app9 = new Hono2();
-app9.get("/", async (c) => {
+var app10 = new Hono2();
+app10.get("/", async (c) => {
   const { data, error } = await supabasePublic.from("footer_sections").select("*").order("sort_order", { ascending: true });
   if (error) {
     return c.json({ success: false, error: error.message }, 500);
@@ -24084,7 +24109,7 @@ app9.get("/", async (c) => {
   }
   return c.json({ success: true, data: result });
 });
-var footer_default = app9;
+var footer_default = app10;
 
 // ../../packages/shared/src/schemas/index.ts
 var paginationSchema = external_exports.object({
@@ -24098,9 +24123,9 @@ var siteSettingSchema = external_exports.object({
 var navigationItemSchema = external_exports.object({
   label: external_exports.string().min(1).max(100),
   path: external_exports.string().min(1).max(255),
-  sort_order: external_exports.number().int().default(0),
+  sort_order: external_exports.coerce.number().int().default(0),
   is_active: external_exports.boolean().default(true),
-  parent_id: external_exports.string().uuid().nullable().default(null)
+  parent_id: external_exports.string().uuid().nullable().optional().default(null).transform((v) => v || null)
 });
 var footerSectionSchema = external_exports.object({
   section_key: external_exports.string().min(1).max(100),
@@ -24131,14 +24156,31 @@ var blogSchema = external_exports.object({
   published_at: external_exports.string().nullable().default(null),
   is_active: external_exports.boolean().default(true)
 });
+var serviceSchema = external_exports.object({
+  slug: external_exports.string().min(1).max(255).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  title: external_exports.string().min(1).max(500),
+  description: external_exports.string().min(1),
+  short_description: external_exports.string().default(""),
+  icon: external_exports.string().max(100).nullable().default(null),
+  image_url: external_exports.string().nullable().default(null),
+  number: external_exports.string().max(20).nullable().default(null),
+  metrics: external_exports.record(external_exports.unknown()).default({}),
+  tooling: external_exports.array(external_exports.record(external_exports.unknown())).default([]),
+  features: external_exports.array(external_exports.record(external_exports.unknown())).default([]),
+  is_featured: external_exports.boolean().default(false),
+  sort_order: external_exports.number().int().default(0),
+  is_active: external_exports.boolean().default(true)
+});
 var portfolioSchema = external_exports.object({
   slug: external_exports.string().min(1).max(255).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   title: external_exports.string().min(1).max(500),
   tag: external_exports.string().min(1).max(100),
   description: external_exports.string().nullable().default(null),
-  image_url: external_exports.string().url().nullable().default(null),
+  short_description: external_exports.string().default(""),
+  image_url: external_exports.string().nullable().default(null),
   tech_stack: external_exports.record(external_exports.unknown()).nullable().default(null),
   metrics: external_exports.record(external_exports.unknown()).nullable().default(null),
+  is_featured: external_exports.boolean().default(false),
   sort_order: external_exports.number().int().default(0),
   is_active: external_exports.boolean().default(true)
 });
@@ -24177,24 +24219,57 @@ var faqSchema = external_exports.object({
   sort_order: external_exports.number().int().default(0),
   is_active: external_exports.boolean().default(true)
 });
+var contactMessageSchema = external_exports.object({
+  name: external_exports.string().min(1).max(200),
+  email: external_exports.string().email().max(320),
+  message: external_exports.string().min(1)
+});
+var newsletterSubscribeSchema = external_exports.object({
+  email: external_exports.string().email().max(320)
+});
 var mediaUploadSchema = external_exports.object({
   alt_text: external_exports.string().max(500).nullable().default(null)
 });
 
+// src/routes/public/contact.ts
+var app11 = new Hono2();
+app11.post("/", async (c) => {
+  const body = await c.req.json();
+  const parsed = contactMessageSchema.parse(body);
+  const { error } = await supabasePublic.from("contact_messages").insert(parsed);
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, message: "Message sent successfully" }, 201);
+});
+var contact_default = app11;
+
+// src/routes/public/newsletter.ts
+var app12 = new Hono2();
+app12.post("/subscribe", async (c) => {
+  const body = await c.req.json();
+  const parsed = newsletterSubscribeSchema.parse(body);
+  const { error } = await supabasePublic.from("newsletter_subscribers").upsert(
+    { email: parsed.email, is_active: true },
+    { onConflict: "email" }
+  );
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, message: "Subscribed successfully" }, 201);
+});
+var newsletter_default = app12;
+
 // src/routes/admin/pages.ts
-var app10 = new Hono2();
-app10.get("/", async (c) => {
+var app13 = new Hono2();
+app13.get("/", async (c) => {
   const { data, error } = await supabaseAdmin.from("page_contents").select("*").order("page_slug").order("sort_order", { ascending: true });
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data: data || [] });
 });
-app10.get("/:slug", async (c) => {
+app13.get("/:slug", async (c) => {
   const slug = c.req.param("slug");
   const { data, error } = await supabaseAdmin.from("page_contents").select("*").eq("page_slug", slug).order("sort_order", { ascending: true });
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data: data || [] });
 });
-app10.put("/:slug/:section", async (c) => {
+app13.put("/:slug/:section", async (c) => {
   const slug = c.req.param("slug");
   const section = c.req.param("section");
   const body = await c.req.json();
@@ -24212,18 +24287,18 @@ app10.put("/:slug/:section", async (c) => {
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data });
 });
-app10.delete("/:slug/:section", async (c) => {
+app13.delete("/:slug/:section", async (c) => {
   const slug = c.req.param("slug");
   const section = c.req.param("section");
   const { error } = await supabaseAdmin.from("page_contents").delete().eq("page_slug", slug).eq("section_key", section);
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, message: "Deleted" });
 });
-var pages_default2 = app10;
+var pages_default2 = app13;
 
 // src/routes/admin/blogs.ts
-var app11 = new Hono2();
-app11.get("/", async (c) => {
+var app14 = new Hono2();
+app14.get("/", async (c) => {
   const page = parseInt(c.req.query("page") || "1");
   const perPage = parseInt(c.req.query("per_page") || "20");
   const offset = (page - 1) * perPage;
@@ -24240,20 +24315,20 @@ app11.get("/", async (c) => {
     }
   });
 });
-app11.get("/:id", async (c) => {
+app14.get("/:id", async (c) => {
   const id = c.req.param("id");
   const { data, error } = await supabaseAdmin.from("blogs").select("*").eq("id", id).single();
   if (error) return c.json({ success: false, error: "Blog not found" }, 404);
   return c.json({ success: true, data });
 });
-app11.post("/", async (c) => {
+app14.post("/", async (c) => {
   const body = await c.req.json();
   const parsed = blogSchema.parse(body);
   const { data, error } = await supabaseAdmin.from("blogs").insert(parsed).select().single();
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data }, 201);
 });
-app11.put("/:id", async (c) => {
+app14.put("/:id", async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
   const parsed = blogSchema.partial().parse(body);
@@ -24261,29 +24336,29 @@ app11.put("/:id", async (c) => {
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data });
 });
-app11.delete("/:id", async (c) => {
+app14.delete("/:id", async (c) => {
   const id = c.req.param("id");
   const { error } = await supabaseAdmin.from("blogs").delete().eq("id", id);
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, message: "Deleted" });
 });
-var blogs_default2 = app11;
+var blogs_default2 = app14;
 
 // src/routes/admin/portfolios.ts
-var app12 = new Hono2();
-app12.get("/", async (c) => {
+var app15 = new Hono2();
+app15.get("/", async (c) => {
   const { data, error } = await supabaseAdmin.from("portfolios").select("*").order("sort_order", { ascending: true });
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data: data || [] });
 });
-app12.get("/:id", async (c) => {
+app15.get("/:id", async (c) => {
   const id = c.req.param("id");
   const { data: portfolio, error } = await supabaseAdmin.from("portfolios").select("*").eq("id", id).single();
   if (error) return c.json({ success: false, error: "Not found" }, 404);
   const { data: detail } = await supabaseAdmin.from("portfolio_details").select("*").eq("portfolio_id", id).single();
   return c.json({ success: true, data: { ...portfolio, detail } });
 });
-app12.post("/", async (c) => {
+app15.post("/", async (c) => {
   const body = await c.req.json();
   const { detail: detailBody, ...portfolioBody } = body;
   const parsed = portfolioSchema.parse(portfolioBody);
@@ -24298,7 +24373,7 @@ app12.post("/", async (c) => {
   }
   return c.json({ success: true, data: portfolio }, 201);
 });
-app12.put("/:id", async (c) => {
+app15.put("/:id", async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
   const { detail: detailBody, ...portfolioBody } = body;
@@ -24311,29 +24386,65 @@ app12.put("/:id", async (c) => {
   }
   return c.json({ success: true, data });
 });
-app12.delete("/:id", async (c) => {
+app15.delete("/:id", async (c) => {
   const id = c.req.param("id");
   const { error } = await supabaseAdmin.from("portfolios").delete().eq("id", id);
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, message: "Deleted" });
 });
-var portfolios_default2 = app12;
+var portfolios_default2 = app15;
+
+// src/routes/admin/services.ts
+var app16 = new Hono2();
+app16.get("/", async (c) => {
+  const { data, error } = await supabaseAdmin.from("services").select("*").order("sort_order", { ascending: true });
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, data: data || [] });
+});
+app16.get("/:id", async (c) => {
+  const id = c.req.param("id");
+  const { data, error } = await supabaseAdmin.from("services").select("*").eq("id", id).single();
+  if (error) return c.json({ success: false, error: "Not found" }, 404);
+  return c.json({ success: true, data });
+});
+app16.post("/", async (c) => {
+  const body = await c.req.json();
+  const parsed = serviceSchema.parse(body);
+  const { data, error } = await supabaseAdmin.from("services").insert(parsed).select().single();
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, data }, 201);
+});
+app16.put("/:id", async (c) => {
+  const id = c.req.param("id");
+  const body = await c.req.json();
+  const parsed = serviceSchema.partial().parse(body);
+  const { data, error } = await supabaseAdmin.from("services").update(parsed).eq("id", id).select().single();
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, data });
+});
+app16.delete("/:id", async (c) => {
+  const id = c.req.param("id");
+  const { error } = await supabaseAdmin.from("services").delete().eq("id", id);
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, message: "Deleted" });
+});
+var services_default2 = app16;
 
 // src/routes/admin/navigation.ts
-var app13 = new Hono2();
-app13.get("/", async (c) => {
+var app17 = new Hono2();
+app17.get("/", async (c) => {
   const { data, error } = await supabaseAdmin.from("navigation_items").select("*").order("sort_order", { ascending: true });
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data: data || [] });
 });
-app13.post("/", async (c) => {
+app17.post("/", async (c) => {
   const body = await c.req.json();
   const parsed = navigationItemSchema.parse(body);
   const { data, error } = await supabaseAdmin.from("navigation_items").insert(parsed).select().single();
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data }, 201);
 });
-app13.put("/:id", async (c) => {
+app17.put("/:id", async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
   const parsed = navigationItemSchema.partial().parse(body);
@@ -24341,22 +24452,22 @@ app13.put("/:id", async (c) => {
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data });
 });
-app13.delete("/:id", async (c) => {
+app17.delete("/:id", async (c) => {
   const id = c.req.param("id");
   const { error } = await supabaseAdmin.from("navigation_items").delete().eq("id", id);
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, message: "Deleted" });
 });
-var navigation_default2 = app13;
+var navigation_default2 = app17;
 
 // src/routes/admin/settings.ts
-var app14 = new Hono2();
-app14.get("/", async (c) => {
+var app18 = new Hono2();
+app18.get("/", async (c) => {
   const { data, error } = await supabaseAdmin.from("site_settings").select("*").order("key");
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data: data || [] });
 });
-app14.put("/:key", async (c) => {
+app18.put("/:key", async (c) => {
   const key = c.req.param("key");
   const body = await c.req.json();
   const user = c.get("user");
@@ -24365,29 +24476,29 @@ app14.put("/:key", async (c) => {
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data });
 });
-app14.delete("/:key", async (c) => {
+app18.delete("/:key", async (c) => {
   const key = c.req.param("key");
   const { error } = await supabaseAdmin.from("site_settings").delete().eq("key", key);
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, message: "Deleted" });
 });
-var settings_default2 = app14;
+var settings_default2 = app18;
 
 // src/routes/admin/faqs.ts
-var app15 = new Hono2();
-app15.get("/", async (c) => {
+var app19 = new Hono2();
+app19.get("/", async (c) => {
   const { data, error } = await supabaseAdmin.from("faqs").select("*").order("page_slug").order("sort_order", { ascending: true });
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data: data || [] });
 });
-app15.post("/", async (c) => {
+app19.post("/", async (c) => {
   const body = await c.req.json();
   const parsed = faqSchema.parse(body);
   const { data, error } = await supabaseAdmin.from("faqs").insert(parsed).select().single();
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data }, 201);
 });
-app15.put("/:id", async (c) => {
+app19.put("/:id", async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
   const parsed = faqSchema.partial().parse(body);
@@ -24395,29 +24506,29 @@ app15.put("/:id", async (c) => {
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data });
 });
-app15.delete("/:id", async (c) => {
+app19.delete("/:id", async (c) => {
   const id = c.req.param("id");
   const { error } = await supabaseAdmin.from("faqs").delete().eq("id", id);
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, message: "Deleted" });
 });
-var faqs_default2 = app15;
+var faqs_default2 = app19;
 
 // src/routes/admin/testimonials.ts
-var app16 = new Hono2();
-app16.get("/", async (c) => {
+var app20 = new Hono2();
+app20.get("/", async (c) => {
   const { data, error } = await supabaseAdmin.from("testimonials").select("*").order("sort_order", { ascending: true });
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data: data || [] });
 });
-app16.post("/", async (c) => {
+app20.post("/", async (c) => {
   const body = await c.req.json();
   const parsed = testimonialSchema.parse(body);
   const { data, error } = await supabaseAdmin.from("testimonials").insert(parsed).select().single();
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data }, 201);
 });
-app16.put("/:id", async (c) => {
+app20.put("/:id", async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
   const parsed = testimonialSchema.partial().parse(body);
@@ -24425,29 +24536,29 @@ app16.put("/:id", async (c) => {
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data });
 });
-app16.delete("/:id", async (c) => {
+app20.delete("/:id", async (c) => {
   const id = c.req.param("id");
   const { error } = await supabaseAdmin.from("testimonials").delete().eq("id", id);
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, message: "Deleted" });
 });
-var testimonials_default2 = app16;
+var testimonials_default2 = app20;
 
 // src/routes/admin/team.ts
-var app17 = new Hono2();
-app17.get("/", async (c) => {
+var app21 = new Hono2();
+app21.get("/", async (c) => {
   const { data, error } = await supabaseAdmin.from("team_members").select("*").order("sort_order", { ascending: true });
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data: data || [] });
 });
-app17.post("/", async (c) => {
+app21.post("/", async (c) => {
   const body = await c.req.json();
   const parsed = teamMemberSchema.parse(body);
   const { data, error } = await supabaseAdmin.from("team_members").insert(parsed).select().single();
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data }, 201);
 });
-app17.put("/:id", async (c) => {
+app21.put("/:id", async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
   const parsed = teamMemberSchema.partial().parse(body);
@@ -24455,22 +24566,22 @@ app17.put("/:id", async (c) => {
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data });
 });
-app17.delete("/:id", async (c) => {
+app21.delete("/:id", async (c) => {
   const id = c.req.param("id");
   const { error } = await supabaseAdmin.from("team_members").delete().eq("id", id);
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, message: "Deleted" });
 });
-var team_default2 = app17;
+var team_default2 = app21;
 
 // src/routes/admin/footer.ts
-var app18 = new Hono2();
-app18.get("/", async (c) => {
+var app22 = new Hono2();
+app22.get("/", async (c) => {
   const { data, error } = await supabaseAdmin.from("footer_sections").select("*").order("sort_order", { ascending: true });
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data: data || [] });
 });
-app18.put("/:id", async (c) => {
+app22.put("/:id", async (c) => {
   const id = c.req.param("id");
   const body = await c.req.json();
   const parsed = footerSectionSchema.partial().parse(body);
@@ -24478,24 +24589,24 @@ app18.put("/:id", async (c) => {
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data });
 });
-app18.post("/", async (c) => {
+app22.post("/", async (c) => {
   const body = await c.req.json();
   const parsed = footerSectionSchema.parse(body);
   const { data, error } = await supabaseAdmin.from("footer_sections").insert(parsed).select().single();
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, data }, 201);
 });
-app18.delete("/:id", async (c) => {
+app22.delete("/:id", async (c) => {
   const id = c.req.param("id");
   const { error } = await supabaseAdmin.from("footer_sections").delete().eq("id", id);
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, message: "Deleted" });
 });
-var footer_default2 = app18;
+var footer_default2 = app22;
 
 // src/routes/admin/media.ts
-var app19 = new Hono2();
-app19.get("/", async (c) => {
+var app23 = new Hono2();
+app23.get("/", async (c) => {
   const page = parseInt(c.req.query("page") || "1");
   const perPage = parseInt(c.req.query("per_page") || "20");
   const offset = (page - 1) * perPage;
@@ -24512,7 +24623,7 @@ app19.get("/", async (c) => {
     }
   });
 });
-app19.post("/upload", async (c) => {
+app23.post("/upload", async (c) => {
   const user = c.get("user");
   const formData = await c.req.formData();
   const file = formData.get("file");
@@ -24549,7 +24660,7 @@ app19.post("/upload", async (c) => {
   }
   return c.json({ success: true, data: media }, 201);
 });
-app19.delete("/:id", async (c) => {
+app23.delete("/:id", async (c) => {
   const id = c.req.param("id");
   const { data: media } = await supabaseAdmin.from("media").select("file_path").eq("id", id).single();
   if (media) {
@@ -24559,13 +24670,50 @@ app19.delete("/:id", async (c) => {
   if (error) return c.json({ success: false, error: error.message }, 500);
   return c.json({ success: true, message: "Deleted" });
 });
-var media_default = app19;
+var media_default = app23;
+
+// src/routes/admin/contact-messages.ts
+var app24 = new Hono2();
+app24.get("/", async (c) => {
+  const { data, error } = await supabaseAdmin.from("contact_messages").select("*").order("created_at", { ascending: false });
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, data: data || [] });
+});
+app24.put("/:id", async (c) => {
+  const id = c.req.param("id");
+  const body = await c.req.json();
+  const { data, error } = await supabaseAdmin.from("contact_messages").update({ is_read: body.is_read ?? true }).eq("id", id).select().single();
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, data });
+});
+app24.delete("/:id", async (c) => {
+  const id = c.req.param("id");
+  const { error } = await supabaseAdmin.from("contact_messages").delete().eq("id", id);
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, message: "Deleted" });
+});
+var contact_messages_default = app24;
+
+// src/routes/admin/newsletter.ts
+var app25 = new Hono2();
+app25.get("/", async (c) => {
+  const { data, error } = await supabaseAdmin.from("newsletter_subscribers").select("*").order("created_at", { ascending: false });
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, data: data || [] });
+});
+app25.delete("/:id", async (c) => {
+  const id = c.req.param("id");
+  const { error } = await supabaseAdmin.from("newsletter_subscribers").delete().eq("id", id);
+  if (error) return c.json({ success: false, error: error.message }, 500);
+  return c.json({ success: true, message: "Deleted" });
+});
+var newsletter_default2 = app25;
 
 // src/app.ts
-var app20 = new Hono2();
-app20.use("*", logger());
-app20.use("*", secureHeaders());
-app20.use(
+var app26 = new Hono2();
+app26.use("*", logger());
+app26.use("*", secureHeaders());
+app26.use(
   "*",
   cors({
     origin: (process.env.CORS_ORIGINS || "http://localhost:5173,http://localhost:3001,https://xynhub.com,https://www.xynhub.com,https://admin.xynhub.com").split(","),
@@ -24574,16 +24722,16 @@ app20.use(
     credentials: true
   })
 );
-app20.get(
+app26.get(
   "/",
   (c) => c.json({ status: "ok", service: "xynhub-api", version: "1.0.0" })
 );
-app20.get(
+app26.get(
   "/health",
   (c) => c.json({ status: "healthy", timestamp: (/* @__PURE__ */ new Date()).toISOString() })
 );
-app20.get("/api/docs", middleware({ url: "/api/openapi.json" }));
-app20.get("/api/openapi.json", (c) => {
+app26.get("/api/docs", middleware({ url: "/api/openapi.json" }));
+app26.get("/api/openapi.json", (c) => {
   return c.json({
     openapi: "3.0.3",
     info: {
@@ -24904,20 +25052,24 @@ app20.get("/api/openapi.json", (c) => {
     }
   });
 });
-app20.route("/api/v1/pages", pages_default);
-app20.route("/api/v1/blogs", blogs_default);
-app20.route("/api/v1/portfolios", portfolios_default);
-app20.route("/api/v1/navigation", navigation_default);
-app20.route("/api/v1/settings", settings_default);
-app20.route("/api/v1/faqs", faqs_default);
-app20.route("/api/v1/testimonials", testimonials_default);
-app20.route("/api/v1/team", team_default);
-app20.route("/api/v1/footer", footer_default);
+app26.route("/api/v1/pages", pages_default);
+app26.route("/api/v1/blogs", blogs_default);
+app26.route("/api/v1/portfolios", portfolios_default);
+app26.route("/api/v1/services", services_default);
+app26.route("/api/v1/navigation", navigation_default);
+app26.route("/api/v1/settings", settings_default);
+app26.route("/api/v1/faqs", faqs_default);
+app26.route("/api/v1/testimonials", testimonials_default);
+app26.route("/api/v1/team", team_default);
+app26.route("/api/v1/footer", footer_default);
+app26.route("/api/v1/contact", contact_default);
+app26.route("/api/v1/newsletter", newsletter_default);
 var admin = new Hono2();
 admin.use("*", authMiddleware);
 admin.route("/pages", pages_default2);
 admin.route("/blogs", blogs_default2);
 admin.route("/portfolios", portfolios_default2);
+admin.route("/services", services_default2);
 admin.route("/navigation", navigation_default2);
 admin.route("/settings", settings_default2);
 admin.route("/faqs", faqs_default2);
@@ -24925,12 +25077,14 @@ admin.route("/testimonials", testimonials_default2);
 admin.route("/team", team_default2);
 admin.route("/footer", footer_default2);
 admin.route("/media", media_default);
-app20.route("/api/v1/admin", admin);
-app20.onError(errorHandler2);
-app20.notFound(
+admin.route("/contact-messages", contact_messages_default);
+admin.route("/newsletter", newsletter_default2);
+app26.route("/api/v1/admin", admin);
+app26.onError(errorHandler2);
+app26.notFound(
   (c) => c.json({ success: false, error: "Not found" }, 404)
 );
-var app_default = app20;
+var app_default = app26;
 
 // src/vercel.ts
 var vercel_default = handle(app_default);

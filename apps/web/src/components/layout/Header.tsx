@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom"
 import { cn } from "../../lib/utils"
 import { useTheme } from "../ThemeProvider"
 import { Moon, Sun, Menu, X } from "lucide-react"
-import { getNavigation } from "../../lib/api"
+import { getNavigation, getSettings } from "../../lib/api"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
@@ -20,13 +20,40 @@ export function Header() {
     { label: "Portofolio", path: "/portofolio" },
     { label: "Intel", path: "/blogs" }
   ]);
+  const [headerCta, setHeaderCta] = useState<{ text: string; url: string }>({ text: "Get Started", url: "/services" });
+  const [logoLight, setLogoLight] = useState("/logo-text-dark.png");
+  const [logoDark, setLogoDark] = useState("/logo-text-white.png");
 
   useEffect(() => {
     async function load() {
       try {
-        const res = await getNavigation()
-        if (res.data && res.data.length > 0) {
-          setNavLinks(res.data)
+        const [navRes, settingsRes] = await Promise.all([
+          getNavigation(),
+          getSettings(),
+        ])
+        if (navRes.data && navRes.data.length > 0) {
+          setNavLinks(navRes.data)
+        }
+        // Parse settings
+        const settings = settingsRes.data
+        if (settings) {
+          // Header CTA button
+          const ctaSetting = settings.header_cta
+          if (ctaSetting) {
+            const ctaVal = ctaSetting.value || ctaSetting
+            if (ctaVal.text) setHeaderCta({ text: ctaVal.text, url: ctaVal.url || "/services" })
+          }
+          // Logos from settings
+          const ll = settings.logo_light
+          if (ll) {
+            const v = ll.value?.url || ll.value?.value || ll.value || ll.url
+            if (v && typeof v === "string" && v.length > 1) setLogoLight(v)
+          }
+          const ld = settings.logo_dark
+          if (ld) {
+            const v = ld.value?.url || ld.value?.value || ld.value || ld.url
+            if (v && typeof v === "string" && v.length > 1) setLogoDark(v)
+          }
         }
       } catch (err) {
         console.error("Failed to load navigation:", err)
@@ -35,12 +62,34 @@ export function Header() {
     load()
   }, [])
 
+  const isExternal = headerCta.url?.startsWith("http")
+
+  const ctaButton = isExternal ? (
+    <a href={headerCta.url} target="_blank" rel="noopener noreferrer" className="hidden md:inline-flex bg-primary text-on-primary hover:opacity-90 transition-opacity font-semibold px-6 py-2.5 rounded-full text-sm">
+      {headerCta.text}
+    </a>
+  ) : (
+    <Link to={headerCta.url} className="hidden md:inline-flex bg-primary text-on-primary hover:opacity-90 transition-opacity font-semibold px-6 py-2.5 rounded-full text-sm">
+      {headerCta.text}
+    </Link>
+  )
+
+  const mobileCta = isExternal ? (
+    <a href={headerCta.url} target="_blank" rel="noopener noreferrer" onClick={() => setIsMenuOpen(false)} className="bg-primary text-on-primary hover:opacity-90 transition-opacity font-semibold px-6 py-3 rounded-full text-sm text-center w-full block">
+      {headerCta.text}
+    </a>
+  ) : (
+    <Link to={headerCta.url} onClick={() => setIsMenuOpen(false)} className="bg-primary text-on-primary hover:opacity-90 transition-opacity font-semibold px-6 py-3 rounded-full text-sm text-center w-full block">
+      {headerCta.text}
+    </Link>
+  )
+
   return (
     <header className="fixed top-6 left-0 right-0 z-50 px-6">
       <nav className="max-w-[1200px] w-full mx-auto glass-nav rounded-full px-8 py-3 flex justify-between items-center shadow-sm">
         <Link to="/" className="flex items-center">
           <img
-            src={theme === "light" ? "/logo-text-dark.png" : "/logo-text-white.png"}
+            src={theme === "light" ? logoLight : logoDark}
             alt="XYN Logo"
             className="h-8 w-auto"
           />
@@ -68,9 +117,7 @@ export function Header() {
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
-          <Link to="/services" className="hidden md:inline-flex bg-primary text-on-primary hover:opacity-90 transition-opacity font-semibold px-6 py-2.5 rounded-full text-sm">
-            Get Started
-          </Link>
+          {ctaButton}
 
           <button
             className="md:hidden p-2 rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors flex items-center justify-center"
@@ -99,13 +146,7 @@ export function Header() {
               </Link>
             ))}
           </div>
-          <Link
-            to="/services"
-            onClick={() => setIsMenuOpen(false)}
-            className="bg-primary text-on-primary hover:opacity-90 transition-opacity font-semibold px-6 py-3 rounded-full text-sm text-center w-full"
-          >
-            Get Started
-          </Link>
+          {mobileCta}
         </div>
       )}
     </header>

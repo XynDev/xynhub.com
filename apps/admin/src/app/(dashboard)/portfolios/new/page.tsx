@@ -22,8 +22,8 @@ export default function NewPortfolioPage() {
   const queryClient = useQueryClient();
 
   const [form, setForm] = useState({
-    slug: "", title: "", tag: "", description: "", image_url: "",
-    sort_order: 0, is_active: true,
+    slug: "", title: "", tag: "", description: "", short_description: "", image_url: "",
+    sort_order: 0, is_active: true, is_featured: false,
   });
   const [techItems, setTechItems] = useState<TechItem[]>([{ icon: "", lang: "", role: "" }]);
   const [metricItems, setMetricItems] = useState<MetricItem[]>([{ value: "", label: "" }]);
@@ -103,6 +103,10 @@ export default function NewPortfolioPage() {
             </div>
           </div>
           <div>
+            <label className="block text-sm font-medium mb-1">Short Description (for home page)</label>
+            <input value={form.short_description} onChange={e => setForm({ ...form, short_description: e.target.value })} className={inputClass} placeholder="Brief summary shown on home page featured works" />
+          </div>
+          <div>
             <MarkdownEditor label="Description" value={form.description} onChange={(v) => setForm({ ...form, description: v })} minHeight="80px" placeholder="Project description (supports markdown)..." />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -110,7 +114,11 @@ export default function NewPortfolioPage() {
               <label className="block text-sm font-medium mb-1">Sort Order</label>
               <input type="number" value={form.sort_order} onChange={e => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} className={inputClass} />
             </div>
-            <div className="flex items-end gap-2 pb-2">
+            <div className="flex items-end gap-6 pb-2">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input type="checkbox" checked={form.is_featured} onChange={e => setForm({ ...form, is_featured: e.target.checked })} className="w-4 h-4" />
+                Featured
+              </label>
               <input type="checkbox" checked={form.is_active} onChange={e => setForm({ ...form, is_active: e.target.checked })} className="w-4 h-4" id="is_active" />
               <label htmlFor="is_active" className="text-sm font-medium">Active</label>
             </div>

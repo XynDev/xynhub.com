@@ -16,6 +16,8 @@ import { ProcessHero, ProcessPhases, ProcessPhase4, ProcessPhase5 } from "./proc
 import { BlogsHero } from "./blogs";
 // Portofolio
 import { PortofolioHeader, PortofolioProficiency, PortofolioFeatures, PortofolioContact } from "./portofolio";
+// Legal (Privacy Policy + ToS)
+import { LegalContent } from "./legal";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type D = Record<string, any>;
@@ -72,6 +74,12 @@ const registry: Record<string, Record<string, SectionForm>> = {
     proficiency: PortofolioProficiency,
     features: PortofolioFeatures,
     contact: PortofolioContact,
+  },
+  "privacy-policy": {
+    content: LegalContent,
+  },
+  "terms-of-service": {
+    content: LegalContent,
   },
 };
 
@@ -131,5 +139,11 @@ export const SECTION_DESCRIPTIONS: Record<string, Record<string, string>> = {
     proficiency: "Skills section — label, title, skills with percentages, topology, footer line",
     features: "Feature items — icon, title, description cards",
     contact: "Contact CTA — label, title, description, action button, links",
+  },
+  "privacy-policy": {
+    content: "Privacy Policy — title and markdown content",
+  },
+  "terms-of-service": {
+    content: "Terms of Service — title and markdown content",
   },
 };

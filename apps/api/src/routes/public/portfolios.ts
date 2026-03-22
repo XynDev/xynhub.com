@@ -5,11 +5,19 @@ const app = new Hono();
 
 // GET /api/v1/portfolios - List portfolios
 app.get("/", async (c) => {
-  const { data, error } = await supabasePublic
+  const featured = c.req.query("featured");
+
+  let query = supabasePublic
     .from("portfolios")
     .select("*")
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
+
+  if (featured === "true") {
+    query = query.eq("is_featured", true);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return c.json({ success: false, error: error.message }, 500);

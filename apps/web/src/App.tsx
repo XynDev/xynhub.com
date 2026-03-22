@@ -10,6 +10,8 @@ import { Services } from "./pages/Services"
 import { ServiceDetail } from "./pages/ServiceDetail"
 import { Blogs } from "./pages/Blogs"
 import { BlogDetail } from "./pages/BlogDetail"
+import { PrivacyPolicy } from "./pages/PrivacyPolicy"
+import { TermsOfService } from "./pages/TermsOfService"
 
 function App() {
   return (
@@ -26,6 +28,8 @@ function App() {
           <Route path="/portofolio/:slug" element={<PortofolioDetail />} />
           <Route path="/blogs" element={<Blogs />} />
           <Route path="/blogs/:slug" element={<BlogDetail />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
         </Routes>
       </div>
       <Footer />

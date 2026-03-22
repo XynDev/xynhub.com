@@ -142,4 +142,17 @@
   .bento-card:hover {
     border-color: var(--color-outline);
   }
+
+  @keyframes scroll-x {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-33.333%); }
+  }
+
+  .animate-scroll-x {
+    animation: scroll-x 30s linear infinite;
+  }
+
+  .animate-scroll-x:hover {
+    animation-play-state: paused;
+  }
 }

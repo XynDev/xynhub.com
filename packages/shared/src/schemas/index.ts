@@ -20,9 +20,9 @@ export const siteSettingSchema = z.object({
 export const navigationItemSchema = z.object({
   label: z.string().min(1).max(100),
   path: z.string().min(1).max(255),
-  sort_order: z.number().int().default(0),
+  sort_order: z.coerce.number().int().default(0),
   is_active: z.boolean().default(true),
-  parent_id: z.string().uuid().nullable().default(null),
+  parent_id: z.string().uuid().nullable().optional().default(null).transform(v => v || null),
 });
 
 // ---- Footer ----
@@ -64,6 +64,27 @@ export const blogSchema = z.object({
   is_active: z.boolean().default(true),
 });
 
+// ---- Service ----
+export const serviceSchema = z.object({
+  slug: z
+    .string()
+    .min(1)
+    .max(255)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  title: z.string().min(1).max(500),
+  description: z.string().min(1),
+  short_description: z.string().default(""),
+  icon: z.string().max(100).nullable().default(null),
+  image_url: z.string().nullable().default(null),
+  number: z.string().max(20).nullable().default(null),
+  metrics: z.record(z.unknown()).default({}),
+  tooling: z.array(z.record(z.unknown())).default([]),
+  features: z.array(z.record(z.unknown())).default([]),
+  is_featured: z.boolean().default(false),
+  sort_order: z.number().int().default(0),
+  is_active: z.boolean().default(true),
+});
+
 // ---- Portfolio ----
 export const portfolioSchema = z.object({
   slug: z
@@ -74,9 +95,11 @@ export const portfolioSchema = z.object({
   title: z.string().min(1).max(500),
   tag: z.string().min(1).max(100),
   description: z.string().nullable().default(null),
-  image_url: z.string().url().nullable().default(null),
+  short_description: z.string().default(""),
+  image_url: z.string().nullable().default(null),
   tech_stack: z.record(z.unknown()).nullable().default(null),
   metrics: z.record(z.unknown()).nullable().default(null),
+  is_featured: z.boolean().default(false),
   sort_order: z.number().int().default(0),
   is_active: z.boolean().default(true),
 });
@@ -123,6 +146,18 @@ export const faqSchema = z.object({
   is_active: z.boolean().default(true),
 });
 
+// ---- Contact Message ----
+export const contactMessageSchema = z.object({
+  name: z.string().min(1).max(200),
+  email: z.string().email().max(320),
+  message: z.string().min(1),
+});
+
+// ---- Newsletter ----
+export const newsletterSubscribeSchema = z.object({
+  email: z.string().email().max(320),
+});
+
 // ---- Media ----
 export const mediaUploadSchema = z.object({
   alt_text: z.string().max(500).nullable().default(null),
@@ -134,8 +169,11 @@ export type CreateNavigationItem = z.infer<typeof navigationItemSchema>;
 export type CreateFooterSection = z.infer<typeof footerSectionSchema>;
 export type CreatePageContent = z.infer<typeof pageContentSchema>;
 export type CreateBlog = z.infer<typeof blogSchema>;
+export type CreateService = z.infer<typeof serviceSchema>;
 export type CreatePortfolio = z.infer<typeof portfolioSchema>;
 export type CreatePortfolioDetail = z.infer<typeof portfolioDetailSchema>;
 export type CreateTestimonial = z.infer<typeof testimonialSchema>;
 export type CreateTeamMember = z.infer<typeof teamMemberSchema>;
 export type CreateFAQ = z.infer<typeof faqSchema>;
+export type CreateContactMessage = z.infer<typeof contactMessageSchema>;
+export type CreateNewsletterSubscribe = z.infer<typeof newsletterSubscribeSchema>;

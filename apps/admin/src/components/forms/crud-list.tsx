@@ -5,6 +5,7 @@ import { apiFetch } from "@/lib/api";
 import { Pencil, Trash2, Plus, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
+import { MediaPicker } from "@/components/ui/media-picker";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyRecord = Record<string, any>;
@@ -20,7 +21,7 @@ interface CrudListProps<T extends { id: string }> {
   formFields: {
     key: string;
     label: string;
-    type?: "text" | "textarea" | "number" | "checkbox" | "json" | "select";
+    type?: "text" | "textarea" | "number" | "checkbox" | "json" | "select" | "media";
     required?: boolean;
     placeholder?: string;
     options?: { label: string; value: string }[];
@@ -148,7 +149,14 @@ export function CrudList<T extends { id: string }>({
             {formFields.map((field) => (
               <div key={field.key} className={field.type === "textarea" || field.type === "json" ? "md:col-span-2" : ""}>
                 <label className="block text-sm font-medium mb-1">{field.label}{field.required && " *"}</label>
-                {field.type === "checkbox" ? (
+                {field.type === "media" ? (
+                  <MediaPicker
+                    label={field.label}
+                    value={(form[field.key] as string) || ""}
+                    onChange={(v) => setForm({ ...form, [field.key]: v })}
+                    placeholder={field.placeholder}
+                  />
+                ) : field.type === "checkbox" ? (
                   <input
                     type="checkbox"
                     checked={!!form[field.key]}

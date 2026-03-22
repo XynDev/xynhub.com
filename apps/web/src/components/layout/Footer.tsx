@@ -1,13 +1,39 @@
 import { useState, useEffect } from "react"
+import type { FormEvent } from "react"
+import { Link } from "react-router-dom"
 import { useTheme } from "../ThemeProvider"
-import { getFooter } from "../../lib/api"
+import { getFooter, subscribeNewsletter } from "../../lib/api"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
 
+function FooterLink({ url, label }: { url?: string; label: string }) {
+  if (!url || url === "#") {
+    return <span className="font-['Inter'] text-sm text-on-surface-variant uppercase tracking-tight">{label}</span>
+  }
+  // External link
+  if (url.startsWith("http")) {
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer" className="font-['Inter'] text-sm text-on-surface-variant hover:text-primary transition-colors uppercase tracking-tight">
+        {label}
+      </a>
+    )
+  }
+  // Internal link - use React Router Link
+  return (
+    <Link to={url} className="font-['Inter'] text-sm text-on-surface-variant hover:text-primary transition-colors uppercase tracking-tight">
+      {label}
+    </Link>
+  )
+}
+
 export function Footer() {
   const { theme } = useTheme();
   const [footerData, setFooterData] = useState<AnyData | null>(null)
+  const [email, setEmail] = useState("")
+  const [subscribing, setSubscribing] = useState(false)
+  const [subscribed, setSubscribed] = useState(false)
+  const [emailError, setEmailError] = useState("")
 
   useEffect(() => {
     async function load() {
@@ -21,7 +47,31 @@ export function Footer() {
     load()
   }, [])
 
-  // Footer data comes as keyed object: { brand, platform, company, newsletter, bottom }
+  const handleSubscribe = async (e: FormEvent) => {
+    e.preventDefault()
+    setEmailError("")
+
+    if (!email) {
+      setEmailError("Email is required")
+      return
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("Please enter a valid email")
+      return
+    }
+
+    setSubscribing(true)
+    try {
+      await subscribeNewsletter(email)
+      setSubscribed(true)
+      setEmail("")
+    } catch (err) {
+      setEmailError("Failed to subscribe. Try again.")
+    } finally {
+      setSubscribing(false)
+    }
+  }
+
   const brand = footerData?.brand
   const platform = footerData?.platform
   const company = footerData?.company
@@ -49,9 +99,7 @@ export function Footer() {
           <ul className="space-y-4">
             {(platform?.links || [{ label: "Infrastructure" }, { label: "Security" }, { label: "Ecosystem" }]).map((link: AnyData) => (
               <li key={link.label}>
-                <a className="font-['Inter'] text-sm text-on-surface-variant hover:text-primary transition-colors uppercase tracking-tight" href={link.url || "#"}>
-                  {link.label}
-                </a>
+                <FooterLink url={link.url} label={link.label} />
               </li>
             ))}
           </ul>
@@ -62,9 +110,7 @@ export function Footer() {
           <ul className="space-y-4">
             {(company?.links || [{ label: "About Us" }, { label: "Careers" }, { label: "Legal" }]).map((link: AnyData) => (
               <li key={link.label}>
-                <a className="font-['Inter'] text-sm text-on-surface-variant hover:text-primary transition-colors uppercase tracking-tight" href={link.url || "#"}>
-                  {link.label}
-                </a>
+                <FooterLink url={link.url} label={link.label} />
               </li>
             ))}
           </ul>
@@ -74,24 +120,54 @@ export function Footer() {
           <h4 className="text-primary font-bold text-xs uppercase tracking-widest mb-8">
             {newsletter?.title || "Newsletter"}
           </h4>
-          <div className="flex bg-surface-container-low rounded-full p-1 border border-outline-variant">
-            <input className="bg-transparent border-none focus:ring-0 text-sm px-4 outline-none flex-grow text-primary placeholder:text-on-surface-variant/50" placeholder={newsletter?.placeholder || "Email Address"} type="email"/>
-            <button className="bg-primary text-on-primary text-[10px] font-bold px-5 py-3 rounded-full uppercase tracking-widest hover:opacity-80 transition-opacity">
-              {newsletter?.button_text || "Join"}
-            </button>
-          </div>
+          {subscribed ? (
+            <div className="text-sm text-primary">Subscribed! Thank you.</div>
+          ) : (
+            <form onSubmit={handleSubscribe}>
+              <div className="flex bg-surface-container-low rounded-full border border-outline-variant overflow-hidden">
+                <input
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setEmailError(""); }}
+                  className="bg-transparent border-none focus:ring-0 text-sm px-4 py-3 outline-none flex-grow min-w-0 text-primary placeholder:text-on-surface-variant/50"
+                  placeholder={newsletter?.placeholder || "Email Address"}
+                  type="email"
+                />
+                <button
+                  type="submit"
+                  disabled={subscribing}
+                  className="bg-primary text-on-primary text-[10px] font-bold px-5 py-3 uppercase tracking-widest hover:opacity-80 transition-opacity shrink-0 disabled:opacity-50"
+                >
+                  {subscribing ? "..." : (newsletter?.button_text || "Join")}
+                </button>
+              </div>
+              {emailError && <p className="text-xs text-red-500 mt-1 px-4">{emailError}</p>}
+            </form>
+          )}
         </div>
 
         <div className="col-span-4 pt-12 border-t border-outline-variant mt-12 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="font-['Inter'] text-[0.70rem] uppercase tracking-widest text-on-surface-variant">
-            {bottom?.copyright || "© 2024 XYN Engineering Ecosystem. All rights reserved."}
+            {bottom?.copyright || "\u00A9 2024 XYN Engineering Ecosystem. All rights reserved."}
           </div>
           <div className="flex gap-8">
-            {(bottom?.links || [{ label: "Privacy Policy" }, { label: "Terms of Service" }]).map((link: AnyData) => (
-              <a key={link.label} className="font-['Inter'] text-[0.70rem] uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors" href={link.url || "#"}>
-                {link.label}
-              </a>
-            ))}
+            {(bottom?.links || [
+              { label: "Privacy Policy", url: "/privacy-policy" },
+              { label: "Terms of Service", url: "/terms-of-service" },
+            ]).map((link: AnyData) => {
+              const url = link.url || "#"
+              if (url.startsWith("http")) {
+                return (
+                  <a key={link.label} href={url} target="_blank" rel="noopener noreferrer" className="font-['Inter'] text-[0.70rem] uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors">
+                    {link.label}
+                  </a>
+                )
+              }
+              return (
+                <Link key={link.label} to={url} className="font-['Inter'] text-[0.70rem] uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors">
+                  {link.label}
+                </Link>
+              )
+            })}
           </div>
         </div>
       </div>

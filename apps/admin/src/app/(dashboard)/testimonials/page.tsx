@@ -29,12 +29,13 @@ export default function TestimonialsPage() {
         { key: "author_name", label: "Author Name", required: true },
         { key: "author_role", label: "Author Role", placeholder: "CEO at Company" },
         { key: "author_initials", label: "Initials (for avatar)", placeholder: "JD" },
+        { key: "author_image", label: "Profile Image", type: "media" },
         { key: "span_class", label: "Card Size", type: "select" as "text", placeholder: "col-span-12 md:col-span-6" },
         { key: "sort_order", label: "Sort Order", type: "number" },
         { key: "is_active", label: "Active", type: "checkbox" },
         { key: "quote", label: "Quote", type: "textarea", required: true },
       ]}
-      defaultValues={{ author_name: "", author_role: "", author_initials: "", quote: "", span_class: "col-span-12 md:col-span-6", sort_order: 0, is_active: true }}
+      defaultValues={{ author_name: "", author_role: "", author_initials: "", author_image: "", quote: "", span_class: "col-span-12 md:col-span-6", sort_order: 0, is_active: true }}
     />
   );
 }

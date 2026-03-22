@@ -74,6 +74,8 @@ export default function PageEditorPage() {
     process: "Process Page",
     blogs: "Blogs Page",
     portofolio: "Portfolio Page",
+    "privacy-policy": "Privacy Policy",
+    "terms-of-service": "Terms of Service",
   };
 
   const descriptions = SECTION_DESCRIPTIONS[slug] || {};

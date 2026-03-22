@@ -10,17 +10,21 @@ import { errorHandler } from "./middleware/error-handler.js";
 import publicPages from "./routes/public/pages.js";
 import publicBlogs from "./routes/public/blogs.js";
 import publicPortfolios from "./routes/public/portfolios.js";
+import publicServices from "./routes/public/services.js";
 import publicNavigation from "./routes/public/navigation.js";
 import publicSettings from "./routes/public/settings.js";
 import publicFaqs from "./routes/public/faqs.js";
 import publicTestimonials from "./routes/public/testimonials.js";
 import publicTeam from "./routes/public/team.js";
 import publicFooter from "./routes/public/footer.js";
+import publicContact from "./routes/public/contact.js";
+import publicNewsletter from "./routes/public/newsletter.js";
 
 // Admin routes
 import adminPages from "./routes/admin/pages.js";
 import adminBlogs from "./routes/admin/blogs.js";
 import adminPortfolios from "./routes/admin/portfolios.js";
+import adminServices from "./routes/admin/services.js";
 import adminNavigation from "./routes/admin/navigation.js";
 import adminSettings from "./routes/admin/settings.js";
 import adminFaqs from "./routes/admin/faqs.js";
@@ -28,6 +32,8 @@ import adminTestimonials from "./routes/admin/testimonials.js";
 import adminTeam from "./routes/admin/team.js";
 import adminFooter from "./routes/admin/footer.js";
 import adminMedia from "./routes/admin/media.js";
+import adminContactMessages from "./routes/admin/contact-messages.js";
+import adminNewsletter from "./routes/admin/newsletter.js";
 
 const app = new Hono();
 
@@ -384,12 +390,15 @@ app.get("/api/openapi.json", (c) => {
 app.route("/api/v1/pages", publicPages);
 app.route("/api/v1/blogs", publicBlogs);
 app.route("/api/v1/portfolios", publicPortfolios);
+app.route("/api/v1/services", publicServices);
 app.route("/api/v1/navigation", publicNavigation);
 app.route("/api/v1/settings", publicSettings);
 app.route("/api/v1/faqs", publicFaqs);
 app.route("/api/v1/testimonials", publicTestimonials);
 app.route("/api/v1/team", publicTeam);
 app.route("/api/v1/footer", publicFooter);
+app.route("/api/v1/contact", publicContact);
+app.route("/api/v1/newsletter", publicNewsletter);
 
 // ── Admin Routes (protected) ──
 const admin = new Hono();
@@ -397,6 +406,7 @@ admin.use("*", authMiddleware);
 admin.route("/pages", adminPages);
 admin.route("/blogs", adminBlogs);
 admin.route("/portfolios", adminPortfolios);
+admin.route("/services", adminServices);
 admin.route("/navigation", adminNavigation);
 admin.route("/settings", adminSettings);
 admin.route("/faqs", adminFaqs);
@@ -404,6 +414,8 @@ admin.route("/testimonials", adminTestimonials);
 admin.route("/team", adminTeam);
 admin.route("/footer", adminFooter);
 admin.route("/media", adminMedia);
+admin.route("/contact-messages", adminContactMessages);
+admin.route("/newsletter", adminNewsletter);
 
 app.route("/api/v1/admin", admin);
 

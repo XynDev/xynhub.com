@@ -1,33 +1,35 @@
 import { useState, useEffect } from "react"
+import { useParams } from "react-router-dom"
 import { BentoCard } from "../components/ui/BentoCard"
 import { Button } from "../components/ui/Button"
-import { PageHeader } from "../components/layout/PageHeader"
 import { Link } from "react-router-dom"
 import { SEO } from "../components/SEO"
-import { getPageContent } from "../lib/api"
+import { getServiceBySlug } from "../lib/api"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
 
 export function ServiceDetail() {
-  const [pageData, setPageData] = useState<AnyData | null>(null)
+  const { slug } = useParams<{ slug: string }>()
+  const [service, setService] = useState<AnyData | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
+      if (!slug) return
       try {
-        const page = await getPageContent("service-detail")
-        setPageData(page)
+        const res = await getServiceBySlug(slug)
+        setService(res.data)
       } catch (err) {
-        console.error("Failed to load service detail data:", err)
+        console.error("Failed to load service detail:", err)
       } finally {
         setLoading(false)
       }
     }
     load()
-  }, [])
+  }, [slug])
 
-  if (loading || !pageData) {
+  if (loading) {
     return (
       <main className="pt-48 pb-20 px-6 md:px-8 max-w-[1440px] w-full mx-auto flex items-center justify-center min-h-screen">
         <div className="text-on-surface-variant text-sm uppercase tracking-widest animate-pulse">Loading...</div>
@@ -35,127 +37,136 @@ export function ServiceDetail() {
     )
   }
 
-  const hero = pageData.hero || {}
-  const security = pageData.security || {}
-  const memory = pageData.memory || {}
-  const routing = pageData.routing || {}
-  const stress = pageData.stress || {}
-  const habitsData = pageData.habits || {}
-  const cta = pageData.cta || {}
+  if (!service) {
+    return (
+      <main className="pt-48 pb-20 px-6 md:px-8 max-w-[1440px] w-full mx-auto flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-primary mb-4">Service Not Found</h1>
+          <Link to="/services" className="text-sm text-primary underline">Back to Services</Link>
+        </div>
+      </main>
+    )
+  }
 
-  // habits may be wrapped in { items: [...] } from the API
-  const habits = Array.isArray(habitsData) ? habitsData : (habitsData.items || [])
+  const metrics = service.metrics || []
+  const tooling = service.tooling || []
+  const features = service.features || []
 
   return (
     <main className="pt-48 pb-20 px-6 md:px-8 max-w-[1440px] w-full mx-auto">
-      <SEO title="Service Architecture Details" />
-      <PageHeader
-        label={hero.label}
-        headline={hero.title}
-        description={hero.description}
-      >
-        <div className="flex justify-start md:justify-end w-full mt-6">
-          <Link to="/services">
-            <Button variant="secondary" className="px-6 py-3 tracking-widest text-[0.6875rem] border-outline-variant/30 text-on-surface-variant hover:text-primary transition-colors">
-              <span className="material-symbols-outlined mr-2 text-[1.125rem]">arrow_back</span>
-              BACK TO SERVICES
-            </Button>
-          </Link>
-        </div>
-      </PageHeader>
+      <SEO title={service.title} description={service.short_description || service.description} />
+
+      {/* Hero */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
+        <BentoCard className="md:col-span-12 p-5 md:p-10 md:p-14 min-h-[400px] relative overflow-hidden flex flex-col justify-end">
+          {service.image_url && (
+            <>
+              <div className="absolute inset-0 z-0">
+                <img alt={service.title} className="w-full h-full object-cover opacity-40 mix-blend-luminosity" src={service.image_url} />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/60 to-transparent"></div>
+              </div>
+            </>
+          )}
+          <div className="relative z-10">
+            <div className="flex justify-between items-start mb-8">
+              <Link to="/services" className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors">
+                <span className="material-symbols-outlined text-lg">arrow_back</span>
+                Back to Services
+              </Link>
+              {service.number && (
+                <span className="text-3xl md:text-5xl font-black text-on-surface-variant/20 tracking-tighter">{service.number}</span>
+              )}
+            </div>
+            <div className="flex items-start gap-6 mb-6">
+              {service.icon && (
+                <span className="material-symbols-outlined text-3xl md:text-5xl text-primary">{service.icon}</span>
+              )}
+              <div>
+                <h1 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-primary leading-tight">{service.title}</h1>
+                {service.short_description && (
+                  <p className="text-on-surface-variant text-lg mt-4 max-w-2xl font-medium">{service.short_description}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </BentoCard>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
 
-        {/* Zero-Trust Security */}
-        <BentoCard className="md:col-span-12 lg:col-span-8 bg-surface-container p-5 md:p-10 md:p-14 relative overflow-hidden flex flex-col justify-between min-h-[500px]">
-          <div className="relative z-10">
-            <span className="material-symbols-outlined text-primary text-xl md:text-3xl md:text-5xl mb-8">{security.icon}</span>
-            <h2 className="text-2xl md:text-4xl font-bold tracking-tight text-primary mb-6">{security.title}</h2>
-            <p className="text-on-surface-variant text-lg max-w-md">
-              {security.description}
-            </p>
-          </div>
-          <div className="mt-12 space-y-4 relative z-10">
-            {security.modules?.map((module: AnyData) => (
-              <div key={module.name} className="bg-surface-container-high rounded-2xl p-6 flex items-center justify-between">
-                <span className="font-mono text-sm tracking-tight text-on-surface">{module.name}</span>
-                <div className={`h-2 w-2 rounded-full bg-primary ${module.status === 'active' ? 'shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'opacity-40'}`}></div>
-              </div>
-            ))}
-          </div>
-          <div className="absolute right-0 top-0 w-1/2 h-full opacity-20 pointer-events-none" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAL23geyY29g3b-QhWszXseA5vj7Dh4rrf4vgHG7_EbyTNomJn6-Vs1IbtnTywSejJNtRXCKMzqTTbuQJC1z2hz3gounOLv5Wys-tHRFK3dbZpeD71afbnTi391DySbpe8eAZu_imJZ6UgU4h0je6HpUXb2xDwujbeFOiomPW8FRnV7mzgEDPwLl9LfkMWp-lmWrMGqkqrHxSpjQjWmJWyBlMM-nXJmkAFnNydW3obW7GOU0tOyLhJdn-1YQwLCYs9sbxadXMXNZWI')", backgroundSize: 'cover', maskImage: 'linear-gradient(to left, black, transparent)' }}>
-          </div>
-        </BentoCard>
-
-        {/* Memory Safety */}
-        <BentoCard className="md:col-span-12 lg:col-span-4 bg-surface-container p-5 md:p-10 flex flex-col justify-between">
-          <div>
-            <span className="material-symbols-outlined text-primary text-2xl md:text-4xl mb-6">{memory.icon}</span>
-            <h3 className="text-2xl font-bold tracking-tight text-primary mb-4">{memory.title}</h3>
-            <p className="text-on-surface-variant leading-relaxed">
-              {memory.description}
-            </p>
-          </div>
-          <div className="mt-8 pt-8 border-t border-outline-variant/20">
-            <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                <span>{memory.metrics?.[0]?.label}</span>
-                <span>{memory.metrics?.[0]?.value}</span>
-              </div>
-              <div className="w-full bg-surface-container-lowest h-1 rounded-full overflow-hidden">
-                <div className="bg-primary h-full w-full"></div>
-              </div>
-            </div>
-          </div>
-        </BentoCard>
-
-        {/* Deterministic Routing */}
-        <BentoCard className="md:col-span-12 lg:col-span-4 bg-surface-container p-5 md:p-10 flex flex-col border border-outline-variant/10">
-          <span className="material-symbols-outlined text-primary text-2xl md:text-4xl mb-6">{routing.icon}</span>
-          <h3 className="text-2xl font-bold tracking-tight text-primary mb-4">{routing.title}</h3>
-          <p className="text-on-surface-variant leading-relaxed">
-            {routing.description}
-          </p>
-        </BentoCard>
-
-        {/* Proven by Stress */}
-        <BentoCard className="md:col-span-12 lg:col-span-8 bg-surface-container p-5 md:p-10 md:p-14 flex flex-col justify-center overflow-hidden relative border border-outline-variant/10">
-          <div className="relative z-10">
-            <h2 className="text-2xl md:text-4xl md:text-6xl font-extrabold tracking-tighter text-primary leading-none">
-              {stress.titlePrefix}<br/>{stress.titleHighlight}
-            </h2>
-            <p className="mt-8 text-on-surface-variant font-medium text-lg max-w-lg">
-              {stress.description}
-            </p>
-          </div>
-          <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
-        </BentoCard>
-
-        {/* Habits Grid */}
-        {habits.map((habit: AnyData) => (
-          <BentoCard key={habit.id} className="md:col-span-4 bg-surface-container p-5 md:p-8 flex flex-col gap-4">
-            <span className="text-xs font-bold uppercase tracking-[0.3em] text-on-surface-variant">{habit.label}</span>
-            <p className="text-xl font-bold text-primary">{habit.title}</p>
-            <p className="text-sm text-on-surface-variant">{habit.description}</p>
+        {/* Description */}
+        {service.description && (
+          <BentoCard className="md:col-span-8 p-5 md:p-10 md:p-14 flex flex-col justify-center">
+            <h2 className="text-xl md:text-3xl font-bold tracking-tight text-primary mb-8">Overview</h2>
+            <p className="text-on-surface-variant leading-relaxed text-lg">{service.description}</p>
           </BentoCard>
-        ))}
+        )}
 
-        {/* Ready for Scale CTA */}
-        <BentoCard className="md:col-span-12 mt-20 bg-surface-container p-5 md:p-10 md:p-14 border border-outline-variant/10">
+        {/* Metrics */}
+        {metrics.length > 0 && (
+          <BentoCard className={`${service.description ? "md:col-span-4" : "md:col-span-12"} p-5 md:p-10 flex flex-col justify-between`}>
+            <h3 className="label-sm text-on-surface-variant font-bold uppercase tracking-widest mb-8">Key Metrics</h3>
+            <div className={`grid ${service.description ? "grid-cols-1" : "grid-cols-2 md:grid-cols-4"} gap-4`}>
+              {metrics.map((metric: AnyData, i: number) => (
+                <div key={i} className="p-5 rounded-2xl bg-surface-container-low flex flex-col gap-1">
+                  <span className="label-sm text-outline uppercase tracking-widest text-[10px]">{metric.label}</span>
+                  <span className="text-xl font-bold text-primary tracking-tight">{metric.value}</span>
+                </div>
+              ))}
+            </div>
+          </BentoCard>
+        )}
+
+        {/* Tooling / Tech Stack */}
+        {tooling.length > 0 && (
+          <BentoCard className="md:col-span-5 bg-surface-container-high p-5 md:p-10">
+            <h3 className="label-sm text-on-surface-variant font-bold uppercase tracking-widest mb-8">Tech Stack</h3>
+            <ul className="space-y-4">
+              {tooling.map((tech: string | AnyData, i: number) => {
+                const name = typeof tech === "string" ? tech : tech.name
+                return (
+                  <li key={i} className="flex items-center justify-between p-5 rounded-2xl bg-surface-container-lowest border border-outline-variant/10">
+                    <span className="font-bold text-sm tracking-tight">{name}</span>
+                    <span className="material-symbols-outlined text-outline">check_circle</span>
+                  </li>
+                )
+              })}
+            </ul>
+          </BentoCard>
+        )}
+
+        {/* Features */}
+        {features.length > 0 && (
+          <BentoCard className={`${tooling.length > 0 ? "md:col-span-7" : "md:col-span-12"} p-5 md:p-10 md:p-14`}>
+            <h3 className="label-sm text-on-surface-variant font-bold uppercase tracking-widest mb-8">Features</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {features.map((feat: AnyData, i: number) => (
+                <div key={i}>
+                  <h4 className="font-bold text-primary mb-2">{feat.title}</h4>
+                  <p className="text-sm text-on-surface-variant leading-relaxed">{feat.description}</p>
+                </div>
+              ))}
+            </div>
+          </BentoCard>
+        )}
+
+        {/* CTA */}
+        <BentoCard className="md:col-span-12 mt-12 bg-surface-container p-5 md:p-10 md:p-14 border border-outline-variant/10">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-12">
             <div className="max-w-xl">
-              <h2 className="text-xl md:text-3xl md:text-5xl font-bold tracking-tighter text-primary mb-8">{cta.title}</h2>
+              <h2 className="text-xl md:text-3xl md:text-5xl font-bold tracking-tighter text-primary mb-4">Ready to get started?</h2>
               <p className="text-on-surface-variant text-lg">
-                {cta.description}
+                Let us help you build with {service.title}. Get in touch with our engineering team.
               </p>
             </div>
-            <Button className="px-10 py-5 font-bold text-lg hover:bg-on-primary-fixed-variant transition-colors flex items-center gap-3 shrink-0 normal-case tracking-normal">
-              {cta.buttonText}
-              <span className="material-symbols-outlined">arrow_forward</span>
-            </Button>
+            <Link to="/">
+              <Button className="px-10 py-5 font-bold text-lg flex items-center gap-3 shrink-0">
+                Contact Us
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </Button>
+            </Link>
           </div>
         </BentoCard>
-
       </div>
     </main>
   )

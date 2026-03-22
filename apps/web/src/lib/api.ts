@@ -72,6 +72,46 @@ export async function getPortfolioBySlug(slug: string): Promise<ApiResponse<AnyD
   return fetchApi<ApiResponse<AnyData>>(`/api/v1/portfolios/${slug}`);
 }
 
+// Services
+export async function getServices(params?: { featured?: string }): Promise<ApiResponse<AnyData[]>> {
+  const query = new URLSearchParams();
+  if (params?.featured) query.set("featured", params.featured);
+  const qs = query.toString();
+  return fetchApi<ApiResponse<AnyData[]>>(`/api/v1/services${qs ? `?${qs}` : ""}`);
+}
+
+export async function getServiceBySlug(slug: string): Promise<ApiResponse<AnyData>> {
+  return fetchApi<ApiResponse<AnyData>>(`/api/v1/services/${slug}`);
+}
+
+// Contact
+export async function submitContact(data: { name: string; email: string; message: string }): Promise<ApiResponse<null>> {
+  const res = await fetch(`${API_URL}/api/v1/contact`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const json = await res.json();
+    throw new Error(json.error || "Failed to send message");
+  }
+  return res.json();
+}
+
+// Newsletter
+export async function subscribeNewsletter(email: string): Promise<ApiResponse<null>> {
+  const res = await fetch(`${API_URL}/api/v1/newsletter/subscribe`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  if (!res.ok) {
+    const json = await res.json();
+    throw new Error(json.error || "Failed to subscribe");
+  }
+  return res.json();
+}
+
 // Other
 export async function getNavigation(): Promise<ApiResponse<AnyData[]>> {
   return fetchApi<ApiResponse<AnyData[]>>(`/api/v1/navigation`);

@@ -85,15 +85,34 @@ export interface BlogListItem {
   published_at: string | null;
 }
 
+// ---- Services ----
+export interface Service extends BaseEntity {
+  slug: string;
+  title: string;
+  description: string;
+  short_description: string;
+  icon: string | null;
+  image_url: string | null;
+  number: string | null;
+  metrics: Record<string, unknown>;
+  tooling: Record<string, unknown>[];
+  features: Record<string, unknown>[];
+  is_featured: boolean;
+  sort_order: number;
+  is_active: boolean;
+}
+
 // ---- Portfolios ----
 export interface Portfolio extends BaseEntity {
   slug: string;
   title: string;
   tag: string;
   description: string | null;
+  short_description: string;
   image_url: string | null;
   tech_stack: Record<string, unknown> | null;
   metrics: Record<string, unknown> | null;
+  is_featured: boolean;
   sort_order: number;
   is_active: boolean;
 }
@@ -135,6 +154,24 @@ export interface FAQ extends SortableEntity {
   answer: string;
   page_slug: string;
   is_active: boolean;
+}
+
+// ---- Contact Messages ----
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+// ---- Newsletter Subscribers ----
+export interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  is_active: boolean;
+  created_at: string;
 }
 
 // ---- Media ----

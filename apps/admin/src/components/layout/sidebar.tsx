@@ -16,6 +16,9 @@ import {
   Briefcase,
   BookOpen,
   LogOut,
+  Wrench,
+  Mail,
+  Newspaper,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase";
@@ -26,12 +29,15 @@ const navItems = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
   { label: "Pages", href: "/pages/home", icon: FileText },
   { label: "Blogs", href: "/blogs", icon: BookOpen },
+  { label: "Services", href: "/services", icon: Wrench },
   { label: "Portfolios", href: "/portfolios", icon: Briefcase },
   { label: "Navigation", href: "/navigation", icon: Navigation },
   { label: "Footer", href: "/footer", icon: PanelBottom },
   { label: "Testimonials", href: "/testimonials", icon: MessageSquareQuote },
   { label: "Team", href: "/team", icon: Users },
   { label: "FAQs", href: "/faqs", icon: HelpCircle },
+  { label: "Messages", href: "/contact-messages", icon: Mail },
+  { label: "Newsletter", href: "/newsletter", icon: Newspaper },
   { label: "Media", href: "/media", icon: Image },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
