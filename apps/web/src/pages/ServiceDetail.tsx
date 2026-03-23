@@ -160,7 +160,7 @@ export function ServiceDetail() {
               </p>
             </div>
             <Link to="/">
-              <Button className="px-10 py-5 font-bold text-lg flex items-center gap-3 shrink-0">
+              <Button size="lg" className="font-bold flex items-center gap-3 shrink-0">
                 Contact Us
                 <span className="material-symbols-outlined">arrow_forward</span>
               </Button>

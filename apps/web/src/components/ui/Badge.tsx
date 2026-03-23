@@ -10,7 +10,7 @@ function Badge({ className, variant = "default", dot = false, children, ...props
   return (
     <div
       className={cn(
-        "inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-8 label-sm font-bold uppercase tracking-widest text-[0.6875rem]",
+        "inline-flex items-center gap-2 px-4 py-1.5 rounded-full label-sm font-bold uppercase tracking-widest text-[0.6875rem]",
         {
           "bg-surface-container-high border border-outline-variant/15": variant === "default",
           "bg-transparent border border-outline-variant/20": variant === "outline",

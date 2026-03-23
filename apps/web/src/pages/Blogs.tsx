@@ -74,7 +74,7 @@ export function Blogs() {
           {/* Featured Post */}
           {featuredBlog && (
             <Link to={`/blogs/${featuredBlog.slug}`} className="md:col-span-8 group block">
-              <BentoCard className="p-0 overflow-hidden h-full">
+              <BentoCard className="p-0 overflow-hidden h-full bento-card-interactive">
                 <div className="h-96 w-full relative">
                   <img
                     alt={featuredBlog.title}
@@ -109,7 +109,7 @@ export function Blogs() {
           <div className="md:col-span-4 flex flex-col gap-6">
             {secondaryLatest.map((post) => (
               <Link key={post.id} to={`/blogs/${post.slug}`} className="h-full block group">
-                <BentoCard className="bg-surface-container-low p-5 md:p-8 h-full flex flex-col justify-between cursor-pointer group-hover:bg-surface-container-high transition-colors">
+                <BentoCard className="bg-surface-container-low p-5 md:p-8 h-full flex flex-col justify-between bento-card-interactive">
                   <div>
                     <span className="label-sm text-outline mb-4 block">{post.category}</span>
                     <h4 className="text-xl font-bold text-primary leading-snug">{post.title}</h4>
@@ -147,7 +147,7 @@ export function Blogs() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {researchBlogs.map((post) => (
               <Link key={post.id} to={`/blogs/${post.slug}`} className="block group cursor-pointer">
-                <BentoCard className="p-2 border border-transparent hover:border-outline-variant/30 transition-all bg-surface-container h-full">
+                <BentoCard className="p-2 bento-card-interactive bg-surface-container h-full">
                   <div className="bg-surface-container-low rounded-xl p-5 md:p-10 h-full flex flex-col justify-between border border-transparent group-hover:border-outline-variant transition-all">
                     <div>
                       <div className="flex justify-between items-start mb-12">
@@ -158,10 +158,15 @@ export function Blogs() {
                       <p className="text-on-surface-variant leading-relaxed">{post.excerpt}</p>
                     </div>
                     <div className="mt-16 pt-8 border-t border-outline-variant/20 flex justify-between items-center">
-                      <div className="flex -space-x-3">
-                        <div className="w-8 h-8 rounded-full border-2 border-surface-container-low bg-surface-container-high flex items-center justify-center text-[10px] font-bold text-primary">
-                          {post.author_name?.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full border-2 border-surface-container-low bg-surface-container-high flex items-center justify-center text-[10px] font-bold text-primary overflow-hidden">
+                          {post.author_image ? (
+                            <img src={post.author_image} alt={post.author_name} className="w-full h-full object-cover" />
+                          ) : (
+                            post.author_name?.split(" ").map((n: string) => n[0]).join("").slice(0, 2)
+                          )}
                         </div>
+                        <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">{post.author_name}</span>
                       </div>
                       <span className="material-symbols-outlined text-primary group-hover:translate-x-2 transition-transform">arrow_forward</span>
                     </div>
@@ -195,7 +200,7 @@ export function Blogs() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {infraBlogs.map((post) => (
               <Link key={post.id} to={`/blogs/${post.slug}`} className="block group">
-                <BentoCard className="p-5 md:p-10 h-full hover:bg-surface-container-high transition-colors">
+                <BentoCard className="p-5 md:p-10 h-full bento-card-interactive">
                   <div className="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center mb-8">
                     <span className="material-symbols-outlined text-primary">storage</span>
                   </div>

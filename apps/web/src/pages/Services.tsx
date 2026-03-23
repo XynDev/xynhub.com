@@ -71,7 +71,7 @@ export function Services() {
               to={`/services/${service.slug}`}
               className="md:col-span-8 group"
             >
-              <BentoCard className="p-5 md:p-10 lg:p-14 min-h-[400px] h-full hover:border-primary/30 transition-colors">
+              <BentoCard className="p-5 md:p-10 lg:p-14 min-h-[400px] h-full bento-card-interactive">
                 <div className="h-full flex flex-col relative z-10">
                   <div className="flex items-start justify-between mb-12">
                     <div>
@@ -127,7 +127,7 @@ export function Services() {
               to={`/services/${service.slug}`}
               className="md:col-span-4 group"
             >
-              <BentoCard className="p-5 md:p-8 lg:p-10 min-h-[400px] h-full bg-surface-container-high hover:border-primary/30 transition-colors overflow-hidden relative">
+              <BentoCard className="p-5 md:p-8 lg:p-10 min-h-[400px] h-full bg-surface-container-high bento-card-interactive overflow-hidden relative">
                 <div className="absolute top-0 right-0 p-6 opacity-10">
                   {service.icon && (
                     <span className="material-symbols-outlined text-[8rem]">{service.icon}</span>
@@ -175,7 +175,7 @@ export function Services() {
                 if (isExternal) {
                   return (
                     <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                      <Button variant={btn.variant as "primary" | "secondary"} className="px-10 py-4 font-bold tracking-widest text-sm w-full sm:w-auto">
+                      <Button variant={btn.variant as "primary" | "secondary"} size="lg" className="font-bold tracking-widest w-full sm:w-auto">
                         {btn.text}
                       </Button>
                     </a>
@@ -183,7 +183,7 @@ export function Services() {
                 }
                 return (
                   <Link key={i} to={url}>
-                    <Button variant={btn.variant as "primary" | "secondary"} className="px-10 py-4 font-bold tracking-widest text-sm w-full sm:w-auto">
+                    <Button variant={btn.variant as "primary" | "secondary"} size="lg" className="font-bold tracking-widest w-full sm:w-auto">
                       {btn.text}
                     </Button>
                   </Link>

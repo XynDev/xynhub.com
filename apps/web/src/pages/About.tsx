@@ -189,9 +189,13 @@ export function About() {
       {/* Core Tenets Section — with carousel pagination */}
       <section className="mb-32">
         <SectionHeader title={tenets.title} label={tenets.label} />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {visibleTenets.map((item: AnyData) => (
-            <BentoCard key={item.id || item.title} className="bg-surface-container-low hover:bg-surface-container transition-colors duration-300 !rounded-[3rem] p-5 md:p-10 flex flex-col">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 transition-opacity duration-300 ease-in-out" key={tenetsPage}>
+          {visibleTenets.map((item: AnyData, idx: number) => (
+            <BentoCard
+              key={item.id || item.title}
+              className="bg-surface-container-low !rounded-[3rem] p-5 md:p-10 flex flex-col animate-fade-in"
+              style={{ animationDelay: `${idx * 80}ms` }}
+            >
               <div className="w-12 h-12 bg-surface-container-high rounded-2xl flex items-center justify-center mb-8">
                 <span className="material-symbols-outlined text-primary text-xl">{item.icon}</span>
               </div>
@@ -320,13 +324,13 @@ export function About() {
           </div>
           {ctaIsExternal ? (
             <a href={ctaUrl} target="_blank" rel="noopener noreferrer">
-              <Button className="px-12 py-5 rounded-full text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-opacity whitespace-nowrap">
+              <Button size="lg" className="whitespace-nowrap">
                 {ctaData.buttonText}
               </Button>
             </a>
           ) : (
             <Link to={ctaUrl}>
-              <Button className="px-12 py-5 rounded-full text-sm font-bold uppercase tracking-widest hover:opacity-90 transition-opacity whitespace-nowrap">
+              <Button size="lg" className="whitespace-nowrap">
                 {ctaData.buttonText}
               </Button>
             </Link>
@@ -397,7 +401,7 @@ export function About() {
               if (ch.url) {
                 return (
                   <a key={ch.id || ch.text} href={ch.url} target="_blank" rel="noopener noreferrer">
-                    <BentoCard className="!rounded-[2rem] bg-surface-container-lowest border border-outline-variant/20 p-5 md:p-8 flex flex-row items-center gap-4 hover:border-outline-variant/40 transition-colors">
+                    <BentoCard className="!rounded-[2rem] bg-surface-container-lowest border border-outline-variant/20 p-5 md:p-8 flex flex-row items-center gap-4 bento-card-interactive">
                       {inner}
                     </BentoCard>
                   </a>

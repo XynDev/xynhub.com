@@ -9,24 +9,16 @@ import { getPageContent, getPortfolios } from "../lib/api"
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
 
-// Flatten portfolio data: merge tech_stack and metrics into top-level
-function flattenPortfolio(p: AnyData): AnyData {
-  const ts = p.tech_stack || {}
-  const m = p.metrics || {}
-  return {
-    ...p,
-    // For project 0 layout (featured)
-    tech1: ts.tech1,
-    tech2: ts.tech2,
-    metric: typeof m === "object" && !Array.isArray(m) && m.value ? m : undefined,
-    image: p.image_url,
-    // For project 1 layout (stack/memory)
-    stack: ts.stack || (Array.isArray(ts) ? ts : undefined),
-    memory: ts.memory,
-    // For project 2 layout (metrics array)
-    metrics: Array.isArray(m) ? m : (m.items || []),
-  }
-}
+// Bento row cycle: alternates every 3 projects
+// Row A: featured 8col + stats 4col
+// Row B: two equal 6col + 6col
+// Row C: 4col + wide 8col
+// Then repeats
+const ROW_PATTERNS = [
+  [8, 4],
+  [6, 6],
+  [4, 8],
+]
 
 export function Portofolio() {
   const [pageData, setPageData] = useState<AnyData | null>(null)
@@ -42,7 +34,7 @@ export function Portofolio() {
         ])
         setPageData(page)
         const raw = Array.isArray(portfoliosRes.data) ? portfoliosRes.data : []
-        setProjects(raw.map(flattenPortfolio))
+        setProjects(raw)
       } catch (err) {
         console.error("Failed to load portfolio data:", err)
       } finally {
@@ -67,10 +59,21 @@ export function Portofolio() {
 
   const featureItems = Array.isArray(features) ? features : (features.items || [])
 
+  // Build rows from projects
+  const rows: { projects: AnyData[]; pattern: number[] }[] = []
+  let idx = 0
+  let patternIdx = 0
+  while (idx < projects.length) {
+    const pattern = ROW_PATTERNS[patternIdx % ROW_PATTERNS.length]
+    const rowProjects = projects.slice(idx, idx + pattern.length)
+    rows.push({ projects: rowProjects, pattern })
+    idx += pattern.length
+    patternIdx++
+  }
+
   return (
     <main className="pt-48 pb-20 px-6 md:px-8 max-w-[1440px] w-full mx-auto">
       <SEO title="Engineering Portfolio" description="Showcasing high-density technical solutions deployed globally." />
-      {/* Technical Identity Header */}
       <PageHeader
         label={header.label}
         headline={<>{header.titlePrefix}<span className="text-outline">{header.titleSuffix}</span></>}
@@ -89,202 +92,163 @@ export function Portofolio() {
         </div>
       </PageHeader>
 
-      {/* Bento Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <div className="space-y-6">
+        {/* Dynamic portfolio rows */}
+        {rows.map((row, rowIdx) => (
+          <div key={rowIdx} className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            {row.projects.map((project, colIdx) => {
+              const span = row.pattern[colIdx] || 6
+              const isWide = span >= 8
+              const metrics = Array.isArray(project.metrics) ? project.metrics : (project.metrics?.items || [])
+              const techStack = project.tech_stack || {}
 
-        {/* Featured Project: Large Bento */}
-        {projects[0] && (
-          <BentoCard className="md:col-span-8 bg-surface-container p-5 md:p-8 md:p-12 flex flex-col justify-between min-h-[500px] group">
-            <div className="flex justify-between items-start">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(255,255,255,0.5)]"></span>
-                  <span className="label-sm text-primary tracking-widest uppercase font-bold text-[10px]">{projects[0].tag}</span>
-                </div>
-                <h2 className="text-2xl md:text-4xl md:text-5xl font-bold tracking-tight text-primary">{projects[0].title}</h2>
-              </div>
-              {projects[0].metric && (
-                <div className="flex gap-4">
-                  <div className="flex flex-col items-end">
-                    <span className="text-primary font-bold text-2xl">{projects[0].metric.value}</span>
-                    <span className="text-outline text-[10px] uppercase font-bold tracking-widest">{projects[0].metric.label}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-            {projects[0].image && (
-              <div className="my-12 overflow-hidden rounded-lg bg-surface-container-low aspect-video relative">
-                <img alt="Project visualization" className="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700" src={projects[0].image} />
-                <div className="absolute inset-0 bg-gradient-to-t from-surface-container to-transparent opacity-60"></div>
-              </div>
-            )}
-            <div className="flex flex-wrap justify-between items-end gap-6">
-              <div className="flex gap-4">
-                {projects[0].tech1 && (
-                  <div className="flex flex-col bg-surface-container-high rounded-lg p-4 min-w-[120px]">
-                    <span className="material-symbols-outlined text-primary mb-2">{projects[0].tech1.icon}</span>
-                    <span className="text-primary font-bold">{projects[0].tech1.lang}</span>
-                    <span className="text-outline text-[10px] uppercase font-bold">{projects[0].tech1.role}</span>
-                  </div>
-                )}
-                {projects[0].tech2 && (
-                  <div className="flex flex-col bg-surface-container-high rounded-lg p-4 min-w-[120px]">
-                    <span className="material-symbols-outlined text-primary mb-2">{projects[0].tech2.icon}</span>
-                    <span className="text-primary font-bold">{projects[0].tech2.lang}</span>
-                    <span className="text-outline text-[10px] uppercase font-bold">{projects[0].tech2.role}</span>
-                  </div>
-                )}
-              </div>
-              <Link to={`/portofolio/${projects[0].slug}`}>
-                <Button className="bg-primary text-on-primary rounded-full px-8 py-4 font-bold text-sm tracking-tight flex items-center gap-3 transition-opacity hover:opacity-90">
-                  {projects[0].action || "Deep Dive"} <span className="material-symbols-outlined text-sm">arrow_outward</span>
-                </Button>
-              </Link>
-            </div>
-          </BentoCard>
-        )}
+              return (
+                <Link
+                  key={project.id || project.slug}
+                  to={`/portofolio/${project.slug}`}
+                  className={`md:col-span-${span} group block`}
+                >
+                  <BentoCard className="bento-card-interactive p-5 md:p-8 lg:p-10 h-full min-h-[400px] flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-start justify-between mb-6">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-3">
+                            <span className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(255,255,255,0.3)]"></span>
+                            <span className="label-sm text-primary tracking-widest uppercase font-bold text-[10px]">{project.tag}</span>
+                          </div>
+                          <h2 className={`font-bold tracking-tight text-primary ${isWide ? "text-2xl md:text-4xl" : "text-xl md:text-2xl"}`}>
+                            {project.title}
+                          </h2>
+                        </div>
+                        {project.number && (
+                          <span className="text-xl md:text-3xl font-black text-on-surface-variant/15 tracking-tighter">{project.number}</span>
+                        )}
+                      </div>
 
-        {/* Stats Card: Medium Bento */}
-        <BentoCard className="md:col-span-4 bg-surface-container p-5 md:p-8 flex flex-col gap-8">
-          <div className="space-y-1">
-            <span className="label-sm text-outline tracking-widest uppercase font-bold text-[10px]">{proficiency.label}</span>
-            <h3 className="text-2xl font-bold text-primary">{proficiency.title}</h3>
-          </div>
-          <div className="space-y-6">
-            {proficiency.skills?.map((skill: AnyData) => (
-              <div key={skill.id} className="space-y-2">
-                <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
-                  <span>{skill.name}</span>
-                  <span className="text-primary">{skill.percentage}</span>
-                </div>
-                <div className="h-1 bg-surface-container-highest rounded-full overflow-hidden">
-                  <div className="h-full bg-primary" style={{ width: skill.percentage }}></div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="space-y-4 py-4">
-            <div className="flex justify-between items-center"><span className="text-[10px] font-bold text-outline uppercase tracking-widest">Network Topology</span><span className="text-[10px] font-bold text-primary uppercase">Optimized</span></div>
-            <div className="grid grid-cols-6 gap-1 h-12">
-              <div className="bg-primary/20 rounded-sm h-4 self-end"></div>
-              <div className="bg-primary/40 rounded-sm h-8 self-end"></div>
-              <div className="bg-primary rounded-sm h-12 self-end"></div>
-              <div className="bg-primary/60 rounded-sm h-10 self-end"></div>
-              <div className="bg-primary/30 rounded-sm h-6 self-end"></div>
-              <div className="bg-primary/50 rounded-sm h-9 self-end"></div>
-            </div>
-            <p className="text-[10px] text-outline leading-tight italic">{proficiency.topology?.desc}</p>
-          </div>
-          <div className="mt-auto bg-surface-container-low rounded-lg p-6 flex flex-col gap-4 border border-outline-variant/10">
-            <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>{proficiency.footer?.icon}</span>
-            <p className="text-sm leading-relaxed text-on-surface-variant">
-              {proficiency.footer?.text}<span className="text-primary font-bold">{proficiency.footer?.highlight}</span>{proficiency.footer?.text2}
-            </p>
-          </div>
-        </BentoCard>
+                      {project.image_url && isWide && (
+                        <div className="mb-8 overflow-hidden rounded-lg bg-surface-container-low aspect-video relative">
+                          <img alt={project.title} className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700" src={project.image_url} />
+                          <div className="absolute inset-0 bg-gradient-to-t from-surface-container to-transparent opacity-60"></div>
+                        </div>
+                      )}
 
-        {/* Project 2: Square Bento */}
-        {projects[1] && (
-          <BentoCard className="md:col-span-6 lg:col-span-4 bg-surface-container p-5 md:p-8 flex flex-col justify-between min-h-[400px]">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="material-symbols-outlined text-outline">hub</span>
-                <span className="text-[10px] font-bold tracking-[0.2em] text-outline uppercase">{projects[1].tag}</span>
-              </div>
-              <h3 className="text-xl md:text-3xl font-bold tracking-tight text-primary leading-none">{projects[1].title}</h3>
-              <p className="text-on-surface-variant text-sm">{projects[1].description}</p>
-            </div>
-            <div className="flex flex-col gap-3">
-              {projects[1].stack && (
-                <div className="flex items-center gap-4 py-3 border-b border-outline-variant/10">
-                  <span className="text-xs font-bold text-outline w-16">STACK</span>
-                  <div className="flex gap-2">
-                    {projects[1].stack.map((s: string) => (
-                      <span key={s} className="text-[10px] bg-surface-container-high px-2 py-0.5 rounded text-primary">{s}</span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {projects[1].memory && (
-                <div className="flex items-center gap-4 py-3">
-                  <span className="text-xs font-bold text-outline w-16">MEMORY</span>
-                  <span className="text-xs font-bold text-primary">{projects[1].memory}</span>
-                </div>
-              )}
-            </div>
-          </BentoCard>
-        )}
-
-        {/* Project 3: Wide Bento */}
-        {projects[2] && (
-          <BentoCard className="md:col-span-6 lg:col-span-8 bg-surface-container p-5 md:p-8 flex flex-col md:flex-row gap-8 items-center">
-            <div className="w-full md:w-1/2 space-y-6">
-              <div className="space-y-2">
-                <span className="label-sm text-outline tracking-widest uppercase font-bold text-[10px]">{projects[2].tag}</span>
-                <h3 className="text-xl md:text-3xl font-bold tracking-tight text-primary leading-none">{projects[2].title}</h3>
-              </div>
-              <p className="text-on-surface-variant text-sm leading-relaxed">
-                {projects[2].description}
-              </p>
-              {projects[2].metrics?.length > 0 && (
-                <div className="flex gap-6">
-                  {projects[2].metrics.map((m: AnyData) => (
-                    <div key={m.label} className="flex flex-col">
-                      <span className="text-xl font-bold text-primary">{m.value}</span>
-                      <span className="text-[10px] font-bold text-outline uppercase tracking-widest">{m.label}</span>
+                      <p className="text-on-surface-variant text-sm leading-relaxed mb-6 line-clamp-3">
+                        {project.short_description || project.description}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            {projects[2].image && (
-              <div className="w-full md:w-1/2 h-full min-h-[250px] bg-surface-container-low rounded-lg overflow-hidden relative">
-                <img alt="Visualization Dashboard" className="w-full h-full object-cover grayscale" src={projects[2].image} />
-                <div className="absolute inset-0 bg-primary/5 hover:bg-transparent transition-colors"></div>
-              </div>
-            )}
-          </BentoCard>
-        )}
 
-        {/* Detail Grid */}
-        {featureItems.map((f: AnyData) => (
-          <BentoCard key={f.id} className="md:col-span-4 bg-surface-container p-6 flex items-center gap-6">
-            <div className="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-primary">{f.icon}</span>
-            </div>
-            <div className="space-y-1">
-              <h4 className="font-bold text-primary leading-tight">{f.title}</h4>
-              <p className="text-xs text-outline font-medium">{f.description}</p>
-            </div>
-          </BentoCard>
+                    <div className="mt-auto">
+                      {/* Tech stack pills */}
+                      {techStack.stack && (
+                        <div className="flex flex-wrap gap-2 mb-6">
+                          {(Array.isArray(techStack.stack) ? techStack.stack : []).map((s: string) => (
+                            <span key={s} className="text-[10px] bg-surface-container-high px-3 py-1 rounded-full text-primary font-bold uppercase tracking-widest">{s}</span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Metrics */}
+                      {metrics.length > 0 && (
+                        <div className="flex gap-6 mb-6">
+                          {metrics.slice(0, isWide ? 4 : 2).map((m: AnyData, i: number) => (
+                            <div key={i} className="flex flex-col">
+                              <span className="text-lg font-bold text-primary">{m.value}</span>
+                              <span className="text-[10px] font-bold text-outline uppercase tracking-widest">{m.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-2 text-primary text-xs font-bold uppercase tracking-widest group-hover:gap-4 transition-all">
+                        View Case Study
+                        <span className="material-symbols-outlined text-base">arrow_forward</span>
+                      </div>
+                    </div>
+                  </BentoCard>
+                </Link>
+              )
+            })}
+          </div>
         ))}
 
-        {/* Contact Section */}
-        <BentoCard className="md:col-span-12 mt-20 mb-20 bg-surface-container p-6 md:p-12 md:p-20 text-center border border-outline-variant/10 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-5 md:p-8 opacity-10">
-            <span className="material-symbols-outlined text-9xl">deployed_code</span>
-          </div>
-          <div className="max-w-3xl mx-auto space-y-8 relative z-10">
-            <div className="space-y-4">
-              <span className="label-sm text-outline tracking-[0.4em] uppercase font-bold text-[10px]">{contact.label}</span>
-              <h2 className="text-2xl md:text-4xl md:text-6xl font-extrabold tracking-tighter text-primary">{contact.title}</h2>
-              <p className="text-on-surface-variant text-lg">{contact.description}</p>
-            </div>
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
-              <a className="w-full sm:w-auto bg-primary text-on-primary rounded-full px-10 py-5 font-bold text-sm tracking-tight flex items-center justify-center gap-3 transition-all hover:scale-105 shadow-xl shadow-primary/10" href="mailto:hello@xyn.system">
-                {contact.actionPrimary} <span className="material-symbols-outlined">terminal</span>
-              </a>
-              <div className="flex gap-2 w-full sm:w-auto">
-                {contact.links?.map((link: string) => (
-                  <a key={link} className="flex-1 sm:flex-none px-8 py-5 bg-surface-container-high rounded-full text-[10px] font-bold text-primary uppercase tracking-widest border border-outline-variant/10 hover:bg-surface-bright transition-colors" href="#">
-                    {link}
-                  </a>
+        {/* Proficiency Stats */}
+        {proficiency.title && (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <BentoCard className="md:col-span-8 p-5 md:p-10 lg:p-12">
+              <div className="space-y-1 mb-8">
+                <span className="label-sm text-outline tracking-widest uppercase font-bold text-[10px]">{proficiency.label}</span>
+                <h3 className="text-2xl font-bold text-primary">{proficiency.title}</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {proficiency.skills?.map((skill: AnyData) => (
+                  <div key={skill.id} className="space-y-2">
+                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
+                      <span>{skill.name}</span>
+                      <span className="text-primary">{skill.percentage}</span>
+                    </div>
+                    <div className="h-1 bg-surface-container-highest rounded-full overflow-hidden">
+                      <div className="h-full bg-primary" style={{ width: skill.percentage }}></div>
+                    </div>
+                  </div>
                 ))}
               </div>
+              {proficiency.footer && (
+                <div className="mt-8 bg-surface-container-low rounded-lg p-6 flex flex-col gap-4 border border-outline-variant/10">
+                  <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>{proficiency.footer?.icon}</span>
+                  <p className="text-sm leading-relaxed text-on-surface-variant">
+                    {proficiency.footer?.text}<span className="text-primary font-bold">{proficiency.footer?.highlight}</span>{proficiency.footer?.text2}
+                  </p>
+                </div>
+              )}
+            </BentoCard>
+
+            <div className="md:col-span-4 flex flex-col gap-6">
+              {featureItems.map((f: AnyData) => (
+                <BentoCard key={f.id} className="p-5 md:p-6 flex items-center gap-5">
+                  <div className="w-11 h-11 rounded-full bg-surface-container-high flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined text-primary text-lg">{f.icon}</span>
+                  </div>
+                  <div className="space-y-0.5">
+                    <h4 className="font-bold text-primary text-sm leading-tight">{f.title}</h4>
+                    <p className="text-xs text-outline font-medium">{f.description}</p>
+                  </div>
+                </BentoCard>
+              ))}
             </div>
           </div>
-        </BentoCard>
+        )}
 
+        {/* Contact CTA */}
+        {contact.title && (
+          <BentoCard className="p-6 md:p-12 lg:p-20 text-center border border-outline-variant/10 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-5 md:p-8 opacity-10">
+              <span className="material-symbols-outlined text-9xl">deployed_code</span>
+            </div>
+            <div className="max-w-3xl mx-auto space-y-8 relative z-10">
+              <div className="space-y-4">
+                <span className="label-sm text-outline tracking-[0.4em] uppercase font-bold text-[10px]">{contact.label}</span>
+                <h2 className="text-2xl md:text-4xl font-extrabold tracking-tighter text-primary">{contact.title}</h2>
+                <p className="text-on-surface-variant text-lg">{contact.description}</p>
+              </div>
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4 pt-4">
+                {contact.actionPrimary && (
+                  <a className="w-full sm:w-auto" href="mailto:hello@xyn.system">
+                    <Button size="lg" className="w-full flex items-center justify-center gap-3">
+                      {contact.actionPrimary} <span className="material-symbols-outlined text-lg">terminal</span>
+                    </Button>
+                  </a>
+                )}
+                <div className="flex gap-2 w-full sm:w-auto">
+                  {contact.links?.map((link: string) => (
+                    <Button key={link} variant="secondary" size="sm" className="flex-1 sm:flex-none">
+                      {link}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </BentoCard>
+        )}
       </div>
     </main>
   )

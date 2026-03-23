@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, Link } from "react-router-dom"
 import { BentoCard } from "../components/ui/BentoCard"
 import { Button } from "../components/ui/Button"
 import { PageHeader } from "../components/layout/PageHeader"
-import { Link } from "react-router-dom"
 import { SEO } from "../components/SEO"
 import { getPortfolioBySlug } from "../lib/api"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
@@ -50,7 +51,7 @@ export function PortofolioDetail() {
       >
         <div className="flex md:justify-end w-full mt-8 md:mt-0">
           <Link to="/portofolio">
-            <Button variant="secondary" className="px-6 py-3 tracking-widest text-[0.6875rem] border-outline-variant/30 text-on-surface-variant hover:text-primary transition-colors">
+            <Button variant="secondary" size="sm">
               <span className="material-symbols-outlined mr-2 text-[1.125rem]">arrow_back</span>
               BACK TO PORTFOLIO
             </Button>
@@ -96,20 +97,38 @@ export function PortofolioDetail() {
         </BentoCard>
 
         {/* Narrative */}
-        <BentoCard className="md:col-span-12 lg:col-span-7 bg-surface-container-lowest p-5 md:p-10 md:p-14 flex flex-col justify-center">
+        <BentoCard className="md:col-span-12 lg:col-span-7 bg-surface-container-lowest p-5 md:p-10 lg:p-14 flex flex-col justify-center">
           <h2 className="text-xl md:text-3xl font-bold tracking-tight text-primary mb-8">{detail.narrative?.title}</h2>
-          <div className="flex flex-col gap-6 text-on-surface-variant leading-relaxed text-lg">
-            {detail.narrative?.paragraphs?.map((p: string, i: number) => (
-              <p key={i}>{p}</p>
-            ))}
-          </div>
-          <div className="mt-12 flex flex-wrap gap-4">
-            {detail.narrative?.buttons?.map((btn: AnyData, i: number) => (
-              <Button key={i} variant={btn.variant as "primary" | "secondary"} className="px-8 py-3 tracking-widest text-[0.6875rem]">
-                {btn.text}
-              </Button>
-            ))}
-          </div>
+          {typeof detail.narrative?.body === "string" ? (
+            <article className="prose prose-lg dark:prose-invert max-w-none
+              prose-headings:text-primary prose-headings:tracking-tight prose-headings:font-bold
+              prose-p:text-on-surface-variant prose-p:leading-relaxed
+              prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+              prose-blockquote:border-primary prose-blockquote:text-primary prose-blockquote:italic
+              prose-code:text-primary prose-code:bg-surface-container-high prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded
+              prose-pre:bg-surface-container prose-pre:border prose-pre:border-outline-variant/30
+              prose-img:rounded-xl prose-strong:text-primary prose-li:text-on-surface-variant
+            ">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {detail.narrative.body}
+              </ReactMarkdown>
+            </article>
+          ) : (
+            <div className="flex flex-col gap-6 text-on-surface-variant leading-relaxed text-lg">
+              {detail.narrative?.paragraphs?.map((p: string, i: number) => (
+                <p key={i}>{p}</p>
+              ))}
+            </div>
+          )}
+          {detail.narrative?.buttons && (
+            <div className="mt-12 flex flex-wrap gap-4">
+              {detail.narrative.buttons.map((btn: AnyData, i: number) => (
+                <Button key={i} variant={btn.variant as "primary" | "secondary"} size="md">
+                  {btn.text}
+                </Button>
+              ))}
+            </div>
+          )}
         </BentoCard>
 
         {/* Features */}
@@ -147,7 +166,7 @@ export function PortofolioDetail() {
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               {detail.cta?.buttons?.map((btn: AnyData, i: number) => (
-                <Button key={i} variant={btn.variant as "primary" | "outline"} className="px-12 py-4 tracking-widest text-[0.6875rem]">
+                <Button key={i} variant={btn.variant as "primary" | "outline"} size="lg">
                   {btn.text}
                 </Button>
               ))}

@@ -107,7 +107,7 @@ export function Home() {
 
         {/* Hero Section */}
         <section className="mb-32 flex flex-col items-center text-center">
-          <Badge dot>{hero.version}</Badge>
+          <Badge dot className="mb-8">{hero.version}</Badge>
           <h1 className="text-[3.5rem] md:text-[5.5rem] font-extrabold tracking-tighter leading-[0.9] text-primary mb-8 max-w-4xl">
             {hero.headline}
           </h1>
@@ -115,8 +115,8 @@ export function Home() {
             {hero.description}
           </p>
           <div className="flex gap-4">
-            <Button variant="primary" className="px-10 py-4">Start Building</Button>
-            <Button variant="secondary" className="px-10 py-4">Documentation</Button>
+            <Button variant="primary" size="lg">Start Building</Button>
+            <Button variant="secondary" size="lg">Documentation</Button>
           </div>
         </section>
 
@@ -260,7 +260,7 @@ export function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {services.map((service: AnyData) => (
               <Link key={service.id} to={`/services/${service.slug}`}>
-                <BentoCard className="flex flex-col h-full hover:border-outline-variant/30 transition-all">
+                <BentoCard className="flex flex-col h-full bento-card-interactive">
                   <div className="h-64 bg-surface-container-low overflow-hidden relative">
                     {service.image_url && <img alt={service.title} className="w-full h-full object-cover opacity-60 grayscale" src={service.image_url}/>}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#201f22] to-transparent"></div>
@@ -290,7 +290,7 @@ export function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {portfolios.map((project: AnyData) => (
               <Link key={project.id} to={`/portofolio/${project.slug}`}>
-                <BentoCard className="h-[500px] hover:border-outline-variant/30 transition-all flex flex-col justify-end p-5 md:p-10 group">
+                <BentoCard className="h-[500px] bento-card-interactive flex flex-col justify-end p-5 md:p-10 group">
                   {project.image_url && <img alt={project.title} className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:scale-105 transition-transform duration-700" src={project.image_url}/>}
                   <div className="absolute inset-0 bg-gradient-to-t from-surface-container via-surface-container/60 to-transparent"></div>
                   <div className="relative z-10">
@@ -370,20 +370,20 @@ export function Home() {
                   if (isExternal) {
                     return (
                       <a key={i} href={btn.url} target="_blank" rel="noopener noreferrer">
-                        <Button variant={btn.variant || "primary"} className="px-12 py-5 text-lg">{btn.text}</Button>
+                        <Button variant={btn.variant || "primary"} size="lg">{btn.text}</Button>
                       </a>
                     )
                   }
                   return (
                     <Link key={i} to={btn.url || "/services"}>
-                      <Button variant={btn.variant || "primary"} className="px-12 py-5 text-lg">{btn.text}</Button>
+                      <Button variant={btn.variant || "primary"} size="lg">{btn.text}</Button>
                     </Link>
                   )
                 })
               ) : (
                 <>
-                  <Button variant="primary" className="px-12 py-5 text-lg shadow-outline-variant/10">Get Started Now</Button>
-                  <Button variant="secondary" className="px-12 py-5 text-lg">Talk to Engineering</Button>
+                  <Button variant="primary" size="lg">Get Started Now</Button>
+                  <Button variant="secondary" size="lg">Talk to Engineering</Button>
                 </>
               )}
             </div>
@@ -479,7 +479,7 @@ export function Home() {
                   {/* Honeypot - invisible to humans, bots auto-fill this */}
                   <input ref={antiSpam.honeypotRef} {...antiSpam.honeypotProps} />
                   {contactError && <p className="text-xs text-red-500 mb-2">{contactError}</p>}
-                  <Button type="submit" disabled={contactSending} className="w-full py-4 rounded-lg bg-primary text-on-primary disabled:opacity-50">
+                  <Button type="submit" disabled={contactSending} size="lg" className="w-full rounded-lg">
                     {contactSending ? "Sending..." : "Send Transmission"}
                   </Button>
                 </div>

@@ -172,7 +172,7 @@ export function BlogDetail() {
                     placeholder={cta.placeholder}
                     type="email"
                   />
-                  <Button type="submit" className="px-8 py-4 uppercase tracking-widest text-[0.6875rem] font-bold w-full md:w-auto">
+                  <Button type="submit" size="md" className="w-full md:w-auto">
                     {cta.buttonText || "Subscribe"}
                   </Button>
                 </div>
