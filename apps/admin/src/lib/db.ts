@@ -301,6 +301,9 @@ export async function dbCleanupMediaByUrl(url: string): Promise<void> {
   const supabase = createClient();
   const match = url.match(/\/storage\/v1\/object\/public\/media\/(.+)$/);
   if (match?.[1]) {
+    // Remove file from storage
     await supabase.storage.from("media").remove([match[1]]);
+    // Remove matching record from media table
+    await supabase.from("media").delete().eq("file_url", url);
   }
 }

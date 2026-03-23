@@ -29,7 +29,7 @@ export default function TeamPage() {
         { key: "name", label: "Full Name", required: true },
         { key: "role", label: "Job Title", required: true, placeholder: "Chief Architect" },
         { key: "group_name", label: "Team Group", required: true, placeholder: "Systems Architects" },
-        { key: "image_url", label: "Photo URL", placeholder: "https://..." },
+        { key: "image_url", label: "Photo", type: "media" },
         { key: "sort_order", label: "Sort Order", type: "number" },
         { key: "is_active", label: "Active", type: "checkbox" },
       ]}

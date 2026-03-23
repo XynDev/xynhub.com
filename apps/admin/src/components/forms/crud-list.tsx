@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { dbCreate, dbUpdate, dbDelete } from "@/lib/db";
+import { dbCreate, dbUpdate, dbDelete, dbCleanupMediaByUrl } from "@/lib/db";
 import { Pencil, Trash2, Plus, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -56,10 +56,24 @@ export function CrudList<T extends { id: string }>({
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
-      dbUpdate(table, id, data),
+    mutationFn: async ({ id, data }: { id: string; data: Record<string, unknown> }) => {
+      // Clean up old media files when replacing with new ones
+      const item = items.find((i) => i.id === id);
+      if (item) {
+        const mediaFields = formFields.filter((f) => f.type === "media");
+        for (const f of mediaFields) {
+          const oldUrl = (item as AnyRecord)[f.key];
+          const newUrl = data[f.key];
+          if (oldUrl && typeof oldUrl === "string" && oldUrl !== newUrl && oldUrl.includes("/storage/")) {
+            await dbCleanupMediaByUrl(oldUrl);
+          }
+        }
+      }
+      return dbUpdate(table, id, data);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKey] });
+      queryClient.invalidateQueries({ queryKey: ["admin-media-picker"] });
       toast.success("Updated");
       resetForm();
     },
@@ -67,9 +81,23 @@ export function CrudList<T extends { id: string }>({
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => dbDelete(table, id),
+    mutationFn: async (id: string) => {
+      // Clean up any media fields before deleting the record
+      const item = items.find((i) => i.id === id);
+      if (item) {
+        const mediaFields = formFields.filter((f) => f.type === "media");
+        for (const f of mediaFields) {
+          const url = (item as AnyRecord)[f.key];
+          if (url && typeof url === "string") {
+            await dbCleanupMediaByUrl(url);
+          }
+        }
+      }
+      return dbDelete(table, id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKey] });
+      queryClient.invalidateQueries({ queryKey: ["admin-media-picker"] });
       toast.success("Deleted");
     },
     onError: (err: Error) => toast.error(err.message),
