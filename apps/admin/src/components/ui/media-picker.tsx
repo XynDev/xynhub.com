@@ -27,6 +27,8 @@ export function MediaPicker({ value, onChange, label, placeholder }: MediaPicker
   const [tab, setTab] = useState<"browse" | "upload">("browse");
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [altText, setAltText] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -56,15 +58,28 @@ export function MediaPicker({ value, onChange, label, placeholder }: MediaPicker
       handleChange(res.data.file_url);
       toast.success("Uploaded & selected");
       setAltText("");
+      setSelectedFile(null);
+      setPreview(null);
       if (fileRef.current) fileRef.current.value = "";
       setOpen(false);
     },
     onError: (err: Error) => toast.error(err.message),
   });
 
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
+    if (file.type.startsWith("image/")) {
+      const url = URL.createObjectURL(file);
+      setPreview(url);
+    } else {
+      setPreview(null);
+    }
+  };
+
   const handleUpload = () => {
-    const file = fileRef.current?.files?.[0];
-    if (file) uploadMutation.mutate(file);
+    if (selectedFile) {
+      uploadMutation.mutate(selectedFile);
+    }
   };
 
   const inputClass =
@@ -145,23 +160,86 @@ export function MediaPicker({ value, onChange, label, placeholder }: MediaPicker
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-4">
               {tab === "upload" ? (
-                <div className="space-y-3">
-                  <input ref={fileRef} type="file" accept="image/*,.pdf" className="text-sm" />
+                <div className="space-y-4">
+                  {/* Hidden file input */}
                   <input
-                    value={altText}
-                    onChange={(e) => setAltText(e.target.value)}
-                    placeholder="Alt text (optional)"
-                    className={inputClass}
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*,.pdf"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileSelect(file);
+                    }}
                   />
-                  <button
-                    type="button"
-                    onClick={handleUpload}
-                    disabled={uploadMutation.isPending}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
-                  >
-                    <Upload className="w-4 h-4" />
-                    {uploadMutation.isPending ? "Uploading..." : "Upload & Select"}
-                  </button>
+
+                  {/* Click-to-select zone */}
+                  {!selectedFile ? (
+                    <button
+                      type="button"
+                      onClick={() => fileRef.current?.click()}
+                      className="w-full border-2 border-dashed border-[var(--border)] rounded-lg p-8 flex flex-col items-center gap-3 hover:border-[var(--primary)] hover:bg-[var(--muted)]/50 transition-colors cursor-pointer"
+                    >
+                      <Upload className="w-8 h-8 text-[var(--muted-foreground)]" />
+                      <div className="text-center">
+                        <p className="text-sm font-medium">Click to select a file</p>
+                        <p className="text-xs text-[var(--muted-foreground)] mt-1">JPG, PNG, WebP, SVG, GIF, or PDF</p>
+                      </div>
+                    </button>
+                  ) : (
+                    <div className="border border-[var(--border)] rounded-lg p-4 space-y-3">
+                      <div className="flex items-center gap-3">
+                        {preview ? (
+                          <img src={preview} alt="Preview" className="w-16 h-16 object-cover rounded-lg border border-[var(--border)]" />
+                        ) : (
+                          <div className="w-16 h-16 bg-[var(--muted)] rounded-lg flex items-center justify-center">
+                            <ImageIcon className="w-6 h-6 text-[var(--muted-foreground)]" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{selectedFile.name}</p>
+                          <p className="text-xs text-[var(--muted-foreground)]">{(selectedFile.size / 1024).toFixed(1)} KB</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedFile(null);
+                            setPreview(null);
+                            if (fileRef.current) fileRef.current.value = "";
+                          }}
+                          className="p-1.5 rounded hover:bg-[var(--muted)]"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <input
+                        value={altText}
+                        onChange={(e) => setAltText(e.target.value)}
+                        placeholder="Alt text (optional)"
+                        className={inputClass}
+                      />
+
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={handleUpload}
+                          disabled={uploadMutation.isPending}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                        >
+                          <Upload className="w-4 h-4" />
+                          {uploadMutation.isPending ? "Uploading..." : "Upload & Select"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => fileRef.current?.click()}
+                          className="px-4 py-2 border border-[var(--border)] rounded-lg text-sm hover:bg-[var(--muted)]"
+                        >
+                          Choose Different File
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ) : isLoading ? (
                 <div className="grid grid-cols-4 gap-3">
