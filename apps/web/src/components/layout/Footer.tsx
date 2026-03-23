@@ -2,7 +2,11 @@ import { useState, useEffect } from "react"
 import type { FormEvent } from "react"
 import { Link } from "react-router-dom"
 import { useTheme } from "../ThemeProvider"
-import { getFooter, subscribeNewsletter } from "../../lib/api"
+import { getFooter } from "../../lib/api"
+import { supabase } from "../../lib/supabase"
+import { Turnstile } from "../ui/Turnstile"
+
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || ""
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
@@ -34,6 +38,7 @@ export function Footer() {
   const [subscribing, setSubscribing] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
   const [emailError, setEmailError] = useState("")
+  const [turnstileToken, setTurnstileToken] = useState("")
 
   useEffect(() => {
     async function load() {
@@ -59,13 +64,21 @@ export function Footer() {
       setEmailError("Please enter a valid email")
       return
     }
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setEmailError("Please complete the verification.")
+      return
+    }
 
     setSubscribing(true)
     try {
-      await subscribeNewsletter(email)
+      const { error } = await supabase
+        .from("newsletter_subscribers")
+        .upsert({ email, is_active: true }, { onConflict: "email" })
+      if (error) throw new Error(error.message)
       setSubscribed(true)
       setEmail("")
-    } catch (err) {
+      setTurnstileToken("")
+    } catch {
       setEmailError("Failed to subscribe. Try again.")
     } finally {
       setSubscribing(false)
@@ -134,12 +147,19 @@ export function Footer() {
                 />
                 <button
                   type="submit"
-                  disabled={subscribing}
+                  disabled={subscribing || (!!TURNSTILE_SITE_KEY && !turnstileToken)}
                   className="bg-primary text-on-primary text-[10px] font-bold px-5 py-3 uppercase tracking-widest hover:opacity-80 transition-opacity shrink-0 disabled:opacity-50"
                 >
                   {subscribing ? "..." : (newsletter?.button_text || "Join")}
                 </button>
               </div>
+              <Turnstile
+                siteKey={TURNSTILE_SITE_KEY}
+                onVerify={setTurnstileToken}
+                onExpire={() => setTurnstileToken("")}
+                theme="dark"
+                size="compact"
+              />
               {emailError && <p className="text-xs text-red-500 mt-1 px-4">{emailError}</p>}
             </form>
           )}

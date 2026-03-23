@@ -58,8 +58,13 @@ export function HomeStats({ data, onChange }: Props) {
     const stat = data[key] ?? {};
     onChange({ ...data, [key]: { ...stat, [field]: val } });
   };
+  const updateBadges = (val: string) => {
+    const badges = val.split(",").map((s) => s.trim()).filter(Boolean);
+    onChange({ ...data, network: { ...(data.network ?? {}), badges } });
+  };
   return (
     <div className="space-y-6">
+      {/* Number stats */}
       {["deployments", "clients"].map((key) => (
         <fieldset key={key} className="border border-[var(--border)] rounded-lg p-4 space-y-3">
           <legend className="text-xs font-semibold px-2 uppercase tracking-wider">{key}</legend>
@@ -70,6 +75,26 @@ export function HomeStats({ data, onChange }: Props) {
           <TextAreaField label="Description" value={data[key]?.description ?? ""} onChange={(v) => updateStat(key, "description", v)} rows={2} />
         </fieldset>
       ))}
+
+      {/* Network Infrastructure card */}
+      <fieldset className="border border-[var(--border)] rounded-lg p-4 space-y-3">
+        <legend className="text-xs font-semibold px-2 uppercase tracking-wider">Network Card (large left)</legend>
+        <div className="grid grid-cols-2 gap-3">
+          <TextField label="Label" value={data.network?.label ?? ""} onChange={(v) => updateStat("network", "label", v)} placeholder="Network Infrastructure" />
+          <TextField label="Title" value={data.network?.title ?? ""} onChange={(v) => updateStat("network", "title", v)} placeholder="Ecosystem Topology" />
+        </div>
+        <TextAreaField label="Description" value={data.network?.description ?? ""} onChange={(v) => updateStat("network", "description", v)} rows={2} placeholder="Visualizing the multi-layered nodal connections..." />
+        <TextField label="Badges (comma-separated)" value={(data.network?.badges ?? []).join(", ")} onChange={updateBadges} placeholder="Active Nodal Map, Latency: 0.4ms" />
+      </fieldset>
+
+      {/* System Load card */}
+      <fieldset className="border border-[var(--border)] rounded-lg p-4 space-y-3">
+        <legend className="text-xs font-semibold px-2 uppercase tracking-wider">System Load Card (wide bottom)</legend>
+        <div className="grid grid-cols-2 gap-3">
+          <TextField label="Label" value={data.systemLoad?.label ?? ""} onChange={(v) => updateStat("systemLoad", "label", v)} placeholder="System Load" />
+          <TextField label="Title" value={data.systemLoad?.title ?? ""} onChange={(v) => updateStat("systemLoad", "title", v)} placeholder="Throughput Velocity" />
+        </div>
+      </fieldset>
     </div>
   );
 }

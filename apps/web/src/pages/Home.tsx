@@ -2,11 +2,15 @@ import { useState, useEffect } from "react"
 import type { FormEvent } from "react"
 import { Link } from "react-router-dom"
 import { cn } from "../lib/utils"
+import { supabase } from "../lib/supabase"
 import { BentoCard } from "../components/ui/BentoCard"
 import { Button } from "../components/ui/Button"
 import { Badge } from "../components/ui/Badge"
 import { SEO } from "../components/SEO"
-import { getPageContent, getTestimonials, getFaqs, getServices, getPortfolios, submitContact } from "../lib/api"
+import { Turnstile } from "../components/ui/Turnstile"
+import { getPageContent, getTestimonials, getFaqs, getServices, getPortfolios } from "../lib/api"
+
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || ""
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
@@ -22,6 +26,8 @@ export function Home() {
   const [contactForm, setContactForm] = useState({ name: "", email: "", message: "" })
   const [contactSending, setContactSending] = useState(false)
   const [contactSent, setContactSent] = useState(false)
+  const [contactError, setContactError] = useState("")
+  const [turnstileToken, setTurnstileToken] = useState("")
 
   useEffect(() => {
     async function load() {
@@ -51,15 +57,26 @@ export function Home() {
 
   const handleContactSubmit = async (e: FormEvent) => {
     e.preventDefault()
+    setContactError("")
     if (!contactForm.name || !contactForm.email || !contactForm.message) return
+    if (TURNSTILE_SITE_KEY && !turnstileToken) {
+      setContactError("Please complete the verification checkbox.")
+      return
+    }
     setContactSending(true)
     try {
-      await submitContact(contactForm)
+      const { error } = await supabase.from("contact_messages").insert({
+        name: contactForm.name,
+        email: contactForm.email,
+        message: contactForm.message,
+      })
+      if (error) throw new Error(error.message)
       setContactSent(true)
       setContactForm({ name: "", email: "", message: "" })
+      setTurnstileToken("")
     } catch (err) {
       console.error("Failed to send:", err)
-      alert("Failed to send message. Please try again.")
+      setContactError("Failed to send message. Please try again.")
     } finally {
       setContactSending(false)
     }
@@ -115,18 +132,23 @@ export function Home() {
               typeof item === "string" ? { name: item, logo: "" } : item
             )
             if (normalized.length === 0) return null
+            // Render one set for layout, then duplicate the entire set for seamless looping
+            const renderItem = (item: AnyData, idx: number) => (
+              <div key={idx} className="flex-shrink-0 flex items-center justify-center h-12 opacity-40 grayscale hover:opacity-70 hover:grayscale-0 transition-all">
+                {item.logo ? (
+                  <img src={item.logo} alt={item.name || ""} className="h-10 w-auto max-w-[140px] object-contain" />
+                ) : (
+                  <div className="text-2xl font-black tracking-tighter text-primary whitespace-nowrap">{item.name}</div>
+                )}
+              </div>
+            )
             return (
-              <div className="overflow-hidden relative">
-                <div className="flex gap-16 animate-scroll-x">
-                  {[...normalized, ...normalized, ...normalized].map((item: AnyData, idx: number) => (
-                    <div key={idx} className="flex-shrink-0 flex items-center justify-center h-12 opacity-40 grayscale hover:opacity-70 hover:grayscale-0 transition-all">
-                      {item.logo ? (
-                        <img src={item.logo} alt={item.name || ""} className="h-10 w-auto max-w-[140px] object-contain" />
-                      ) : (
-                        <div className="text-2xl font-black tracking-tighter text-primary whitespace-nowrap">{item.name}</div>
-                      )}
-                    </div>
-                  ))}
+              <div className="overflow-hidden relative logo-scroll-mask">
+                <div className="flex gap-16 animate-scroll-x w-max">
+                  {/* First set */}
+                  {normalized.map((item: AnyData, idx: number) => renderItem(item, idx))}
+                  {/* Duplicate set for seamless loop */}
+                  {normalized.map((item: AnyData, idx: number) => renderItem(item, idx + normalized.length))}
                 </div>
               </div>
             )
@@ -137,14 +159,15 @@ export function Home() {
         <div className="grid grid-cols-12 gap-6 mb-32">
           <BentoCard className="col-span-12 lg:col-span-8 p-6 md:p-12 min-h-[500px] group">
             <div className="relative z-10 flex flex-col h-full">
-              <span className="label-sm text-outline mb-4 block tracking-widest uppercase text-[0.7rem]">Network Infrastructure</span>
-              <h2 className="text-xl md:text-3xl font-bold tracking-tight text-primary mb-6">Ecosystem Topology</h2>
+              <span className="label-sm text-outline mb-4 block tracking-widest uppercase text-[0.7rem]">{stats.network?.label || "Network Infrastructure"}</span>
+              <h2 className="text-xl md:text-3xl font-bold tracking-tight text-primary mb-6">{stats.network?.title || "Ecosystem Topology"}</h2>
               <p className="text-on-surface-variant max-w-xs mb-auto">
-                Visualizing the multi-layered nodal connections across our distributed engineering environment.
+                {stats.network?.description || "Visualizing the multi-layered nodal connections across our distributed engineering environment."}
               </p>
               <div className="mt-8 flex gap-3">
-                <div className="px-4 py-2 rounded-full bg-surface-container-high text-[0.65rem] font-bold border border-outline-variant/20 uppercase tracking-widest">Active Nodal Map</div>
-                <div className="px-4 py-2 rounded-full bg-surface-container-high text-[0.65rem] font-bold border border-outline-variant/20 uppercase tracking-widest">Latency: 0.4ms</div>
+                {(stats.network?.badges || ["Active Nodal Map", "Latency: 0.4ms"]).map((badge: string, i: number) => (
+                  <div key={i} className="px-4 py-2 rounded-full bg-surface-container-high text-[0.65rem] font-bold border border-outline-variant/20 uppercase tracking-widest">{badge}</div>
+                ))}
               </div>
             </div>
             <div className="absolute inset-0 top-0 left-0 flex items-center justify-center opacity-20 pointer-events-none scale-110">
@@ -185,8 +208,8 @@ export function Home() {
           <BentoCard className="col-span-12 lg:col-span-8 p-6 md:p-12">
             <div className="flex justify-between items-start mb-12">
               <div>
-                <span className="label-sm text-outline mb-2 block tracking-widest uppercase text-[0.7rem]">System Load</span>
-                <h3 className="text-2xl font-bold tracking-tight">Throughput Velocity</h3>
+                <span className="label-sm text-outline mb-2 block tracking-widest uppercase text-[0.7rem]">{stats.systemLoad?.label || "System Load"}</span>
+                <h3 className="text-2xl font-bold tracking-tight">{stats.systemLoad?.title || "Throughput Velocity"}</h3>
               </div>
               <div className="flex gap-2">
                 <div className="w-12 h-1 bg-primary rounded-full"></div>
@@ -438,7 +461,14 @@ export function Home() {
                   ></textarea>
                 </div>
                 <div className="col-span-1 md:col-span-2">
-                  <Button type="submit" disabled={contactSending} className="w-full py-4 rounded-lg bg-primary text-on-primary disabled:opacity-50">
+                  <Turnstile
+                    siteKey={TURNSTILE_SITE_KEY}
+                    onVerify={setTurnstileToken}
+                    onExpire={() => setTurnstileToken("")}
+                    theme="dark"
+                  />
+                  {contactError && <p className="text-xs text-red-500 mt-2">{contactError}</p>}
+                  <Button type="submit" disabled={contactSending || (!!TURNSTILE_SITE_KEY && !turnstileToken)} className="w-full py-4 rounded-lg bg-primary text-on-primary disabled:opacity-50 mt-3">
                     {contactSending ? "Sending..." : "Send Transmission"}
                   </Button>
                 </div>
