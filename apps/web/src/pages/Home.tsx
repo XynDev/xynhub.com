@@ -7,10 +7,8 @@ import { BentoCard } from "../components/ui/BentoCard"
 import { Button } from "../components/ui/Button"
 import { Badge } from "../components/ui/Badge"
 import { SEO } from "../components/SEO"
-import { Turnstile } from "../components/ui/Turnstile"
+import { useAntiSpam } from "../components/ui/Turnstile"
 import { getPageContent, getTestimonials, getFaqs, getServices, getPortfolios } from "../lib/api"
-
-const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || ""
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
@@ -27,7 +25,7 @@ export function Home() {
   const [contactSending, setContactSending] = useState(false)
   const [contactSent, setContactSent] = useState(false)
   const [contactError, setContactError] = useState("")
-  const [turnstileToken, setTurnstileToken] = useState("")
+  const antiSpam = useAntiSpam(3)
 
   useEffect(() => {
     async function load() {
@@ -59,8 +57,9 @@ export function Home() {
     e.preventDefault()
     setContactError("")
     if (!contactForm.name || !contactForm.email || !contactForm.message) return
-    if (TURNSTILE_SITE_KEY && !turnstileToken) {
-      setContactError("Please complete the verification checkbox.")
+    const { isBot } = antiSpam.check()
+    if (isBot) {
+      setContactError("Please complete the verification before submitting.")
       return
     }
     setContactSending(true)
@@ -73,7 +72,7 @@ export function Home() {
       if (error) throw new Error(error.message)
       setContactSent(true)
       setContactForm({ name: "", email: "", message: "" })
-      setTurnstileToken("")
+      antiSpam.reset()
     } catch (err) {
       console.error("Failed to send:", err)
       setContactError("Failed to send message. Please try again.")
@@ -461,14 +460,12 @@ export function Home() {
                   ></textarea>
                 </div>
                 <div className="col-span-1 md:col-span-2">
-                  <Turnstile
-                    siteKey={TURNSTILE_SITE_KEY}
-                    onVerify={setTurnstileToken}
-                    onExpire={() => setTurnstileToken("")}
-                    theme="dark"
-                  />
-                  {contactError && <p className="text-xs text-red-500 mt-2">{contactError}</p>}
-                  <Button type="submit" disabled={contactSending || (!!TURNSTILE_SITE_KEY && !turnstileToken)} className="w-full py-4 rounded-lg bg-primary text-on-primary disabled:opacity-50 mt-3">
+                  {/* Cloudflare Turnstile widget */}
+                  <div ref={antiSpam.turnstileRef} className="mb-4" />
+                  {/* Honeypot - invisible to humans, bots auto-fill this */}
+                  <input ref={antiSpam.honeypotRef} {...antiSpam.honeypotProps} />
+                  {contactError && <p className="text-xs text-red-500 mb-2">{contactError}</p>}
+                  <Button type="submit" disabled={contactSending} className="w-full py-4 rounded-lg bg-primary text-on-primary disabled:opacity-50">
                     {contactSending ? "Sending..." : "Send Transmission"}
                   </Button>
                 </div>

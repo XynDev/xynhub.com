@@ -4,9 +4,7 @@ import { Link } from "react-router-dom"
 import { useTheme } from "../ThemeProvider"
 import { getFooter } from "../../lib/api"
 import { supabase } from "../../lib/supabase"
-import { Turnstile } from "../ui/Turnstile"
-
-const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || ""
+import { useAntiSpam } from "../ui/Turnstile"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
@@ -38,7 +36,7 @@ export function Footer() {
   const [subscribing, setSubscribing] = useState(false)
   const [subscribed, setSubscribed] = useState(false)
   const [emailError, setEmailError] = useState("")
-  const [turnstileToken, setTurnstileToken] = useState("")
+  const antiSpam = useAntiSpam(2)
 
   useEffect(() => {
     async function load() {
@@ -64,8 +62,9 @@ export function Footer() {
       setEmailError("Please enter a valid email")
       return
     }
-    if (TURNSTILE_SITE_KEY && !turnstileToken) {
-      setEmailError("Please complete the verification.")
+    const { isBot } = antiSpam.check()
+    if (isBot) {
+      setEmailError("Please complete the verification first.")
       return
     }
 
@@ -77,7 +76,7 @@ export function Footer() {
       if (error) throw new Error(error.message)
       setSubscribed(true)
       setEmail("")
-      setTurnstileToken("")
+      antiSpam.reset()
     } catch {
       setEmailError("Failed to subscribe. Try again.")
     } finally {
@@ -147,19 +146,16 @@ export function Footer() {
                 />
                 <button
                   type="submit"
-                  disabled={subscribing || (!!TURNSTILE_SITE_KEY && !turnstileToken)}
+                  disabled={subscribing}
                   className="bg-primary text-on-primary text-[10px] font-bold px-5 py-3 uppercase tracking-widest hover:opacity-80 transition-opacity shrink-0 disabled:opacity-50"
                 >
                   {subscribing ? "..." : (newsletter?.button_text || "Join")}
                 </button>
               </div>
-              <Turnstile
-                siteKey={TURNSTILE_SITE_KEY}
-                onVerify={setTurnstileToken}
-                onExpire={() => setTurnstileToken("")}
-                theme="dark"
-                size="compact"
-              />
+              {/* Cloudflare Turnstile widget */}
+              <div ref={antiSpam.turnstileRef} className="mt-3" />
+              {/* Honeypot */}
+              <input ref={antiSpam.honeypotRef} {...antiSpam.honeypotProps} />
               {emailError && <p className="text-xs text-red-500 mt-1 px-4">{emailError}</p>}
             </form>
           )}
