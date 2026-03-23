@@ -29,14 +29,14 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
     throw new HTTPException(401, { message: "Missing authorization token" });
   }
 
-  // 7s timeout — fail fast with a proper error response (with CORS headers)
-  // instead of letting Vercel kill the function at 10s with a CORS-less 504
+  // 5s timeout — fail fast with a proper error response (with CORS headers)
+  // instead of letting Vercel kill the function at 10s with a bare 504
   const {
     data: { user },
     error,
   } = await withTimeout(
     supabaseAdmin.auth.getUser(token),
-    7000,
+    5000,
     "Auth verification"
   );
 

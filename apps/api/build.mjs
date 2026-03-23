@@ -4,6 +4,7 @@ import { build } from "esbuild";
 await build({
   entryPoints: ["src/vercel.ts"],
   bundle: true,
+  minify: true,
   platform: "node",
   target: "node20",
   format: "esm",

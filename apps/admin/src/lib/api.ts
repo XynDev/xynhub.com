@@ -34,19 +34,39 @@ export async function apiFetch<T>(
     headers: { ...headers, ...options.headers },
   });
 
-  const data = await res.json();
-
-  if (!res.ok) {
-    throw new Error(data.error || `API error: ${res.status}`);
+  // Handle non-JSON error responses (e.g. Vercel 504 returns plain text)
+  const text = await res.text();
+  let data: Record<string, unknown>;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    if (!res.ok) {
+      throw new Error(
+        res.status === 504
+          ? "Server timeout — please try again in a moment"
+          : `Server error (${res.status}): ${text.slice(0, 100)}`
+      );
+    }
+    throw new Error("Invalid response from server");
   }
 
-  return data;
+  if (!res.ok) {
+    throw new Error((data.error as string) || `API error: ${res.status}`);
+  }
+
+  return data as T;
 }
 
 // Public API (no auth needed)
 export async function publicFetch<T>(endpoint: string): Promise<T> {
   const res = await fetch(`${API_URL}${endpoint}`);
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || `API error: ${res.status}`);
-  return data;
+  const text = await res.text();
+  let data: Record<string, unknown>;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error(res.ok ? "Invalid response" : `Server error (${res.status})`);
+  }
+  if (!res.ok) throw new Error((data.error as string) || `API error: ${res.status}`);
+  return data as T;
 }
