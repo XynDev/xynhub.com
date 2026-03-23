@@ -21,7 +21,7 @@ interface CrudListProps<T extends { id: string }> {
   formFields: {
     key: string;
     label: string;
-    type?: "text" | "textarea" | "number" | "checkbox" | "json" | "select" | "media";
+    type?: "text" | "textarea" | "number" | "checkbox" | "json" | "select" | "media" | "social";
     required?: boolean;
     placeholder?: string;
     options?: { label: string; value: string }[];
@@ -115,6 +115,9 @@ export function CrudList<T extends { id: string }>({
     formFields.forEach((f) => {
       if (f.type === "json") {
         values[f.key] = JSON.stringify(rec[f.key] || {}, null, 2);
+      } else if (f.type === "social") {
+        // Keep social_links as object (not stringified)
+        values[f.key] = rec[f.key] || {};
       } else {
         values[f.key] = rec[f.key] ?? defaultValues[f.key];
       }
@@ -173,9 +176,35 @@ export function CrudList<T extends { id: string }>({
           <h3 className="font-medium">{editingId ? "Edit" : "New"} {title.replace(/s$/, "")}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {formFields.map((field) => (
-              <div key={field.key} className={field.type === "textarea" || field.type === "json" ? "md:col-span-2" : ""}>
+              <div key={field.key} className={field.type === "textarea" || field.type === "json" || field.type === "social" ? "md:col-span-2" : ""}>
                 <label className="block text-sm font-medium mb-1">{field.label}{field.required && " *"}</label>
-                {field.type === "media" ? (
+                {field.type === "social" ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {[
+                      { key: "linkedin", label: "LinkedIn", icon: "🔗", placeholder: "https://linkedin.com/in/..." },
+                      { key: "instagram", label: "Instagram", icon: "📷", placeholder: "https://instagram.com/..." },
+                      { key: "whatsapp", label: "WhatsApp", icon: "💬", placeholder: "https://wa.me/62..." },
+                      { key: "website", label: "Personal Website", icon: "🌐", placeholder: "https://..." },
+                      { key: "other", label: "Other", icon: "🔗", placeholder: "https://..." },
+                    ].map((platform) => {
+                      const socialObj = (form[field.key] as AnyRecord) || {};
+                      return (
+                        <div key={platform.key} className="flex items-center gap-2">
+                          <span className="text-base shrink-0 w-6 text-center">{platform.icon}</span>
+                          <input
+                            value={socialObj[platform.key] || ""}
+                            onChange={(e) => {
+                              const updated = { ...socialObj, [platform.key]: e.target.value };
+                              setForm({ ...form, [field.key]: updated });
+                            }}
+                            className={inputClass}
+                            placeholder={platform.placeholder}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : field.type === "media" ? (
                   <MediaPicker
                     label={field.label}
                     value={(form[field.key] as string) || ""}

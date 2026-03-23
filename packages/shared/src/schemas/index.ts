@@ -133,7 +133,13 @@ export const teamMemberSchema = z.object({
   role: z.string().min(1).max(200),
   group_name: z.string().min(1).max(100),
   image_url: z.string().url().nullable().default(null),
-  social_links: z.array(z.object({ url: z.string().url() })).default([]),
+  social_links: z.object({
+    linkedin: z.string().default(""),
+    instagram: z.string().default(""),
+    whatsapp: z.string().default(""),
+    website: z.string().default(""),
+    other: z.string().default(""),
+  }).default({}),
   sort_order: z.number().int().default(0),
   is_active: z.boolean().default(true),
 });
