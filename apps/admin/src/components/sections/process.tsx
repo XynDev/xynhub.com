@@ -1,6 +1,6 @@
 "use client";
 
-import { TextField, TextAreaField, TagsField } from "@/components/ui/form-field";
+import { TextField, TextAreaField } from "@/components/ui/form-field";
 import { ArrayField } from "@/components/ui/array-field";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,14 +22,20 @@ export function ProcessHero({ data, onChange }: Props) {
 }
 
 // ============================================================
-// PROCESS > PHASES
+// PROCESS > PHASES (Unified — all phases in one array)
 // ============================================================
 export function ProcessPhases({ data, onChange }: Props) {
   return (
     <div className="space-y-4">
-      <p className="text-xs text-[var(--muted-foreground)]">
-        Each phase item can be a main card or a side card. Side cards have &quot;isSideCard: true&quot;.
-      </p>
+      <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/10">
+        <p className="text-xs text-[var(--muted-foreground)]">
+          <strong>Layout:</strong> Phases auto-arrange in a bento grid cycle: Wide+Side → Equal pair → Side+Wide → Full-width, then repeat.
+          Mark items with <code className="px-1 bg-[var(--muted)] rounded">isSideCard: true</code> to make them compact accent cards paired with the next main phase.
+        </p>
+        <p className="text-xs text-[var(--muted-foreground)] mt-2">
+          <strong>Supported fields:</strong> phase (label), title, icon (Material Symbols name), description, metric (label+value), tags (comma list), metrics (array), features (array with icon+title).
+        </p>
+      </div>
       <ArrayField
         label="Phase Items"
         items={data.items ?? []}
@@ -38,20 +44,16 @@ export function ProcessPhases({ data, onChange }: Props) {
           { key: "phase", label: "Phase Label", placeholder: "Phase 01" },
           { key: "title", label: "Title", placeholder: "Strategic Inquiry" },
           { key: "icon", label: "Material Icon", placeholder: "search_check" },
-          { key: "span", label: "Grid Span", placeholder: "md:col-span-3" },
           { key: "description", label: "Description", type: "textarea", colSpan: 2 },
-          { key: "padding", label: "Padding Class", placeholder: "p-10" },
-          { key: "minH", label: "Min Height Class", placeholder: "min-h-[400px]" },
-          { key: "bg", label: "BG Class", placeholder: "bg-surface-container-high" },
         ]}
-        defaultItem={{ id: "", phase: "", title: "", icon: "", description: "", span: "md:col-span-2", padding: "p-10", minH: "min-h-[400px]", bg: "" }}
+        defaultItem={{ id: "", phase: "", title: "", icon: "", description: "", isSideCard: false }}
       />
     </div>
   );
 }
 
 // ============================================================
-// PROCESS > PHASE4
+// PROCESS > PHASE4 (Legacy support — kept for backward compat)
 // ============================================================
 export function ProcessPhase4({ data, onChange }: Props) {
   const setSide = (k: string, v: string) => {
@@ -62,6 +64,11 @@ export function ProcessPhase4({ data, onChange }: Props) {
   };
   return (
     <div className="space-y-6">
+      <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/10">
+        <p className="text-xs text-[var(--muted-foreground)]">
+          <strong>Legacy section.</strong> For new phases, add items to the &quot;phases&quot; section above. This section is kept for backward compatibility.
+        </p>
+      </div>
       <fieldset className="border border-[var(--border)] rounded-lg p-4 space-y-3">
         <legend className="text-xs font-semibold px-2">Side Card</legend>
         <TextField label="Icon" value={data.sideCard?.icon ?? ""} onChange={(v) => setSide("icon", v)} placeholder="rocket_launch" />
@@ -89,12 +96,17 @@ export function ProcessPhase4({ data, onChange }: Props) {
 }
 
 // ============================================================
-// PROCESS > PHASE5
+// PROCESS > PHASE5 (Legacy support — kept for backward compat)
 // ============================================================
 export function ProcessPhase5({ data, onChange }: Props) {
   const set = (k: string, v: string) => onChange({ ...data, [k]: v });
   return (
     <div className="space-y-4">
+      <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/10">
+        <p className="text-xs text-[var(--muted-foreground)]">
+          <strong>Legacy section.</strong> For new phases, add items to the &quot;phases&quot; section above. This section is kept for backward compatibility.
+        </p>
+      </div>
       <div className="grid grid-cols-2 gap-4">
         <TextField label="Phase" value={data.phase ?? ""} onChange={(v) => set("phase", v)} placeholder="Phase 05" />
         <TextField label="Title" value={data.title ?? ""} onChange={(v) => set("title", v)} />

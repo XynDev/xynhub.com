@@ -114,10 +114,10 @@ export const SECTION_DESCRIPTIONS: Record<string, Record<string, string>> = {
   },
   services: {
     hero: "Page header — label, headline, status badge",
-    web: "Web development card — icon, number, title, description, metrics",
-    tooling: "Tooling sidebar — title and stack list",
-    app: "App development card — icon, title, description, platforms",
-    cloud: "Cloud services card — icon, number, title, features, technologies",
+    web: "Legacy — service cards now managed in Services CRUD page",
+    tooling: "Legacy — service cards now managed in Services CRUD page",
+    app: "Legacy — service cards now managed in Services CRUD page",
+    cloud: "Legacy — service cards now managed in Services CRUD page",
     cta: "Call-to-action — title, description, buttons",
   },
   "service-detail": {
@@ -131,9 +131,9 @@ export const SECTION_DESCRIPTIONS: Record<string, Record<string, string>> = {
   },
   process: {
     hero: "Page header — label, headline, description",
-    phases: "Process phases grid — items with phase label, title, icon, description, layout settings",
-    phase4: "Phase 4 cards — side card (icon, title, desc) + main card (phase, title, metrics)",
-    phase5: "Phase 5 section — phase, title, description, feature icons",
+    phases: "All process phases — auto-arranged bento grid. Mark items as isSideCard for compact accent cards",
+    phase4: "Legacy Phase 4 — side card + main card (migrate items to phases section)",
+    phase5: "Legacy Phase 5 — full-width with features (migrate items to phases section)",
   },
   blogs: {
     hero: "Blog listing header — label, title, description",
