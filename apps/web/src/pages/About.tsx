@@ -148,7 +148,7 @@ export function About() {
                 {team.members?.map((member: AnyData) => (
                   <div key={member.id} className="flex items-center gap-6 p-6 bg-surface-container-low rounded-2xl hover:bg-surface-container transition-all">
                     <div className="w-16 h-16 rounded-full overflow-hidden grayscale bg-surface-bright">
-                      <img alt={member.name} className="w-full h-full object-cover" src={member.image} />
+                      <img alt={member.name} className="w-full h-full object-cover" src={member.image_url || member.image} />
                     </div>
                     <div>
                       <div className="font-bold text-primary tracking-tight">{member.name}</div>

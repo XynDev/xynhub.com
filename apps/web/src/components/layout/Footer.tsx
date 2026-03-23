@@ -72,8 +72,9 @@ export function Footer() {
     try {
       const { error } = await supabase
         .from("newsletter_subscribers")
-        .upsert({ email, is_active: true }, { onConflict: "email" })
-      if (error) throw new Error(error.message)
+        .insert({ email, is_active: true })
+      // Duplicate email (23505) is fine — treat as success
+      if (error && error.code !== "23505") throw new Error(error.message)
       setSubscribed(true)
       setEmail("")
       antiSpam.reset()
