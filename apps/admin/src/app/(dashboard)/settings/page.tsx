@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList, dbUpsertSetting, dbDeleteSetting } from "@/lib/db";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Save, Plus, Trash2, Info } from "lucide-react";
@@ -62,15 +62,12 @@ export default function SettingsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-settings"],
-    queryFn: () => apiFetch<{ data: Setting[] }>("/api/v1/admin/settings"),
+    queryFn: () => dbList<Setting>("site_settings"),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ key, value }: { key: string; value: AnyVal }) =>
-      apiFetch(`/api/v1/admin/settings/${key}`, {
-        method: "PUT",
-        body: JSON.stringify({ value }),
-      }),
+      dbUpsertSetting(key, value),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
       setEditingKey(null);
@@ -80,8 +77,7 @@ export default function SettingsPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (key: string) =>
-      apiFetch(`/api/v1/admin/settings/${key}`, { method: "DELETE" }),
+    mutationFn: (key: string) => dbDeleteSetting(key),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
       toast.success("Deleted");

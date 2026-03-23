@@ -1,14 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList } from "@/lib/db";
 import { CrudList } from "@/components/forms/crud-list";
 import type { TeamMember } from "@xynhub/shared";
 
 export default function TeamPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-team"],
-    queryFn: () => apiFetch<{ data: TeamMember[] }>("/api/v1/admin/team"),
+    queryFn: () => dbList<TeamMember>("team_members"),
   });
 
   return (
@@ -16,7 +16,7 @@ export default function TeamPage() {
       title="Team Members"
       description="Manage team members displayed on the About page"
       queryKey="admin-team"
-      apiPath="/api/v1/admin/team"
+      table="team_members"
       items={data?.data || []}
       isLoading={isLoading}
       columns={[

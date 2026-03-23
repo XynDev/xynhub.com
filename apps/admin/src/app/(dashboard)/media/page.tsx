@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList, dbUploadMedia, dbDeleteMedia } from "@/lib/db";
 import { Upload, Trash2, Copy } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
@@ -23,23 +23,11 @@ export default function MediaPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-media"],
-    queryFn: () =>
-      apiFetch<{ data: MediaItem[]; pagination: { total: number } }>(
-        "/api/v1/admin/media?per_page=100"
-      ),
+    queryFn: () => dbList<MediaItem>("media", { limit: 100 }),
   });
 
   const uploadMutation = useMutation({
-    mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      if (altText) formData.append("alt_text", altText);
-
-      return apiFetch<{ data: MediaItem }>("/api/v1/admin/media/upload", {
-        method: "POST",
-        body: formData as unknown as BodyInit,
-      });
-    },
+    mutationFn: (file: File) => dbUploadMedia(file, altText || undefined),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-media"] });
       toast.success("File uploaded");
@@ -50,8 +38,7 @@ export default function MediaPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) =>
-      apiFetch(`/api/v1/admin/media/${id}`, { method: "DELETE" }),
+    mutationFn: (id: string) => dbDeleteMedia(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-media"] });
       toast.success("Deleted");

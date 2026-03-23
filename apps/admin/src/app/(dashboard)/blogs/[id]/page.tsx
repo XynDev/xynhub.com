@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbGet } from "@/lib/db";
 import { BlogForm } from "@/components/forms/blog-form";
 import type { Blog } from "@xynhub/shared";
 
@@ -12,7 +12,7 @@ export default function EditBlogPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-blog", id],
-    queryFn: () => apiFetch<{ data: Blog }>(`/api/v1/admin/blogs/${id}`),
+    queryFn: () => dbGet<Blog>("blogs", id),
   });
 
   if (isLoading) {

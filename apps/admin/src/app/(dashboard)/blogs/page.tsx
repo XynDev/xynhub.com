@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList, dbDelete } from "@/lib/db";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -12,15 +12,11 @@ export default function BlogsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-blogs"],
-    queryFn: () =>
-      apiFetch<{ data: Blog[]; pagination: { total: number } }>(
-        "/api/v1/admin/blogs?per_page=100"
-      ),
+    queryFn: () => dbList<Blog>("blogs", { limit: 100 }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) =>
-      apiFetch(`/api/v1/admin/blogs/${id}`, { method: "DELETE" }),
+    mutationFn: (id: string) => dbDelete("blogs", id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
       toast.success("Blog deleted");

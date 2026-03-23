@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList, dbCreate, dbUpdate, dbDelete } from "@/lib/db";
 import { MediaPicker } from "@/components/ui/media-picker";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
 import { toast } from "sonner";
@@ -84,18 +84,14 @@ export default function ServicesPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-services"],
-    queryFn: () =>
-      apiFetch<{ data: Service[] }>("/api/v1/admin/services"),
+    queryFn: () => dbList<Service>("services"),
   });
 
   const services = data?.data || [];
 
   const createMutation = useMutation({
     mutationFn: (data: ServiceFormData) =>
-      apiFetch("/api/v1/admin/services", {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
+      dbCreate("services", data as unknown as Record<string, unknown>),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-services"] });
       toast.success("Service created");
@@ -106,10 +102,7 @@ export default function ServicesPage() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: ServiceFormData }) =>
-      apiFetch(`/api/v1/admin/services/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(data),
-      }),
+      dbUpdate("services", id, data as unknown as Record<string, unknown>),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-services"] });
       toast.success("Service updated");
@@ -119,8 +112,7 @@ export default function ServicesPage() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) =>
-      apiFetch(`/api/v1/admin/services/${id}`, { method: "DELETE" }),
+    mutationFn: (id: string) => dbDelete("services", id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-services"] });
       toast.success("Service deleted");

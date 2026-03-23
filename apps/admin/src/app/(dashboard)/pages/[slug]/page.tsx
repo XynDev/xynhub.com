@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbGetPageSections, dbUpsertPageSection } from "@/lib/db";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save, ChevronDown, ChevronRight, Info, Code } from "lucide-react";
@@ -23,7 +23,7 @@ export default function PageEditorPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-page", slug],
-    queryFn: () => apiFetch<{ data: PageSection[] }>(`/api/v1/admin/pages/${slug}`),
+    queryFn: () => dbGetPageSections<PageSection>(slug),
   });
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
@@ -33,10 +33,7 @@ export default function PageEditorPage() {
 
   const updateMutation = useMutation({
     mutationFn: ({ section, content, sort_order }: { section: string; content: Record<string, unknown>; sort_order: number }) =>
-      apiFetch(`/api/v1/admin/pages/${slug}/${section}`, {
-        method: "PUT",
-        body: JSON.stringify({ content, sort_order }),
-      }),
+      dbUpsertPageSection(slug, section, content, sort_order),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-page", slug] });
       setEditingSection(null);

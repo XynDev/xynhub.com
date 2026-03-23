@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/api";
+import { dbCreate, dbUpdate } from "@/lib/db";
 import { toast } from "sonner";
 import { Save } from "lucide-react";
 import type { Blog } from "@xynhub/shared";
@@ -47,13 +47,9 @@ export function BlogForm({ blog }: BlogFormProps) {
 
   const mutation = useMutation({
     mutationFn: (data: Record<string, unknown>) =>
-      apiFetch(
-        isEdit ? `/api/v1/admin/blogs/${blog!.id}` : "/api/v1/admin/blogs",
-        {
-          method: isEdit ? "PUT" : "POST",
-          body: JSON.stringify(data),
-        }
-      ),
+      isEdit
+        ? dbUpdate("blogs", blog!.id, data)
+        : dbCreate("blogs", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-blogs"] });
       toast.success(isEdit ? "Blog updated" : "Blog created");

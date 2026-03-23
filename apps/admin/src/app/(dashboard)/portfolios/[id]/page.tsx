@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbGetPortfolioWithDetail, dbUpdatePortfolio } from "@/lib/db";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save, Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
@@ -37,7 +37,7 @@ export default function EditPortfolioPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-portfolio", id],
-    queryFn: () => apiFetch<{ data: AnyData }>(`/api/v1/admin/portfolios/${id}`),
+    queryFn: () => dbGetPortfolioWithDetail<AnyData>(id),
   });
 
   const [form, setForm] = useState({
@@ -102,8 +102,7 @@ export default function EditPortfolioPage() {
   }, [data]);
 
   const mutation = useMutation({
-    mutationFn: (body: AnyData) =>
-      apiFetch(`/api/v1/admin/portfolios/${id}`, { method: "PUT", body: JSON.stringify(body) }),
+    mutationFn: (body: AnyData) => dbUpdatePortfolio(id, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-portfolios"] });
       toast.success("Updated");

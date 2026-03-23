@@ -1,14 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList } from "@/lib/db";
 import { CrudList } from "@/components/forms/crud-list";
 import type { NavigationItem } from "@xynhub/shared";
 
 export default function NavigationPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-navigation"],
-    queryFn: () => apiFetch<{ data: NavigationItem[] }>("/api/v1/admin/navigation"),
+    queryFn: () => dbList<NavigationItem>("navigation_items"),
   });
 
   return (
@@ -16,7 +16,7 @@ export default function NavigationPage() {
       title="Navigation"
       description="Manage header navigation menu items"
       queryKey="admin-navigation"
-      apiPath="/api/v1/admin/navigation"
+      table="navigation_items"
       items={data?.data || []}
       isLoading={isLoading}
       columns={[

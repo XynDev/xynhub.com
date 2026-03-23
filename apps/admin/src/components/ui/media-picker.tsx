@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList, dbUploadMedia, dbCleanupMediaByUrl } from "@/lib/db";
 import { toast } from "sonner";
 import { Upload, Image as ImageIcon, X, Check } from "lucide-react";
 
@@ -31,20 +31,13 @@ export function MediaPicker({ value, onChange, label, placeholder }: MediaPicker
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-media-picker"],
-    queryFn: () =>
-      apiFetch<{ data: MediaItem[] }>("/api/v1/admin/media?per_page=100"),
+    queryFn: () => dbList<MediaItem>("media", { limit: 100 }),
     enabled: open,
   });
 
   // Cleanup old image from storage when replaced/removed
   const cleanupMutation = useMutation({
-    mutationFn: async (url: string) => {
-      if (!url || !url.includes("/storage/")) return; // Only cleanup storage URLs
-      return apiFetch("/api/v1/admin/media/cleanup", {
-        method: "POST",
-        body: JSON.stringify({ url }),
-      });
-    },
+    mutationFn: (url: string) => dbCleanupMediaByUrl(url),
   });
 
   const handleChange = (newUrl: string) => {
@@ -56,15 +49,7 @@ export function MediaPicker({ value, onChange, label, placeholder }: MediaPicker
   };
 
   const uploadMutation = useMutation({
-    mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      if (altText) formData.append("alt_text", altText);
-      return apiFetch<{ data: MediaItem }>("/api/v1/admin/media/upload", {
-        method: "POST",
-        body: formData as unknown as BodyInit,
-      });
-    },
+    mutationFn: (file: File) => dbUploadMedia(file, altText || undefined),
     onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ["admin-media-picker"] });
       queryClient.invalidateQueries({ queryKey: ["admin-media"] });

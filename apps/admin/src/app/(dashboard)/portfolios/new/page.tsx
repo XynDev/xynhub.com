@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { apiFetch } from "@/lib/api";
+import { dbCreatePortfolio } from "@/lib/db";
 import { toast } from "sonner";
 import { Save, Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 import { MediaPicker } from "@/components/ui/media-picker";
@@ -39,8 +39,7 @@ export default function NewPortfolioPage() {
   });
 
   const mutation = useMutation({
-    mutationFn: (data: AnyData) =>
-      apiFetch("/api/v1/admin/portfolios", { method: "POST", body: JSON.stringify(data) }),
+    mutationFn: (data: AnyData) => dbCreatePortfolio(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-portfolios"] });
       toast.success("Created");

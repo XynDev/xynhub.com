@@ -1,14 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList } from "@/lib/db";
 import { CrudList } from "@/components/forms/crud-list";
 import type { Testimonial } from "@xynhub/shared";
 
 export default function TestimonialsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-testimonials"],
-    queryFn: () => apiFetch<{ data: Testimonial[] }>("/api/v1/admin/testimonials"),
+    queryFn: () => dbList<Testimonial>("testimonials"),
   });
 
   return (
@@ -16,7 +16,7 @@ export default function TestimonialsPage() {
       title="Testimonials"
       description="Manage client testimonials displayed on the home page"
       queryKey="admin-testimonials"
-      apiPath="/api/v1/admin/testimonials"
+      table="testimonials"
       items={data?.data || []}
       isLoading={isLoading}
       columns={[

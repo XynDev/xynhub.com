@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbCreate, dbUpdate, dbDelete } from "@/lib/db";
 import { Pencil, Trash2, Plus, GripVertical } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
@@ -14,7 +14,7 @@ interface CrudListProps<T extends { id: string }> {
   title: string;
   description: string;
   queryKey: string;
-  apiPath: string;
+  table: string;
   items: T[];
   isLoading: boolean;
   columns: { key: keyof T | string; label: string; render?: (item: T) => React.ReactNode }[];
@@ -33,7 +33,7 @@ export function CrudList<T extends { id: string }>({
   title,
   description,
   queryKey,
-  apiPath,
+  table,
   items,
   isLoading,
   columns,
@@ -46,8 +46,7 @@ export function CrudList<T extends { id: string }>({
   const [form, setForm] = useState<Record<string, unknown>>(defaultValues);
 
   const createMutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) =>
-      apiFetch(apiPath, { method: "POST", body: JSON.stringify(data) }),
+    mutationFn: (data: Record<string, unknown>) => dbCreate(table, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKey] });
       toast.success("Created");
@@ -58,7 +57,7 @@ export function CrudList<T extends { id: string }>({
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Record<string, unknown> }) =>
-      apiFetch(`${apiPath}/${id}`, { method: "PUT", body: JSON.stringify(data) }),
+      dbUpdate(table, id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKey] });
       toast.success("Updated");
@@ -68,8 +67,7 @@ export function CrudList<T extends { id: string }>({
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) =>
-      apiFetch(`${apiPath}/${id}`, { method: "DELETE" }),
+    mutationFn: (id: string) => dbDelete(table, id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [queryKey] });
       toast.success("Deleted");

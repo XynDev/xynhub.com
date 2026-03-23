@@ -1,14 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList } from "@/lib/db";
 import { CrudList } from "@/components/forms/crud-list";
 import type { FAQ } from "@xynhub/shared";
 
 export default function FAQsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-faqs"],
-    queryFn: () => apiFetch<{ data: FAQ[] }>("/api/v1/admin/faqs"),
+    queryFn: () => dbList<FAQ>("faqs"),
   });
 
   return (
@@ -16,7 +16,7 @@ export default function FAQsPage() {
       title="FAQs"
       description="Manage frequently asked questions displayed on the home page"
       queryKey="admin-faqs"
-      apiPath="/api/v1/admin/faqs"
+      table="faqs"
       items={data?.data || []}
       isLoading={isLoading}
       columns={[

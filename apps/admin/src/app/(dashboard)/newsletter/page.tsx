@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList, dbDelete } from "@/lib/db";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 
@@ -17,12 +17,11 @@ export default function NewsletterPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-newsletter"],
-    queryFn: () => apiFetch<{ data: Subscriber[] }>("/api/v1/admin/newsletter"),
+    queryFn: () => dbList<Subscriber>("newsletter_subscribers"),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) =>
-      apiFetch(`/api/v1/admin/newsletter/${id}`, { method: "DELETE" }),
+    mutationFn: (id: string) => dbDelete("newsletter_subscribers", id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-newsletter"] });
       toast.success("Subscriber removed");

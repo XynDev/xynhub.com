@@ -1,23 +1,23 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList } from "@/lib/db";
 import { FileText, BookOpen, Briefcase, Image } from "lucide-react";
 
 export default function DashboardPage() {
   const { data: blogs } = useQuery({
     queryKey: ["admin-blogs"],
-    queryFn: () => apiFetch<{ data: unknown[]; pagination: { total: number } }>("/api/v1/admin/blogs?per_page=1"),
+    queryFn: () => dbList("blogs", { limit: 1 }),
   });
 
   const { data: portfolios } = useQuery({
     queryKey: ["admin-portfolios"],
-    queryFn: () => apiFetch<{ data: unknown[] }>("/api/v1/admin/portfolios"),
+    queryFn: () => dbList("portfolios"),
   });
 
   const { data: media } = useQuery({
     queryKey: ["admin-media"],
-    queryFn: () => apiFetch<{ pagination: { total: number } }>("/api/v1/admin/media?per_page=1"),
+    queryFn: () => dbList("media", { limit: 1 }),
   });
 
   const stats = [

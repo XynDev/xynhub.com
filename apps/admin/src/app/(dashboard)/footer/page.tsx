@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList, dbCreate, dbUpdate } from "@/lib/db";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Save, Plus, Trash2 } from "lucide-react";
@@ -51,7 +51,7 @@ export default function FooterPage() {
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["admin-footer"],
-    queryFn: () => apiFetch<{ data: FooterSection[] }>("/api/v1/admin/footer"),
+    queryFn: () => dbList<FooterSection>("footer_sections", { orderBy: "sort_order" }),
   });
 
   const [editing, setEditing] = useState<string | null>(null);
@@ -59,7 +59,7 @@ export default function FooterPage() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, body }: { id: string; body: Record<string, unknown> }) =>
-      apiFetch(`/api/v1/admin/footer/${id}`, { method: "PUT", body: JSON.stringify(body) }),
+      dbUpdate("footer_sections", id, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-footer"] });
       setEditing(null);
@@ -70,7 +70,7 @@ export default function FooterPage() {
 
   const createMutation = useMutation({
     mutationFn: (body: Record<string, unknown>) =>
-      apiFetch("/api/v1/admin/footer", { method: "POST", body: JSON.stringify(body) }),
+      dbCreate("footer_sections", body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-footer"] });
       toast.success("Section created");

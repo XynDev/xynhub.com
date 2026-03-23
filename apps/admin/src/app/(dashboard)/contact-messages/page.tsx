@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiFetch } from "@/lib/api";
+import { dbList, dbUpdate, dbDelete } from "@/lib/db";
 import { toast } from "sonner";
 import { Trash2, Mail, MailOpen } from "lucide-react";
 
@@ -19,23 +19,19 @@ export default function ContactMessagesPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-contact-messages"],
-    queryFn: () => apiFetch<{ data: ContactMessage[] }>("/api/v1/admin/contact-messages"),
+    queryFn: () => dbList<ContactMessage>("contact_messages", { orderBy: "created_at", ascending: false }),
   });
 
   const markReadMutation = useMutation({
     mutationFn: ({ id, is_read }: { id: string; is_read: boolean }) =>
-      apiFetch(`/api/v1/admin/contact-messages/${id}`, {
-        method: "PUT",
-        body: JSON.stringify({ is_read }),
-      }),
+      dbUpdate("contact_messages", id, { is_read }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-contact-messages"] });
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) =>
-      apiFetch(`/api/v1/admin/contact-messages/${id}`, { method: "DELETE" }),
+    mutationFn: (id: string) => dbDelete("contact_messages", id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-contact-messages"] });
       toast.success("Deleted");
