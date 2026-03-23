@@ -40,12 +40,13 @@ export function HomeTrust({ data, onChange }: Props) {
         onChange={(items) => onChange({ ...data, logos: items })}
         fields={[
           { key: "name", label: "Company Name", placeholder: "Acme Corp" },
-          { key: "logo", label: "Logo Image", type: "media", colSpan: 2 },
+          { key: "logo", label: "Logo (Light Mode)", type: "media" },
+          { key: "logo_dark", label: "Logo (Dark Mode)", type: "media" },
         ]}
-        defaultItem={{ name: "", logo: "" }}
+        defaultItem={{ name: "", logo: "", logo_dark: "" }}
         renderMediaPicker={(val, onChangeVal) => <MediaPicker value={val} onChange={onChangeVal} />}
       />
-      <p className="text-xs text-[var(--muted-foreground)]">Upload company logos. They will be displayed in an infinite horizontal scroll animation on the landing page.</p>
+      <p className="text-xs text-[var(--muted-foreground)]">Upload company logos for light &amp; dark mode. They will be displayed in an infinite horizontal scroll animation on the landing page. If only one variant is uploaded, it will be used for both modes with an automatic CSS invert filter.</p>
     </div>
   );
 }

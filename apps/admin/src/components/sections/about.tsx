@@ -1,6 +1,7 @@
 "use client";
 
 import { TextField, TextAreaField } from "@/components/ui/form-field";
+import { MediaPicker } from "@/components/ui/media-picker";
 import { ArrayField } from "@/components/ui/array-field";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -33,10 +34,13 @@ export function AboutTimeline({ data, onChange }: Props) {
         onChange={(milestones) => onChange({ ...data, milestones })}
         fields={[
           { key: "id", label: "Number", placeholder: "01" },
-          { key: "title", label: "Title", placeholder: "Initial Convergence" },
+          { key: "label", label: "Label (e.g. EST. 2021)", placeholder: "EST. 2021" },
+          { key: "title", label: "Title", placeholder: "The Founding" },
           { key: "description", label: "Description", type: "textarea", colSpan: 2 },
+          { key: "image", label: "Image", type: "media", colSpan: 2 },
         ]}
-        defaultItem={{ id: "", title: "", description: "" }}
+        defaultItem={{ id: "", label: "", title: "", description: "", image: "" }}
+        renderMediaPicker={(val, onChangeVal) => <MediaPicker value={val} onChange={onChangeVal} />}
       />
     </div>
   );
@@ -83,13 +87,12 @@ export function AboutCulture({ data, onChange }: Props) {
         onChange={(items) => onChange({ ...data, items })}
         fields={[
           { key: "title", label: "Title", placeholder: "Deep Focus Intervals" },
-          { key: "span", label: "Grid Span (CSS)", placeholder: "md:col-span-4" },
           { key: "description", label: "Description", type: "textarea", colSpan: 2 },
-          { key: "bg", label: "BG Class (optional)", placeholder: "bg-surface-container-low" },
           { key: "iconbg", label: "Icon Code (optional)", placeholder: "code" },
         ]}
-        defaultItem={{ id: "", title: "", description: "", span: "md:col-span-4", bg: "", iconbg: "" }}
+        defaultItem={{ id: "", title: "", description: "", iconbg: "" }}
       />
+      <p className="text-xs text-[var(--muted-foreground)]">Items auto-layout in a bento grid. No manual CSS span needed.</p>
     </div>
   );
 }
@@ -104,7 +107,7 @@ export function AboutLeadership({ data, onChange }: Props) {
       <TextField label="Title" value={data.title ?? ""} onChange={(v) => set("title", v)} placeholder="Core Leadership" />
       <TextField label="Label" value={data.label ?? ""} onChange={(v) => set("label", v)} placeholder="XYN / NODES" />
       <p className="text-xs text-[var(--muted-foreground)]">
-        Team members are managed in the Team Members section. This only controls the section header.
+        Team members are managed in the <a href="/team" className="underline font-medium">Team Members</a> section. This only controls the section header.
       </p>
     </div>
   );
@@ -120,6 +123,7 @@ export function AboutCta({ data, onChange }: Props) {
       <TextField label="Headline" value={data.headline ?? ""} onChange={(v) => set("headline", v)} placeholder="Join the Synaptic Revolution." />
       <TextAreaField label="Description" value={data.description ?? ""} onChange={(v) => set("description", v)} rows={3} />
       <TextField label="Button Text" value={data.buttonText ?? ""} onChange={(v) => set("buttonText", v)} placeholder="View Positions" />
+      <TextField label="Button URL" value={data.buttonUrl ?? ""} onChange={(v) => set("buttonUrl", v)} placeholder="/services or https://wa.me/..." />
     </div>
   );
 }
@@ -146,9 +150,10 @@ export function AboutContact({ data, onChange }: Props) {
       </fieldset>
 
       <fieldset className="border border-[var(--border)] rounded-lg p-4 space-y-3">
-        <legend className="text-xs font-semibold px-2">Map Info</legend>
+        <legend className="text-xs font-semibold px-2">Map Card</legend>
         <TextField label="Label" value={data.map?.label ?? ""} onChange={(v) => setNested("map", "label", v)} />
         <TextField label="Text" value={data.map?.text ?? ""} onChange={(v) => setNested("map", "text", v)} />
+        <TextField label="Maps URL" value={data.map?.url ?? ""} onChange={(v) => setNested("map", "url", v)} placeholder="https://maps.google.com/..." />
       </fieldset>
 
       <ArrayField
@@ -158,8 +163,9 @@ export function AboutContact({ data, onChange }: Props) {
         fields={[
           { key: "icon", label: "Material Icon", placeholder: "alternate_email" },
           { key: "text", label: "Text / Value", placeholder: "protocols@xyn.eth" },
+          { key: "url", label: "URL (optional)", placeholder: "mailto:... or https://..." },
         ]}
-        defaultItem={{ id: "", icon: "", text: "" }}
+        defaultItem={{ id: "", icon: "", text: "", url: "" }}
       />
     </div>
   );

@@ -8,12 +8,14 @@ import { Button } from "../components/ui/Button"
 import { Badge } from "../components/ui/Badge"
 import { SEO } from "../components/SEO"
 import { useAntiSpam } from "../components/ui/Turnstile"
+import { useTheme } from "../components/ThemeProvider"
 import { getPageContent, getTestimonials, getFaqs, getServices, getPortfolios } from "../lib/api"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
 
 export function Home() {
+  const { theme } = useTheme()
   const [pageData, setPageData] = useState<AnyData | null>(null)
   const [testimonials, setTestimonials] = useState<AnyData[]>([])
   const [faqs, setFaqs] = useState<AnyData[]>([])
@@ -132,15 +134,27 @@ export function Home() {
             )
             if (normalized.length === 0) return null
             // Render one set for layout, then duplicate the entire set for seamless looping
-            const renderItem = (item: AnyData, idx: number) => (
-              <div key={idx} className="flex-shrink-0 flex items-center justify-center h-12 opacity-40 grayscale hover:opacity-70 hover:grayscale-0 transition-all">
-                {item.logo ? (
-                  <img src={item.logo} alt={item.name || ""} className="h-10 w-auto max-w-[140px] object-contain" />
-                ) : (
-                  <div className="text-2xl font-black tracking-tighter text-primary whitespace-nowrap">{item.name}</div>
-                )}
-              </div>
-            )
+            const renderItem = (item: AnyData, idx: number) => {
+              const isDark = theme === "dark"
+              // Pick logo variant: prefer theme-specific, fallback to single logo
+              const logoSrc = isDark
+                ? (item.logo_dark || item.logo)
+                : (item.logo || item.logo_dark)
+              // If only one variant exists and it's the wrong mode, apply invert filter
+              const needsInvert = logoSrc && (
+                (isDark && !item.logo_dark && item.logo) ||
+                (!isDark && !item.logo && item.logo_dark)
+              )
+              return (
+                <div key={idx} className="flex-shrink-0 flex items-center justify-center h-12 opacity-40 grayscale hover:opacity-70 hover:grayscale-0 transition-all">
+                  {logoSrc ? (
+                    <img src={logoSrc} alt={item.name || ""} className={cn("h-10 w-auto max-w-[140px] object-contain", needsInvert && "invert")} />
+                  ) : (
+                    <div className="text-2xl font-black tracking-tighter text-primary whitespace-nowrap">{item.name}</div>
+                  )}
+                </div>
+              )
+            }
             return (
               <div className="overflow-hidden relative logo-scroll-mask">
                 <div className="flex gap-16 animate-scroll-x w-max">

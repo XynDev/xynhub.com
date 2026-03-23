@@ -145,6 +145,7 @@ export interface TeamMember extends SortableEntity {
   role: string;
   group_name: string;
   image_url: string | null;
+  social_links: { url: string }[];
   is_active: boolean;
 }
 

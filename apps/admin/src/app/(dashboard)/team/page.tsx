@@ -30,10 +30,11 @@ export default function TeamPage() {
         { key: "role", label: "Job Title", required: true, placeholder: "Chief Architect" },
         { key: "group_name", label: "Team Group", required: true, placeholder: "Systems Architects" },
         { key: "image_url", label: "Photo", type: "media" },
+        { key: "social_links", label: "Social Links (JSON)", type: "json", placeholder: '[{"url":"https://linkedin.com/in/..."},{"url":"https://github.com/..."}]' },
         { key: "sort_order", label: "Sort Order", type: "number" },
         { key: "is_active", label: "Active", type: "checkbox" },
       ]}
-      defaultValues={{ name: "", role: "", group_name: "Systems Architects", image_url: "", sort_order: 0, is_active: true }}
+      defaultValues={{ name: "", role: "", group_name: "Systems Architects", image_url: "", social_links: [], sort_order: 0, is_active: true }}
     />
   );
 }
