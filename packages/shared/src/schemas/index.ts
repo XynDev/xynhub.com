@@ -75,7 +75,7 @@ export const serviceSchema = z.object({
   description: z.string().min(1),
   short_description: z.string().default(""),
   icon: z.string().max(100).nullable().default(null),
-  image_url: z.string().nullable().default(null),
+  image_url: z.string().url().nullable().default(null),
   number: z.string().max(20).nullable().default(null),
   metrics: z.record(z.unknown()).default({}),
   tooling: z.array(z.record(z.unknown())).default([]),

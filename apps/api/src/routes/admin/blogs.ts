@@ -1,13 +1,15 @@
 import { Hono } from "hono";
 import { supabaseAdmin } from "../../lib/supabase.js";
-import { blogSchema } from "@xynhub/shared";
+import { blogSchema, paginationSchema } from "@xynhub/shared";
 
 const app = new Hono();
 
 // GET /api/v1/admin/blogs - List all (including inactive)
 app.get("/", async (c) => {
-  const page = parseInt(c.req.query("page") || "1");
-  const perPage = parseInt(c.req.query("per_page") || "20");
+  const { page, per_page: perPage } = paginationSchema.parse({
+    page: c.req.query("page"),
+    per_page: c.req.query("per_page"),
+  });
   const offset = (page - 1) * perPage;
 
   const { data, error, count } = await supabaseAdmin

@@ -1,12 +1,15 @@
 import { Hono } from "hono";
 import { supabasePublic } from "../../lib/supabase.js";
+import { paginationSchema } from "@xynhub/shared";
 
 const app = new Hono();
 
 // GET /api/v1/blogs - List blogs with pagination & filters
 app.get("/", async (c) => {
-  const page = parseInt(c.req.query("page") || "1");
-  const perPage = parseInt(c.req.query("per_page") || "20");
+  const { page, per_page: perPage } = paginationSchema.parse({
+    page: c.req.query("page"),
+    per_page: c.req.query("per_page"),
+  });
   const category = c.req.query("category");
   const featured = c.req.query("featured");
   const offset = (page - 1) * perPage;

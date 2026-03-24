@@ -1,13 +1,27 @@
 import { Hono } from "hono";
 import { supabaseAdmin } from "../../lib/supabase.js";
+import { paginationSchema } from "@xynhub/shared";
 import type { AppEnv } from "../../types.js";
+
+const ALLOWED_MEDIA_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/svg+xml",
+  "image/gif",
+  "application/pdf",
+];
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 const app = new Hono<AppEnv>();
 
 // GET /api/v1/admin/media - List all media
 app.get("/", async (c) => {
-  const page = parseInt(c.req.query("page") || "1");
-  const perPage = parseInt(c.req.query("per_page") || "20");
+  const { page, per_page: perPage } = paginationSchema.parse({
+    page: c.req.query("page"),
+    per_page: c.req.query("per_page"),
+  });
   const offset = (page - 1) * perPage;
 
   const { data, error, count } = await supabaseAdmin
@@ -39,6 +53,17 @@ app.post("/upload", async (c) => {
 
   if (!file) {
     return c.json({ success: false, error: "No file provided" }, 400);
+  }
+
+  if (file.size > MAX_FILE_SIZE) {
+    return c.json({ success: false, error: "File too large. Maximum size is 10MB." }, 400);
+  }
+
+  if (!ALLOWED_MEDIA_TYPES.includes(file.type)) {
+    return c.json({
+      success: false,
+      error: `Invalid file type: ${file.type}. Allowed: ${ALLOWED_MEDIA_TYPES.join(", ")}`,
+    }, 400);
   }
 
   const fileExt = file.name.split(".").pop();
@@ -99,10 +124,13 @@ app.post("/cleanup", async (c) => {
     .single();
 
   if (media) {
-    // Remove from storage
-    await supabaseAdmin.storage.from("media").remove([media.file_path]);
+    // Remove from storage (log errors but don't fail)
+    const { error: storageErr } = await supabaseAdmin.storage.from("media").remove([media.file_path]);
+    if (storageErr) console.error("[Media cleanup] Storage error:", storageErr.message);
+
     // Remove from database
-    await supabaseAdmin.from("media").delete().eq("id", media.id);
+    const { error: dbErr } = await supabaseAdmin.from("media").delete().eq("id", media.id);
+    if (dbErr) console.error("[Media cleanup] DB error:", dbErr.message);
   }
 
   return c.json({ success: true, message: "Cleaned up" });

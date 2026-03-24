@@ -236,6 +236,8 @@ export async function dbDeleteSetting(key: string): Promise<void> {
 
 // ─── Media (Storage + table) ──────────────────────────────
 
+const MAX_UPLOAD_SIZE = 10 * 1024 * 1024; // 10MB — matches Supabase bucket limit
+
 export async function dbUploadMedia(
   file: File,
   altText?: string
@@ -249,6 +251,10 @@ export async function dbUploadMedia(
     alt_text: string | null;
   };
 }> {
+  if (file.size > MAX_UPLOAD_SIZE) {
+    throw new Error("File too large. Maximum size is 10MB.");
+  }
+
   const supabase = createClient();
 
   const ext = file.name.split(".").pop() || "bin";

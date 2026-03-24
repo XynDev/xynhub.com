@@ -4,7 +4,8 @@ import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
 
 export function errorHandler(err: Error, c: Context) {
-  console.error(`[API Error] ${err.message}`, err.stack);
+  const requestId = c.req.header("x-request-id") || crypto.randomUUID();
+  console.error(`[API Error] [${requestId}] ${err.message}`, err.stack);
 
   if (err instanceof HTTPException) {
     return c.json(
@@ -27,5 +28,6 @@ export function errorHandler(err: Error, c: Context) {
     );
   }
 
+  // Don't leak internal error details to client
   return c.json({ success: false, error: "Internal server error" }, 500 as ContentfulStatusCode);
 }
