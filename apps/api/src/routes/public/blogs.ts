@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { supabasePublic } from "../../lib/supabase.js";
+import { dbError } from "../../lib/errors.js";
 import { paginationSchema } from "@xynhub/shared";
 
 const app = new Hono();
@@ -35,7 +36,7 @@ app.get("/", async (c) => {
   const { data, error, count } = await query;
 
   if (error) {
-    return c.json({ success: false, error: error.message }, 500);
+    return dbError(c, error, "Failed to load blogs");
   }
 
   return c.json({

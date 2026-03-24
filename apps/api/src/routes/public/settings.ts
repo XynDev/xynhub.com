@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { supabasePublic } from "../../lib/supabase.js";
+import { dbError } from "../../lib/errors.js";
 
 const app = new Hono();
 
@@ -9,7 +10,7 @@ app.get("/", async (c) => {
     .select("key, value");
 
   if (error) {
-    return c.json({ success: false, error: error.message }, 500);
+    return dbError(c, error, "Failed to load settings");
   }
 
   const result: Record<string, unknown> = {};

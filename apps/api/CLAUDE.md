@@ -183,7 +183,7 @@ PORT=3000
 - Route files import `supabaseAdmin` or `supabasePublic` directly from `lib/supabase.ts`
 - Zod schemas imported from `@xynhub/shared` for input validation
 - Error responses always have `{ success: false, error: "message" }`
-- DB errors are currently returned as-is — consider masking in production
+- DB errors are masked via `dbError()` helper — logs real error server-side, returns generic message to client
 - OpenAPI spec is manually maintained in `app.ts` (not auto-generated from routes)
 - `@hono/zod-openapi` is installed but not used for route definitions
 

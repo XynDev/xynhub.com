@@ -7,6 +7,7 @@ import { SEO } from "../components/SEO"
 import { getPortfolioBySlug } from "../lib/api"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import rehypeSanitize from "rehype-sanitize"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
@@ -109,7 +110,7 @@ export function PortofolioDetail() {
               prose-pre:bg-surface-container prose-pre:border prose-pre:border-outline-variant/30
               prose-img:rounded-xl prose-strong:text-primary prose-li:text-on-surface-variant
             ">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
                 {detail.narrative.body}
               </ReactMarkdown>
             </article>

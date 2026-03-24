@@ -20,6 +20,7 @@ import {
   Mail,
   Newspaper,
 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase";
 import { useAuthStore } from "@/stores/auth";
@@ -46,10 +47,12 @@ export function Sidebar() {
   const pathname = usePathname();
   const { user } = useAuthStore();
   const { sidebarOpen, toggleSidebar } = useUIStore();
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
+    queryClient.clear();
   };
 
   return (

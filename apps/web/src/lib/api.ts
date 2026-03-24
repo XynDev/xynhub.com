@@ -21,17 +21,27 @@ type AnyData = Record<string, any>
 
 const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_TTL = 60 * 1000; // 1 minute
+const CACHE_MAX_SIZE = 100; // Prevent unbounded memory growth
 
-async function fetchApi<T>(endpoint: string): Promise<T> {
+function cacheSet(key: string, data: unknown) {
+  // Evict oldest entries if cache is full
+  if (cache.size >= CACHE_MAX_SIZE) {
+    const oldest = cache.keys().next().value;
+    if (oldest !== undefined) cache.delete(oldest);
+  }
+  cache.set(key, { data, timestamp: Date.now() });
+}
+
+async function fetchApi<T>(endpoint: string, signal?: AbortSignal): Promise<T> {
   const cached = cache.get(endpoint);
   if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
     return cached.data as T;
   }
 
-  const res = await fetch(`${API_URL}${endpoint}`);
+  const res = await fetch(`${API_URL}${endpoint}`, { signal });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   const json = await res.json();
-  cache.set(endpoint, { data: json, timestamp: Date.now() });
+  cacheSet(endpoint, json);
   return json;
 }
 

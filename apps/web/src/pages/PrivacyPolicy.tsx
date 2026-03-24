@@ -3,6 +3,7 @@ import { SEO } from "../components/SEO"
 import { getPageContent } from "../lib/api"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import rehypeSanitize from "rehype-sanitize"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyData = Record<string, any>
@@ -41,7 +42,7 @@ export function PrivacyPolicy() {
       <SEO title={title} />
       <div className="bento-card rounded-xl p-8 md:p-16">
         <div className="prose prose-invert max-w-none prose-headings:text-primary prose-p:text-on-surface-variant prose-a:text-primary prose-strong:text-primary prose-li:text-on-surface-variant">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>{body}</ReactMarkdown>
         </div>
       </div>
     </main>

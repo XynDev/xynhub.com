@@ -1,6 +1,13 @@
 # CLAUDE.md - XYNHub Monorepo Reference
 
 > Complete project reference for AI assistants. Read this instead of re-analyzing the codebase.
+>
+> **Per-app details:** Each app/package has its own `CLAUDE.md` with architecture, endpoints, gotchas, and conventions:
+> - [`apps/api/CLAUDE.md`](apps/api/CLAUDE.md) — Hono.js REST API (middleware, auth, 60+ endpoints, build/deploy)
+> - [`apps/web/CLAUDE.md`](apps/web/CLAUDE.md) — React SPA landing site (routes, data fetching, design system)
+> - [`apps/admin/CLAUDE.md`](apps/admin/CLAUDE.md) — Next.js CMS admin (auth flow, components, state management)
+> - [`packages/shared/CLAUDE.md`](packages/shared/CLAUDE.md) — Shared types, Zod schemas, constants
+> - [`packages/supabase/CLAUDE.md`](packages/supabase/CLAUDE.md) — Database schema, migrations, RLS, storage
 
 ---
 

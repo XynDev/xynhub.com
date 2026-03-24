@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { supabasePublic } from "../../lib/supabase.js";
+import { dbError } from "../../lib/errors.js";
 
 const app = new Hono();
 
@@ -14,7 +15,7 @@ app.get("/:slug", async (c) => {
     .order("sort_order", { ascending: true });
 
   if (error) {
-    return c.json({ success: false, error: error.message }, 500);
+    return dbError(c, error, "Failed to load page content");
   }
 
   // Transform to a flat object keyed by section_key

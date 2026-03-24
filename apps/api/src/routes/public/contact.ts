@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { supabasePublic } from "../../lib/supabase.js";
+import { dbError } from "../../lib/errors.js";
 import { contactMessageSchema } from "@xynhub/shared";
 
 const app = new Hono();
@@ -13,7 +14,7 @@ app.post("/", async (c) => {
     .from("contact_messages")
     .insert(parsed);
 
-  if (error) return c.json({ success: false, error: error.message }, 500);
+  if (error) return dbError(c, error, "Failed to submit contact message");
   return c.json({ success: true, message: "Message sent successfully" }, 201);
 });
 

@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { supabasePublic } from "../../lib/supabase.js";
+import { dbError } from "../../lib/errors.js";
 import { newsletterSubscribeSchema } from "@xynhub/shared";
 
 const app = new Hono();
@@ -16,7 +17,7 @@ app.post("/subscribe", async (c) => {
       { onConflict: "email" }
     );
 
-  if (error) return c.json({ success: false, error: error.message }, 500);
+  if (error) return dbError(c, error, "Failed to subscribe");
   return c.json({ success: true, message: "Subscribed successfully" }, 201);
 });
 
